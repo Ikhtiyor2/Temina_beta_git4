@@ -1,0 +1,22 @@
+{
+  "name": "TeminaFit",
+  "short_name": "TeminaFit",
+  "description": "Фитнес с ИИ и геймификацией. Тренировки с распознаванием поз, квесты, статистика.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0D0D10",
+  "theme_color": "#0f0b1e",
+  "lang": "ru",
+  "categories": ["fitness", "health", "sports"],
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": []
+}

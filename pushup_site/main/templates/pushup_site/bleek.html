@@ -1,0 +1,213 @@
+{% extends "main/base.html" %}
+{% block title %}Навыки{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🎯 Навыки персонажа</h1>
+    
+    <div class="alert alert-info">
+        <strong>Доступно очков навыков:</strong> <span id="skill-points">{{ player.skill_points }}</span>
+        <p class="mb-0 mt-1">Очки навыков даются при повышении уровня. Улучшайте навыки для лучших результатов!</p>
+    </div>
+    
+    <div class="row">
+        <!-- Карточка Силы -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card skill-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="skill-icon" style="font-size: 2em;">💪</div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0">Сила</h5>
+                            <p class="skill-level mb-0">Уровень: <span class="badge bg-primary">{{ player.strength }}</span></p>
+                        </div>
+                    </div>
+                    <p class="card-text">Увеличивает максимальное количество повторений в одном подходе.</p>
+                    {% if player.skill_points > 0 %}
+                    <button class="btn btn-success w-100 upgrade-btn" data-skill="strength">
+                        Улучшить (+1)
+                    </button>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        Нет очков навыков
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Карточка Выносливости -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card skill-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="skill-icon" style="font-size: 2em;">🏃</div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0">Выносливость</h5>
+                            <p class="skill-level mb-0">Уровень: <span class="badge bg-primary">{{ player.stamina }}</span></p>
+                        </div>
+                    </div>
+                    <p class="card-text">Позволяет выполнять больше подходов за одну тренировку.</p>
+                    {% if player.skill_points > 0 %}
+                    <button class="btn btn-success w-100 upgrade-btn" data-skill="stamina">
+                        Улучшить (+1)
+                    </button>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        Нет очков навыков
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Карточка Ловкости -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card skill-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="skill-icon" style="font-size: 2em;">🤸</div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0">Ловкость</h5>
+                            <p class="skill-level mb-0">Уровень: <span class="badge bg-primary">{{ player.agility }}</span></p>
+                        </div>
+                    </div>
+                    <p class="card-text">Улучшает качество выполнения упражнений и снижает усталость.</p>
+                    {% if player.skill_points > 0 %}
+                    <button class="btn btn-success w-100 upgrade-btn" data-skill="agility">
+                        Улучшить (+1)
+                    </button>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        Нет очков навыков
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Карточка Техники -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card skill-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="skill-icon" style="font-size: 2em;">🎯</div>
+                        <div class="ms-3">
+                            <h5 class="card-title mb-0">Техника</h5>
+                            <p class="skill-level mb-0">Уровень: <span class="badge bg-primary">{{ player.technique }}</span></p>
+                        </div>
+                    </div>
+                    <p class="card-text">Повышает точность распознавания позы и качество выполнения.</p>
+                    {% if player.skill_points > 0 %}
+                    <button class="btn btn-success w-100 upgrade-btn" data-skill="technique">
+                        Улучшить (+1)
+                    </button>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        Нет очков навыков
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Как получить очки навыков?</h5>
+            <ul>
+                <li>🔺 <strong>Повышение уровня</strong> - каждое повышение уровня дает +1 очко навыков</li>
+                <li>🏆 <strong>Завершение квестов</strong> - некоторые квесты награждают очками навыков</li>
+                <li>🔥 <strong>Установка рекордов</strong> - новые личные рекорды могут приносить бонусы</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Получаем CSRF токен
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Обработка нажатия на кнопки улучшения
+document.querySelectorAll('.upgrade-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const skill = this.dataset.skill;
+        const skillName = {
+            'strength': 'Силу',
+            'stamina': 'Выносливость', 
+            'agility': 'Ловкость',
+            'technique': 'Технику'
+        }[skill];
+        
+        if (!confirm(`Вы уверены, что хотите улучшить ${skillName}?`)) {
+            return;
+        }
+        
+        fetch('/api/player/upgrade-skill/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ skill: skill })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ Навык "${skillName}" успешно улучшен!`);
+                location.reload(); // Перезагружаем страницу
+            } else {
+                alert(`❌ Ошибка: ${data.error || 'Не удалось улучшить навык'}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Ошибка сети');
+        });
+    });
+});
+</script>
+
+<style>
+.skill-card {
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    border-color: #007bff;
+}
+
+.skill-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.upgrade-btn {
+    transition: all 0.2s;
+}
+
+.upgrade-btn:hover {
+    transform: scale(1.05);
+}
+</style>
+{% endblock %}

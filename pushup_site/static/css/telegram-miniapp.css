@@ -1,0 +1,308 @@
+/* Phone layout for Telegram Mini App. Browser styles stay untouched. */
+
+html.is-tma body::before {
+  animation: none;
+  opacity: 0.45;
+}
+
+html.is-tma main,
+html.is-tma .app.layout-sidebar main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 10px 12px calc(88px + env(safe-area-inset-bottom));
+}
+
+html.is-tma.is-tma-focus main,
+html.is-tma.is-tma-focus .app.layout-sidebar main {
+  padding: 8px 8px calc(12px + env(safe-area-inset-bottom));
+}
+
+/* Titles read as an app screen, not a landing page. */
+html.is-tma :is(
+  h1,
+  .dash-brand,
+  .dash-hero-title,
+  .workouts-title,
+  .profile-title,
+  .quests-title,
+  .stats-title,
+  .leaderboard-hero h1,
+  .text-gradient,
+  .text-gradient-glow
+) {
+  font-size: 1.375rem !important;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--txt) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--txt) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+html.is-tma :is(
+  .dash-tagline,
+  .dash-hero-desc,
+  .workouts-sub,
+  .profile-sub,
+  .leaderboard-hero p
+) {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 14px;
+  max-width: none;
+}
+
+/* Drop marketing banners. */
+html.is-tma :is(
+  .workouts-hero,
+  .ds-hero,
+  .quests-hero,
+  .stats-hero,
+  .leaderboard-hero
+) {
+  margin: 0 0 14px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+html.is-tma :is(
+  .workouts-hero::before,
+  .workouts-hero::after,
+  .ds-hero::before,
+  .quests-hero::before,
+  .quests-hero::after,
+  .stats-hero::before,
+  .stats-hero::after
+) {
+  display: none;
+}
+
+html.is-tma :is(.workouts-hero-badge, .workouts-section-title::after) {
+  display: none;
+}
+
+html.is-tma .workouts-section-title {
+  margin: 18px 0 10px;
+  letter-spacing: 0.04em;
+}
+
+/* One column, except metric pairs. */
+html.is-tma :is(
+  .dash-two-col,
+  .dash-split,
+  .dash-ch-grid,
+  .profile-two,
+  .workouts-grid,
+  .quests-grid,
+  .quests-rewards-grid,
+  .ds-grid-2,
+  .ds-grid-3,
+  .ds-grid-4,
+  .features-grid,
+  .problem-cards,
+  .scenario-cards,
+  .detail-grid
+) {
+  grid-template-columns: 1fr !important;
+  gap: 10px;
+}
+
+html.is-tma :is(.dash-kpis, .dash-stats-row, .player-bar, .stats-grid) {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px;
+}
+
+html.is-tma :is(.stat-card, .quest-card) {
+  grid-column: 1 / -1 !important;
+}
+
+html.is-tma .stats-grid .stat-card {
+  grid-column: auto !important;
+}
+
+html.is-tma .ach-grid {
+  grid-template-columns: 1fr 1fr !important;
+}
+
+html.is-tma .ach-card {
+  grid-column: auto !important;
+}
+
+html.is-tma .panel {
+  grid-column: 1 / -1 !important;
+}
+
+html.is-tma :is(
+  .ds-card,
+  .dash-stat-card,
+  .dash-kpi,
+  .dash-work,
+  .dash-ch-item,
+  .dash-week-card,
+  .dash-streak,
+  .stat-card,
+  .quest-card,
+  .pstat,
+  .profile-skill-box
+) {
+  border-radius: 16px;
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+
+html.is-tma :is(.dash-stat-card, .dash-kpi, .stat-card, .pstat) {
+  padding: 12px;
+}
+
+html.is-tma .dash-stat-ico,
+html.is-tma .dash-kpi-ico {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+html.is-tma .dash-stat-val,
+html.is-tma .dash-kpi-val {
+  font-size: 1.2rem;
+}
+
+html.is-tma :is(
+  .dash-work:hover,
+  .dash-stat-card:hover,
+  .dash-ch-item:hover,
+  .dash-quick-item:hover,
+  .profile-skill-item:hover,
+  .ds-btn-primary:hover
+) {
+  transform: none;
+  box-shadow: none;
+}
+
+html.is-tma :is(.dash-quick-item, .dash-recent-item, .dash-hist-item, .profile-skill-item, .leaderboard-item) {
+  border-radius: 14px;
+  min-height: 52px;
+}
+
+html.is-tma .dash-quick-item {
+  padding: 12px 14px;
+}
+
+html.is-tma .dash-work-top {
+  height: 56px;
+}
+
+html.is-tma .dash-sec {
+  margin-top: 18px;
+}
+
+html.is-tma :is(.workouts-page, .profile-page, .leaderboard-page) {
+  max-width: none;
+  padding-bottom: 8px;
+}
+
+html.is-tma .profile-two {
+  gap: 12px;
+}
+
+html.is-tma .profile-skill-item {
+  padding: 12px;
+}
+
+html.is-tma .profile-skill-btn {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+}
+
+html.is-tma :is(.ds-btn, .ds-btn-primary, .hero-actions .btn) {
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+html.is-tma .ds-btn-primary:hover {
+  transform: none;
+}
+
+html.is-tma .leaderboard-search form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html.is-tma .leaderboard-search input,
+html.is-tma .leaderboard-search button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 14px;
+  font: inherit;
+}
+
+html.is-tma .leaderboard-item-link {
+  min-height: 56px;
+}
+
+/* Tab bar: icon and label, active mark is color, not a filled pill. */
+html.is-tma .bottomNav {
+  background: rgba(13, 13, 16, 0.94);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  padding: 2px 4px calc(4px + env(safe-area-inset-bottom));
+}
+
+html.is-tma .bottomNav-inner {
+  max-width: none;
+  gap: 0;
+}
+
+html.is-tma .bottomNav a {
+  min-height: 54px;
+  gap: 2px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted2);
+}
+
+html.is-tma .bottomNav a span {
+  max-width: none;
+  font-size: 10px;
+  letter-spacing: -0.02em;
+}
+
+html.is-tma .bottomNav a i {
+  font-size: 1.35rem;
+}
+
+html.is-tma .bottomNav a.active {
+  color: var(--purple2);
+  background: transparent;
+}
+
+html.is-tma .bottomNav a.active i {
+  color: #fff;
+}
+
+html.is-tma .tma-gate-card {
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+html.is-tma .tma-gate-mark {
+  box-shadow: none;
+}
+
+/* Local preview (?tma=1) shows the phone layout without Telegram sign-in. */
+html.is-tma.is-tma-preview #tmaGate {
+  display: none !important;
+}
+
+html.is-tma.is-tma-preview main,
+html.is-tma.is-tma-preview footer {
+  visibility: visible !important;
+}

@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Скручивания • Тренировка{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header, .footer { display: none !important; }
+    .main { padding: 0 !important; margin: 0 !important; }
+    body { background: #000; overflow: hidden; height: 100vh; margin: 0; }
+
+    .workout {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #000;
+    }
+
+    .camera-container {
+        flex: 1;
+        min-height: 0;
+        padding: 1.4rem 1.4rem 0.3rem;
+        background: radial-gradient(ellipse at center, rgba(139,92,246,0.15) 0%, transparent 70%);
+    }
+
+    .camera-box {
+        width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 0 35px rgba(139,92,246,0.7), 0 0 70px rgba(236,72,153,0.3);
+        background: linear-gradient(135deg, #1a0033 0%, #0f0a1f 50%, #2a0055 100%);
+    }
+
+    .camera-box::before {
+        content: '';
+        position: absolute;
+        top: -4px; left: -4px; right: -4px; bottom: -4px;
+        background: linear-gradient(45deg, #9d4edd, #e04ef3, #5ce1e6, #9d4edd);
+        border-radius: 28px;
+        z-index: -1;
+        animation: neonPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes neonPulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; filter: hue-rotate(30deg); }
+    }
+
+    .camera-box::after {
+        content: 'TEMINAFIT AI';
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #9d4edd, #e04ef3);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px rgba(157,78,221,0.8);
+        z-index: 10;
+    }
+
+    .camera-box video,
+    .camera-box canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #000;
+    }
+    .camera-box canvas { pointer-events: none; }
+    #camera {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: transparent;
+    }
+
+    /* === HUD — один в один как у отжиманий и приседаний === */
+    .hud {
+        padding: 0.8rem 1.2rem 1.2rem;
+        background: rgba(15,10,31,0.97);
+        backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(139,92,246,0.5);
+    }
+
+    .reps {
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 900;
+        background: linear-gradient(90deg, #9d4edd, #e04ef3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 0.3rem 0;
+        line-height: 1;
+    }
+
+    .timer {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #c8a2ff;
+        margin-bottom: 0.6rem;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 0.6rem;
+        font-size: 0.95rem;
+    }
+
+    .stat-value { font-weight: 700; color: #e6d0ff; }
+    .stat-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
+
+    .ai {
+        text-align: center;
+        font-size: 0.95rem;
+        color: #e0c3fc;
+        background: rgba(139,92,246,0.18);
+        padding: 0.6rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .buttons { display: flex; gap: 1rem; }
+    .btn {
+        flex: 1;
+        padding: 0.8rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 12px;
+        background: #6b21d4;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-secondary { background: #333; }
+
+    @media (max-width: 768px) {
+        .camera-container { padding: 0.6rem 0.6rem 0.1rem; }
+        .hud { padding: 0.5rem 0.8rem calc(0.8rem + env(safe-area-inset-bottom)); }
+        .reps { font-size: 2.2rem; }
+        .timer { font-size: 1rem; margin-bottom: 0.4rem; }
+        .stats { gap: 1.2rem; font-size: 0.88rem; margin-bottom: 0.4rem; }
+        .ai { font-size: 0.82rem; padding: 0.5rem 0.8rem; min-height: 34px; margin-bottom: 0.6rem; }
+        .btn { padding: 0.65rem; font-size: 0.88rem; min-height: 44px; }
+        .buttons { gap: 0.6rem; }
+    }
+
+    @media (max-width: 480px) {
+        .camera-container { padding: 0.4rem 0.4rem 0.1rem; }
+        .reps { font-size: 1.9rem; margin-bottom: 0.2rem; }
+        .timer { font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .stats { gap: 1rem; font-size: 0.82rem; margin-bottom: 0.3rem; }
+        .stat-label { font-size: 0.6rem; }
+        .ai { font-size: 0.75rem; min-height: 30px; }
+    }
+
+    @media (max-width: 900px) and (orientation: landscape) {
+        .workout { flex-direction: row; }
+        .camera-container { flex: 1.6; padding: 0.5rem; }
+        .hud { padding: 0.5rem 0.8rem; overflow-y: auto; }
+        .stats { flex-direction: column; gap: 0.5rem; align-items: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display:none">{% csrf_token %}</div>
+<div class="workout">
+    <div class="camera-container">
+        <div class="camera-box">
+            <video id="video" playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <div class="hud">
+        <div class="reps" id="repsCounter">0</div>
+        <div class="timer" id="timer">00:00</div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-value" id="xpValue">0.0</div><div class="stat-label">Опыт</div></div>
+            <div class="stat"><div class="stat-value" id="qualityValue">—</div><div class="stat-label">Качество</div></div>
+            <div class="stat"><div class="stat-value" id="errorsCount">0</div><div class="stat-label">Ошибки</div></div>
+        </div>
+
+        <div class="ai" id="aiFeedback">AI: Готовимся...</div>
+
+        <div class="buttons">
+            <button id="saveSetButton" class="btn">Сохранить</button>
+            <a href="/" class="btn btn-secondary">Выйти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script>
+(function() {
+  function err(message, hint) { return { message: message, hint: hint }; }
+  function angle(a, b, c) {
+    var ba = [a.x - b.x, a.y - b.y], bc = [c.x - b.x, c.y - b.y];
+    var dot = ba[0]*bc[0] + ba[1]*bc[1];
+    var magBa = Math.sqrt(ba[0]*ba[0] + ba[1]*ba[1]);
+    var magBc = Math.sqrt(bc[0]*bc[0] + bc[1]*bc[1]);
+    if (magBa === 0 || magBc === 0) return 0;
+    return Math.acos(Math.max(-1, Math.min(1, dot / (magBa * magBc)))) * 180 / Math.PI;
+  }
+  var state = { count: 0, stage: "up", ready: false, readyBuffer: [], startHipY: null, crunchDownFrames: 0 };
+  var READY_BUF_LEN = 15;
+
+  function crunch(lm) {
+    var nose = { x: lm[0].x, y: lm[0].y };
+    var shoulder = { x: (lm[11].x + lm[12].x)/2, y: (lm[11].y + lm[12].y)/2 };
+    var hip = { x: (lm[23].x + lm[24].x)/2, y: (lm[23].y + lm[24].y)/2 };
+    var knee = { x: (lm[25].x + lm[26].x)/2, y: (lm[25].y + lm[26].y)/2 };
+    var torsoAngle = angle(knee, hip, shoulder);
+    var errs = [];
+    if (!state.ready) {
+      var minX = Math.min(nose.x, shoulder.x, hip.x, knee.x), maxX = Math.max(nose.x, shoulder.x, hip.x, knee.x);
+      var minY = Math.min(nose.y, shoulder.y, hip.y, knee.y), maxY = Math.max(nose.y, shoulder.y, hip.y, knee.y);
+      var inFrame = minX >= 0.06 && maxX <= 0.94 && minY >= 0.06 && maxY <= 0.94;
+      var bodySpan = Math.hypot(shoulder.x - knee.x, shoulder.y - knee.y);
+      var fullBodyVisible = inFrame && bodySpan > 0.22;
+      var flatLying = torsoAngle > 168;
+      var shoulderSpreadX = Math.abs(lm[11].x - lm[12].x);
+      var sideView = shoulderSpreadX < 0.2;
+      var startPoseOk = fullBodyVisible && flatLying && sideView;
+      if (startPoseOk) state.readyBuffer.push(true);
+      else {
+        state.readyBuffer.push(false);
+        if (!fullBodyVisible) errs.push(err("Тело не полностью в кадре.", "Встаньте боком к камере: лягте так, чтобы были видны голова, корпус и ноги целиком."));
+        else if (!sideView) errs.push(err("Камера видит вас не сбоку.", "Полностью повернитесь боком к камере: лёжа на спине, боком к объективу, чтобы считались скручивания."));
+        else if (!flatLying) errs.push(err("Стартовая поза не выпрямлена.", "Лягте на спину, ноги согнуты, выпрямите корпус."));
+      }
+      if (state.readyBuffer.length > READY_BUF_LEN) state.readyBuffer.shift();
+      if (state.readyBuffer.filter(Boolean).length >= 12) { state.ready = true; state.startHipY = hip.y; state.crunchDownFrames = 0; return { feedback: "Готово. Начинайте скручивания!", errors: [] }; }
+      return { feedback: "Примите стартовую позицию: лёжа боком к камере, всё тело в кадре.", errors: errs };
+    }
+    if (state.startHipY != null && Math.abs(hip.y - state.startHipY) > 0.06)
+      errs.push(err("Таз отрывается.", "Работайте только верхней частью корпуса. Таз на полу."));
+    if (torsoAngle <= 118 && state.stage === "up") { state.stage = "down"; state.crunchDownFrames = 0; return { feedback: "Скручивание...", errors: errs }; }
+    if (state.stage === "down") {
+      if (torsoAngle < 165) state.crunchDownFrames++;
+      if (torsoAngle >= 165) {
+        var counted = state.crunchDownFrames >= 2;
+        if (counted) state.count++;
+        state.stage = "up";
+        state.crunchDownFrames = 0;
+        return { feedback: counted ? (errs.length ? "Исправьте форму!" : "Повтор засчитан!") : "Держите скручивание чуть дольше", errors: errs };
+      }
+    }
+    return { feedback: "Продолжайте...", errors: errs };
+  }
+
+  function processLandmarksClient(landmarks) {
+    if (!landmarks || landmarks.length < 28) return { count: state.count, feedback: "Ожидание...", errors: [] };
+    var out = crunch(landmarks);
+    return { count: state.count, feedback: out.feedback || "Продолжайте...", errors: out.errors || [] };
+  }
+  window.clientDetector = {
+    process: processLandmarksClient,
+    getCount: function() { return state.count; },
+    reset: function() { state.count = 0; state.stage = "up"; state.ready = false; state.readyBuffer = []; state.startHipY = null; state.crunchDownFrames = 0; }
+  };
+})();
+</script>
+<script>
+(function() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const repsEl = document.getElementById('repsCounter');
+  const aiEl = document.getElementById('aiFeedback');
+  const timerEl = document.getElementById('timer');
+  const saveBtn = document.getElementById('saveSetButton');
+  const xpEl = document.getElementById('xpValue');
+  const qualityEl = document.getElementById('qualityValue');
+  const errorsEl = document.getElementById('errorsCount');
+
+  let startTime = Date.now();
+  setInterval(function() {
+    var s = Math.floor((Date.now() - startTime) / 1000);
+    timerEl.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }, 500);
+
+  function getCsrf() {
+    var el = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (el) return el.value;
+    var m = document.cookie.match(/\bcsrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  function updateStats() {
+    fetch('/api/pushup-stats/').then(function(r) { return r.json(); }).then(function(d) {
+      if (d.status === 'success') {
+        if (xpEl) xpEl.textContent = (d.data.xp || 0).toFixed(1);
+        if (qualityEl) qualityEl.textContent = Math.round(d.data.quality || 92) + '%';
+        if (errorsEl) errorsEl.textContent = d.data.errors || 0;
+      }
+    }).catch(function() {});
+  }
+  setInterval(updateStats, 5000);
+  updateStats();
+
+  const pose = new Pose({ locateFile: function(f) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/' + f; } });
+  pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+  pose.onResults(onPose);
+
+  function onPose(results) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    ctx.restore();
+    if (!results.poseLandmarks) {
+      if (aiEl) aiEl.textContent = 'AI: Подойдите в кадр';
+      return;
+    }
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.translate(-canvas.width, 0);
+    if (typeof drawConnectors !== 'undefined' && typeof POSE_CONNECTIONS !== 'undefined') {
+      drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#a855f7', lineWidth: 4 });
+      drawLandmarks(ctx, results.poseLandmarks, { color: '#f1f5f9', radius: 4 });
+    }
+    ctx.restore();
+    if (window.clientDetector) {
+      var out = window.clientDetector.process(results.poseLandmarks);
+      repsEl.textContent = out.count;
+      var msg = out.feedback || 'Продолжайте...';
+      if (out.errors && out.errors.length) msg += ' — ' + out.errors[0].message;
+      if (aiEl) aiEl.textContent = 'AI: ' + msg;
+    }
+  }
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+    .then(function(stream) {
+      video.srcObject = stream;
+      return video.play();
+    })
+    .then(function() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      var cam = new Camera(video, {
+        onFrame: function() { return pose.send({ image: video }); },
+        width: canvas.width,
+        height: canvas.height
+      });
+      cam.start();
+      if (aiEl) aiEl.textContent = 'AI: Готовимся...';
+    })
+    .catch(function() { if (aiEl) aiEl.textContent = 'AI: Ошибка камеры'; });
+
+  saveBtn.onclick = function() {
+    var count = (window.clientDetector && window.clientDetector.getCount) ? window.clientDetector.getCount() : (parseInt(repsEl.textContent, 10) || 0);
+    saveBtn.disabled = true;
+    aiEl.textContent = 'Сохранение...';
+    var headers = { 'Content-Type': 'application/json' };
+    var csrf = getCsrf();
+    if (csrf) headers['X-CSRFToken'] = csrf;
+    fetch('/api/save-set/CRUNCH/', { method: 'POST', headers: headers, credentials: 'same-origin', body: JSON.stringify({ reps: count }) })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(d) {
+        if (d.success) {
+          aiEl.textContent = 'Готово! +' + (d.xp_earned || d.xp_gained || 0) + ' XP';
+          setTimeout(function() { location.href = '/workouts/'; }, 1500);
+        } else throw new Error(d.error || 'Ошибка');
+      })
+      .catch(function() { aiEl.textContent = 'Ошибка сохранения'; saveBtn.disabled = false; });
+  };
+})();
+</script>
+{% endblock %}

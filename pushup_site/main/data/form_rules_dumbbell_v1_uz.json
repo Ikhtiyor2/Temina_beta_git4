@@ -1,0 +1,314 @@
+{
+  "rulesVersion": 4,
+  "locale": "uz",
+  "antiCheat": {
+    "minTrackedFrameRatio": 0.65,
+    "maxRepsPerMinute": 45,
+    "minRepDurationMs": 600,
+    "maxBodyCenterShiftPerFrame": 0.09
+  },
+  "exercises": [
+    {
+      "id": "dumbbell_curl_bicep",
+      "rules": [
+        {
+          "id": "curl_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 28,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tirsaklar oldinga ketmoqda",
+          "hint": "Tirsaklarni tanangizga yopishtiring — yelka uchun xavfsizroq va biceps yaxshiroq ishlaydi",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "curl_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Harakatda silkitish",
+          "hint": "Og\\'irlikni kamaytiring va sekinroq bajaring — silkitish jarohat xavfini oshiradi"
+        },
+        {
+          "id": "curl_asymmetry",
+          "phase": "any",
+          "metric": "elbow_asymmetry_deg",
+          "warnAbove": 25,
+          "severity": "WARNING",
+          "blockRep": false,
+          "message": "Qo\\'llar teng ishlamayapti",
+          "hint": "Ikkala qo\\'lni sinxronlashtiring"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_hammer_curl",
+      "rules": [
+        {
+          "id": "hammer_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 30,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tirsaklar oldinga ketmoqda",
+          "hint": "Bolg\\'acha ushlashda tirsaklarni tanada ushlang",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "hammer_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Silkitish",
+          "hint": "Tempni nazorat qiling"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_press_shoulder",
+      "rules": [
+        {
+          "id": "press_back_lean",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 155,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Belda egilish",
+          "hint": "Pressni qisqaring, orqaga egilmang — gantel og\\'irligini kamaytiring",
+          "healthTighten": [
+            "back"
+          ]
+        },
+        {
+          "id": "press_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 24,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Bosishda silkitish",
+          "hint": "Silliq bosing"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_triceps",
+      "rules": [
+        {
+          "id": "tri_elbow_spread",
+          "phase": "down",
+          "metric": "elbow_spread_ratio",
+          "dangerAbove": 1.12,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tirsaklar yoyilgan",
+          "hint": "Tirsaklarni boshga yaqinroq tuting — triceps yuklanadi, bo\\'g\\'im kamroq",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "tri_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Silkitish",
+          "hint": "Qo\\'llarni nazorat ostida yozing"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_lateral_raise",
+      "rules": [
+        {
+          "id": "lateral_too_high",
+          "phase": "down",
+          "metric": "shoulder_abduction_deg",
+          "dangerAbove": 93,
+          "warnAbove": 88,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Qo\\'l yelkadan yuqori",
+          "hint": "Yelka darajasida to\\'xtang — 90° dan yuqori yelka bo\\'g\\'imi uchun xavfli",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "lateral_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 20,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tebranishda silkitish",
+          "hint": "Gantellarni silliq ko\\'taring"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_chest_fly",
+      "rules": [
+        {
+          "id": "fly_elbow_lock",
+          "phase": "down",
+          "metric": "elbow_lock_deg",
+          "dangerAbove": 168,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tirsaklar to\\'liq yozilgan",
+          "hint": "Tirsaklarda yengil bukish saqlang — bo\\'g\\'imni qulflamang",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "fly_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Silkitish",
+          "hint": "Yig\\'ish va yoyishni nazorat qiling"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_row",
+      "rules": [
+        {
+          "id": "row_round_back",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 145,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Orqa yumaloqlangan",
+          "hint": "Sonlardan egiling, orqa to\\'g\\'ri — aks holda yuk belga tushadi",
+          "healthTighten": [
+            "back"
+          ]
+        },
+        {
+          "id": "row_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tortishda silkitish",
+          "hint": "Tirsakni belga silliq torting"
+        }
+      ]
+    },
+    {
+      "id": "pullup_classic",
+      "rules": [
+        {
+          "id": "pullup_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 16,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Keskin harakat",
+          "hint": "Silliq tortiling — silkitish va tebranish hisoblanmaydi",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_kip",
+          "phase": "any",
+          "metric": "body_center_shift_norm",
+          "dangerAbove": 0.08,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tanani tebratish",
+          "hint": "Tanani barqaror tuting — tebranish va silkitishsiz",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_incomplete_hang",
+          "phase": "top",
+          "metric": "wrist_elevation_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "To\\'liq osilish yo\\'q",
+          "hint": "Past nuqtada qo\\'llarni to\\'liq yozing — bilaklar yelkadan yuqori",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_not_hanging",
+          "phase": "top",
+          "metric": "wrist_above_nose_px",
+          "dangerBelow": 10,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Bu turnikda osilish emas",
+          "hint": "Bilaklar boshdan yuqori bo\\'lishi kerak. Qo\\'l silkitishlari hisoblanmaydi",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_shallow",
+          "phase": "down",
+          "metric": "elbow_flexion_deg",
+          "dangerAbove": 108,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Yetarli ko\\'tarilish yo\\'q",
+          "hint": "Yuqoriroq tortiling — tirsaklar ko\\'proq bukilishi kerak",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_wrist_drift",
+          "phase": "any",
+          "metric": "wrist_drift_px",
+          "dangerAbove": 34,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Bilaklar siljiyapti",
+          "hint": "Turnik ushlashini saqlang — tanani torting, qo\\'llarni emas",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_no_body_rise",
+          "phase": "down",
+          "metric": "body_rise_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Tana ko\\'tarilmayapti",
+          "hint": "Yelka va iyakni yuqoriga torting — bilaklar joyida qoladi",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_asymmetry",
+          "phase": "down",
+          "metric": "elbow_asymmetry_deg",
+          "warnAbove": 28,
+          "severity": "WARNING",
+          "blockRep": false,
+          "message": "Qo\\'llar teng ishlamayapti",
+          "hint": "Ikkala qo\\'l bilan simmetrik tortiling",
+          "healthTighten": [
+            "shoulders"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подтягивания — TeminaFit v3.0</title>
+    {% csrf_token %} 
+    
+    <style>
+        /* Стили из вашего предыдущего кода */
+        body { background-color: #0b0013; color: #ffffff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        header { background-color: #2a0040; width: 100%; text-align: center; padding: 15px 0; font-size: 1.5rem; font-weight: bold; color: #d4b3ff; border-bottom: 2px solid #4a0080; }
+        #camera-container { position: relative; background-color: #150022; border: 2px solid #4a0080; border-radius: 12px; margin-top: 30px; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        #camera { border-radius: 8px; width: 640px; height: 480px; }
+        .stats-top { display: flex; justify-content: center; align-items: center; margin-top: 10px; color: #bfaaff; font-weight: 500; gap: 50px; }
+        .stats-top div span { display: block; color: #00e5ff; font-size: 1.4rem; }
+        .stats-bottom { display: flex; justify-content: center; align-items: center; width: 650px; background-color: #210032; border: 1px solid #5e00cc; border-radius: 10px; margin-top: 15px; padding: 10px; color: #d0bfff; font-size: 1rem; gap: 30px; }
+        .stats-bottom div { padding: 5px 15px; border-radius: 6px; }
+        .reps-box { border: 1px solid #00eaff; }
+        .ai-box { border: 1px solid #8a2be2; }
+        .error-box { border: 1px solid #ff0048; }
+
+        /* Стиль для кнопки сохранения */
+        #saveSetButton { margin-top: 25px; padding: 12px 25px; font-size: 1.1rem; color: #ffffff; background-color: #008040; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+        #saveSetButton:hover { background-color: #00a050; }
+        #message { margin-top: 10px; font-size: 1rem; font-weight: bold; }
+
+        a { margin-top: 25px; color: #a86cff; text-decoration: none; border: 1px solid #7b32ff; padding: 10px 20px; border-radius: 10px; transition: all 0.3s; }
+        a:hover { background-color: #4a0080; color: white; }
+    </style>
+</head>
+<body>
+
+    <header>Подтягивания — TeminaFit v3.0</header>
+
+    <div class="stats-top">
+        {% comment %} <div><span>0.0</span>XP</div>
+        <div><span id="repsCounter">0</span>REPS</div> 
+        <div><span>23</span>SECONDS</div> {% endcomment %}
+        <div><span style="color:#00ff9d;">Подтягивания</span>MODE</div>
+    </div>
+
+    <div id="camera-container">
+        <img id="camera" src="{% url 'video_feed2' %}" alt="Камера">
+    </div>
+
+    {% comment %} <div class="stats-bottom">
+        <div class="reps-box">Reps: 0</div> 
+        <div class="ai-box">ИИ: Отличная форма! Продолжайте!</div>
+        <div class="error-box">Ошибки: 0</div>
+    </div> {% endcomment %}
+    
+    <button id="saveSetButton">
+        Сохранить подход
+    </button>
+    <div id="message"></div>
+    
+    <a href="/">← Назад</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const saveButton = document.getElementById('saveSetButton');
+            const messageDiv = document.getElementById('message');
+            const repsDisplay = document.getElementById('repsCounter'); 
+            const repsBox = document.querySelector('.reps-box'); 
+
+            saveButton.addEventListener('click', function() {
+                messageDiv.innerHTML = 'Сохранение...';
+                saveButton.disabled = true; // Блокируем кнопку
+
+                fetch('/api/save-set/PULL_UPS/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken 
+                    },
+                    body: JSON.stringify({}) 
+                })
+                .then(response => {
+                    // --- КРИТИЧЕСКАЯ ПРОВЕРКА ОТВЕТА СЕРВЕРА (Устраняет 'Unexpected token <') ---
+                    if (!response.ok) {
+                        // Если статус 403 (CSRF) или 302 (Не авторизован), 
+                        // ответ будет HTML, который вызывает ошибку '<'.
+                        if (response.status === 403) {
+                            throw new Error('403 Forbidden. Неверный CSRF-токен или ошибка авторизации.');
+                        }
+                        
+                        // Пытаемся прочитать JSON с ошибкой, если статус не 200/201
+                        return response.json().then(data => {
+                            throw new Error(data.message || `Ошибка сервера: ${response.status}`);
+                        }).catch(() => {
+                            // Если не удалось прочитать JSON, значит, это был HTML
+                            throw new Error(`Ошибка HTTP ${response.status}. Возможно, вы не авторизованы.`);
+                        });
+                    }
+                    return response.json(); // Читаем JSON, если ответ успешный (200/201)
+                })
+
+                .then(data => {
+                    if (data.status === 'success') {
+                        messageDiv.innerHTML = `✅ ${data.message}. Перенаправление...`;
+                        setTimeout(() => {
+                            window.location.href = '/'; // Замените на URL вашей главной страницы, если он другой
+                        }, 1500); 
+                    } else {
+
+                        messageDiv.innerHTML = `❌ Ошибка: ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    messageDiv.innerHTML = `❌ Ошибка при сохранении: ${error.message}`;
+                })
+                .finally(() => {
+                    saveButton.disabled = false; // Разблокируем кнопку
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Турник — TeminaFit v3.0</title>
+  <style>
+    body {
+      background-color: #0b0013;
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      background-color: #2a0040;
+      width: 100%;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #d4b3ff;
+      border-bottom: 2px solid #4a0080;
+    }
+
+    #camera-container {
+      position: relative;
+      background-color: #150022;
+      border: 2px solid #4a0080;
+      border-radius: 12px;
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    #camera {
+      border-radius: 8px;
+      width: 640px;
+      height: 480px;
+    }
+
+    /* Верхняя панель статистики */
+    .stats-top {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+      color: #bfaaff;
+      font-weight: 500;
+      gap: 50px;
+    }
+
+    .stats-top div span {
+      display: block;
+      color: #00e5ff;
+      font-size: 1.4rem;
+    }
+
+    /* Нижняя панель */
+    .stats-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 650px;
+      background-color: #210032;
+      border: 1px solid #5e00cc;
+      border-radius: 10px;
+      margin-top: 15px;
+      padding: 10px;
+      color: #d0bfff;
+      font-size: 1rem;
+      gap: 30px;
+    }
+
+    .stats-bottom div {
+      padding: 5px 15px;
+      border-radius: 6px;
+    }
+
+    .reps-box { border: 1px solid #00eaff; }
+    .ai-box { border: 1px solid #8a2be2; }
+    .error-box { border: 1px solid #ff0048; }
+
+    a {
+      margin-top: 25px;
+      color: #a86cff;
+      text-decoration: none;
+      border: 1px solid #7b32ff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    a:hover {
+      background-color: #4a0080;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Отжимания — TeminaFit v3.0</header>
+
+  <div class="stats-top">
+    <div><span>0.0</span>XP</div>
+    <div><span>0</span>REPS</div>
+    <div><span>23</span>SECONDS</div>
+    <div><span style="color:#00ff9d;">Pull-ups</span>MODE</div>
+  </div>
+
+  <div id="camera-container">
+    <img id="camera" src="/video_feed2/" alt="Камера">
+  </div>
+
+  <div class="stats-bottom">
+    <div class="reps-box">Reps: 0</div>
+    <div class="ai-box">ИИ: Отличная форма! Продолжайте!</div>
+    <div class="error-box">Ошибки: 0</div>
+  </div>
+  <a href="/">← Назад</a>
+
+</body>
+</html>  {% endcomment %}

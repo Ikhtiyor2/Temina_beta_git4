@@ -1,0 +1,768 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Навыки • TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Design system variables for skills */
+.skills-container {
+    --border-primary: var(--border);
+    --gradient-primary: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    --text-primary: var(--txt);
+    --text-secondary: var(--muted);
+    --bg-primary: var(--bg);
+    --neon-purple: var(--accent-start);
+    --neon-purple-light: var(--accent-end);
+    --shadow-glow: 0 8px 24px var(--glow);
+    --border-radius: var(--r2);
+    --border-radius-lg: var(--r);
+    --transition-smooth: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.skills-container {
+    padding: 2rem 0;
+    max-width: var(--container);
+    margin: 0 auto;
+    width: min(var(--container), calc(100% - 32px));
+}
+
+/* Skills Grid */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.skill-card {
+    background: linear-gradient(135deg,
+        rgba(26, 16, 53, 0.8) 0%,
+        rgba(37, 26, 69, 0.9) 100%);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.skill-card:hover::before {
+    transform: scaleX(1);
+}
+
+.skill-card:hover {
+    border-color: var(--neon-purple);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-5px);
+}
+
+/* Skill Header */
+.skill-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.skill-icon {
+    font-size: 2.5rem;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+    transition: var(--transition-smooth);
+}
+
+.skill-card:hover .skill-icon {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--neon-purple);
+    transform: scale(1.1);
+}
+
+.skill-info {
+    flex: 1;
+}
+
+.skill-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.skill-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Skill Level */
+.skill-level {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.level-badge {
+    background: var(--gradient-primary);
+    color: var(--bg-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Progress Bar */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Skill Effects */
+.skill-effects {
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.effect-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.effect-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.effect-item.unlocked {
+    color: var(--neon-purple-light);
+}
+
+.effect-item.locked {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.effect-level {
+    background: rgba(139, 92, 246, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border-primary);
+}
+
+.effect-item.unlocked .effect-level {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple-light);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    border: 1px solid;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.2) 0%,
+        rgba(236, 72, 153, 0.15) 100%);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple-light);
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.3) 0%,
+        rgba(236, 72, 153, 0.25) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-primary:disabled:hover {
+    background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.2) 0%,
+        rgba(236, 72, 153, 0.15) 100%);
+    transform: none;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg,
+        rgba(245, 158, 11, 0.2) 0%,
+        rgba(217, 119, 6, 0.15) 100%);
+    border-color: #f59e0b;
+    color: #f59e0b;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg,
+        rgba(245, 158, 11, 0.3) 0%,
+        rgba(217, 119, 6, 0.25) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+/* Points Display */
+.points-display {
+    background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.1) 0%,
+        rgba(236, 72, 153, 0.05) 100%);
+    border: 1px solid var(--neon-purple);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.points-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+}
+
+.points-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+}
+
+.points-label {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.points-hint {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Section Headers */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.section-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.4));
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--neon-purple-light); }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .skills-container { padding: 1rem 0; }
+    .skills-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .skill-card { padding: 1.5rem; }
+    .skill-header { flex-direction: column; text-align: center; gap: 1rem; }
+    .points-display { padding: 1.5rem; }
+    .points-value { font-size: 2rem; }
+}
+
+@media (max-width: 480px) {
+    .skill-card { padding: 1.25rem; }
+    .section-header { flex-direction: column; text-align: center; gap: 0.75rem; }
+    .btn { padding: 0.875rem 1.5rem; font-size: 0.9rem; }
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.skill-card.max-level {
+    border-color: #10b981;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.skill-card.max-level::before {
+    background: linear-gradient(135deg, #10b981, #059669);
+    transform: scaleX(1);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-top: 2px solid var(--neon-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="skills-container">
+    <!-- Header Section -->
+    <div class="glass-panel visible">
+        <div class="section-header">
+            <div class="section-icon">⚡</div>
+            <h1 class="section-title">Дерево Навыков</h1>
+        </div>
+        <p class="text-secondary" style="font-size: 1.1rem; margin: 0;">
+            Прокачивайте навыки для улучшения эффективности тренировок и получения бонусов
+        </p>
+    </div>
+
+    <!-- Points Information -->
+    <div class="points-display glass-panel visible">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div class="points-value" id="available-points">0</div>
+                <div class="points-label">Доступно очков навыков</div>
+                <div class="points-hint">Получайте очки за повышение уровня и выполнение квестов</div>
+            </div>
+            <button class="btn btn-warning" onclick="resetSkills()" id="reset-btn">
+                <span class="btn-icon">🔄</span>
+                Сбросить навыки
+            </button>
+        </div>
+    </div>
+
+    <!-- Skills Grid -->
+    <div class="skills-grid" id="skills-container">
+        <!-- Skills will be loaded via JS -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ======================= API ======================= */
+const API = {
+  profile: '/api/player/profile/',
+  upgrade: '/api/player/upgrade-skill/',
+};
+
+/* ======================= UI DATA ======================= */
+const skillsData = [
+  {
+    id: 'strength',
+    name: '💪 Сила',
+    description: 'Увеличивает XP за отжимания',
+    maxLevel: 10,
+    effects: [
+      { level: 1, description: '+10% XP за отжимания' },
+      { level: 4, description: '+25% XP за все силовые упражнения' },
+      { level: 10, description: 'Удвоенный XP за силовые тренировки' }
+    ]
+  },
+  {
+    id: 'stamina',
+    name: '🏃 Выносливость',
+    description: 'Увеличивает XP за приседания и кардио',
+    maxLevel: 10,
+    effects: [
+      { level: 1, description: '+10% XP за приседания' },
+      { level: 3, description: '+15% выносливости' },
+      { level: 5, description: '+25% XP за кардио упражнения' },
+      { level: 10, description: 'Бесконечная энергия на 1 тренировку в день' }
+    ]
+  },
+  {
+    id: 'agility',
+    name: '🦵 Ловкость',
+    description: 'Уменьшает вероятность ошибок и улучшает технику',
+    maxLevel: 10,
+    effects: [
+      { level: 1, description: '-5% к ошибкам формы' },
+      { level: 3, description: '+10% к точности движений' },
+      { level: 5, description: '-15% к ошибкам, +5% XP' },
+      { level: 10, description: 'Автоматическая коррекция формы' }
+    ]
+  },
+  {
+    id: 'technique',
+    name: '🎯 Техника',
+    description: 'Увеличивает шанс идеального выполнения',
+    maxLevel: 10,
+    effects: [
+      { level: 1, description: '+5% к идеальным повторениям' },
+      { level: 3, description: '+10% к бонусу за технику' },
+      { level: 5, description: '+20% к качеству выполнения' },
+      { level: 10, description: 'Гарантированная идеальная техника' }
+    ]
+  }
+];
+
+/* ======================= STATE ======================= */
+let state = {
+  player: null,
+  skills: {},
+};
+
+/* ======================= LOAD ======================= */
+async function loadSkills() {
+  try {
+    const response = await fetch(API.profile, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!data || data.success !== true) {
+      throw new Error(data?.error || 'profile_failed');
+    }
+
+    state.player = data.player || {};
+    state.skills = data.skills || {};
+
+    document.getElementById('available-points').textContent =
+      state.player.skill_points ?? 0;
+
+    displaySkills();
+
+  } catch (error) {
+    console.error('Ошибка загрузки навыков:', error);
+    document.getElementById('available-points').textContent = '0';
+    showNotification('❌ Не удалось загрузить навыки (проверь API /api/player/profile/)', 'error');
+    displaySkills(); // всё равно отрисуем, но с нулями
+  }
+}
+
+/* ======================= RENDER ======================= */
+function displaySkills() {
+  const container = document.getElementById('skills-container');
+  const availablePoints = parseInt(document.getElementById('available-points').textContent) || 0;
+
+  container.innerHTML = '';
+
+  skillsData.forEach(skill => {
+    const level = Number(state.skills?.[skill.id] ?? 0);
+    const canUpgrade = availablePoints > 0 && level < skill.maxLevel;
+    const isMaxLevel = level >= skill.maxLevel;
+    const progress = Math.round((level / skill.maxLevel) * 100);
+
+    const skillElement = document.createElement('div');
+    skillElement.className = `skill-card glass-panel visible ${isMaxLevel ? 'max-level' : ''}`;
+
+    skillElement.innerHTML = `
+      <div class="skill-header">
+        <div class="skill-icon">${skill.name.split(' ')[0]}</div>
+        <div class="skill-info">
+          <div class="skill-title">${escapeHtml(skill.name)}</div>
+          <div class="skill-description">${escapeHtml(skill.description)}</div>
+        </div>
+      </div>
+
+      <div class="skill-level">
+        <span>Уровень</span>
+        <span class="level-badge">${level}/${skill.maxLevel}</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${progress}%"></div>
+      </div>
+
+      <div class="skill-effects">
+        ${skill.effects.map(effect => {
+          const isUnlocked = effect.level <= level;
+          return `
+            <div class="effect-item ${isUnlocked ? 'unlocked' : 'locked'}">
+              <span>${escapeHtml(effect.description)}</span>
+              <span class="effect-level">Ур. ${effect.level}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <button class="btn btn-primary upgrade-btn"
+        ${!canUpgrade ? 'disabled' : ''}
+        onclick="upgradeSkill('${skill.id}')"
+        data-skill-id="${skill.id}">
+        <span class="btn-icon">${isMaxLevel ? '🏆' : '🔼'}</span>
+        ${isMaxLevel ? 'Макс. уровень' : (canUpgrade ? 'Улучшить' : 'Недостаточно очков')}
+      </button>
+    `;
+
+    container.appendChild(skillElement);
+  });
+}
+
+/* ======================= ACTIONS ======================= */
+async function upgradeSkill(skillId) {
+  const button = document.querySelector(`.upgrade-btn[data-skill-id="${skillId}"]`);
+  if (!button) return;
+
+  const originalText = button.innerHTML;
+
+  try {
+    button.disabled = true;
+    button.classList.add('loading');
+    button.innerHTML = '<span class="btn-icon">⏳</span>Улучшение...';
+
+    const response = await fetch(API.upgrade, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({ skill: skillId })
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || data.success !== true) {
+      throw new Error(data?.error || 'upgrade_failed');
+    }
+
+    // ⚠️ универсальная поддержка разных форматов ответа
+    // если backend вернул player + skills — отлично
+    if (data.player) state.player = data.player;
+    if (data.skills) state.skills = data.skills;
+
+    // если backend вернул просто новые значения — тоже ок
+    if (typeof data.skill_points !== 'undefined') {
+      state.player.skill_points = data.skill_points;
+    }
+    if (typeof data.new_level !== 'undefined') {
+      state.skills[skillId] = data.new_level;
+    }
+
+    document.getElementById('available-points').textContent =
+      state.player.skill_points ?? 0;
+
+    displaySkills();
+    showNotification('🎉 Навык улучшен!', 'success');
+
+  } catch (error) {
+    console.error('Ошибка улучшения навыка:', error);
+    showNotification('❌ Ошибка при улучшении навыка', 'error');
+
+    button.disabled = false;
+    button.classList.remove('loading');
+    button.innerHTML = originalText;
+  }
+}
+
+/* ======================= RESET (placeholder) ======================= */
+function resetSkills() {
+  showNotification('🔄 Сброс навыков пока не реализован в backend', 'info');
+}
+
+/* ======================= HELPERS ======================= */
+function getCSRFToken() {
+  const name = 'csrftoken=';
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim();
+    if (cookie.indexOf(name) === 0) {
+      return cookie.substring(name.length, cookie.length);
+    }
+  }
+  return '';
+}
+
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function showNotification(message, type) {
+  const existingNotifications = document.querySelectorAll('.skill-notification');
+  existingNotifications.forEach(notification => notification.remove());
+
+  const notification = document.createElement('div');
+  notification.className = `skill-notification ${type}`;
+  notification.style.cssText = `
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 700;
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    max-width: 340px;
+    border: 1px solid;
+  `;
+
+  if (type === 'success') {
+    notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    notification.style.borderColor = '#10b981';
+  } else if (type === 'error') {
+    notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+    notification.style.borderColor = '#ef4444';
+  } else {
+    notification.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
+    notification.style.borderColor = '#8b5cf6';
+  }
+
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => { notification.style.transform = 'translateX(0)'; }, 100);
+
+  setTimeout(() => {
+    notification.style.transform = 'translateX(400px)';
+    setTimeout(() => notification.remove(), 300);
+  }, 4000);
+}
+
+/* ======================= INIT ======================= */
+document.addEventListener('DOMContentLoaded', () => {
+  loadSkills();
+});
+</script>
+{% endblock %}

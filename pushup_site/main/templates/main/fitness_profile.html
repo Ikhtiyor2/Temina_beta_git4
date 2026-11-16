@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}AI Coach Profile{% else %}Профиль для ИИ-тренера{% endif %} · TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+  .fp-page { max-width: 720px; margin: 0 auto; padding-bottom: 48px; }
+  .fp-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .fp-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 28px; }
+  .fp-section { margin-bottom: 28px; padding: 20px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border); }
+  .fp-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; color: var(--txt); }
+  .fp-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .fp-row:last-child { margin-bottom: 0; }
+  .fp-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  .fp-input { width: 100%; padding: 12px 14px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--txt); font-size: 1rem; }
+  .fp-input:focus { outline: none; border-color: var(--accent-end); }
+  .fp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fp-chip { padding: 10px 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--txt); font-size: 0.9rem; cursor: pointer; transition: background .2s, border-color .2s; }
+  .fp-chip:hover { border-color: rgba(168,85,247,0.4); }
+  .fp-chip.selected { background: rgba(168,85,247,0.2); border-color: var(--accent-end); color: var(--purple2); }
+  .fp-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+  .fp-btn { padding: 14px 24px; border-radius: 14px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: opacity .2s; border: none; font-family: inherit; }
+  .fp-btn-primary { background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; }
+  .fp-btn-primary:hover { opacity: 0.95; }
+  .fp-btn-ghost { background: var(--bg-card); border: 1px solid var(--border); color: var(--txt); }
+  .fp-btn-ghost:hover { border-color: var(--accent-end); color: var(--purple2); }
+  .fp-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .fp-plan { margin-top: 28px; padding: 24px; border-radius: 18px; background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(217,70,239,0.06)); border: 1px solid rgba(168,85,247,0.25); display: none; }
+  .fp-plan.visible { display: block; }
+  .fp-plan-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
+  .fp-plan-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 10px; }
+  .fp-plan-item a { padding: 10px 20px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
+  .fp-plan-item a:hover { opacity: 0.95; }
+  .fp-message { padding: 12px 16px; border-radius: 12px; margin-top: 16px; font-size: 0.95rem; display: none; }
+  .fp-message.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; display: block; }
+  .fp-message.error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fp-page">
+  <h1 class="fp-title">{% if current_lang == 'en' %}AI Coach Profile{% else %}Профиль для ИИ‑тренера{% endif %}</h1>
+  <p class="fp-sub">{% if current_lang == 'en' %}Set your goals, health limits and preferences. Your AI coach will use this to personalize your plan and tips.{% else %}Укажите цели, ограничения по здоровью и предпочтения. ИИ‑тренер будет использовать это для персонального плана и подсказок.{% endif %}</p>
+
+  <form id="fp-form">{% csrf_token %}
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Main profile{% else %}Основной профиль{% endif %}</h3>
+      <div class="fp-row">
+        <div><label class="fp-label">{% if current_lang == 'en' %}Age{% else %}Возраст{% endif %}</label><input type="number" name="age" class="fp-input" min="10" max="100" placeholder="25" /></div>
+        <div><label class="fp-label">{% if current_lang == 'en' %}Height (cm){% else %}Рост (см){% endif %}</label><input type="number" name="height_cm" class="fp-input" min="100" max="250" placeholder="175" /></div>
+        <div><label class="fp-label">{% if current_lang == 'en' %}Weight (kg){% else %}Вес (кг){% endif %}</label><input type="number" name="weight_kg" class="fp-input" step="0.1" min="30" max="300" placeholder="70" /></div>
+        <div><label class="fp-label">{% if current_lang == 'en' %}Target weight (kg){% else %}Целевой вес (кг){% endif %}</label><input type="number" name="target_weight_kg" class="fp-input" step="0.1" min="30" max="300" placeholder="68" /></div>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Goals{% else %}Цели{% endif %}</h3>
+      <div class="fp-chips" data-field="goals">
+        <span class="fp-chip" data-value="build_muscle">{% if current_lang == 'en' %}Build Muscle{% else %}Набрать массу{% endif %}</span>
+        <span class="fp-chip" data-value="lose_weight">{% if current_lang == 'en' %}Lose Weight{% else %}Похудеть{% endif %}</span>
+        <span class="fp-chip" data-value="stay_in_shape">{% if current_lang == 'en' %}Stay in Shape{% else %}Поддержать форму{% endif %}</span>
+        <span class="fp-chip" data-value="look_better">{% if current_lang == 'en' %}Look Better{% else %}Выглядеть лучше{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Muscle focus{% else %}Фокус мышц{% endif %}</h3>
+      <div class="fp-chips" data-field="muscle_focus">
+        <span class="fp-chip" data-value="chest">{% if current_lang == 'en' %}Chest{% else %}Грудь{% endif %}</span>
+        <span class="fp-chip" data-value="back">{% if current_lang == 'en' %}Back{% else %}Спина{% endif %}</span>
+        <span class="fp-chip" data-value="arms">{% if current_lang == 'en' %}Arms{% else %}Руки{% endif %}</span>
+        <span class="fp-chip" data-value="shoulders">{% if current_lang == 'en' %}Shoulders{% else %}Плечи{% endif %}</span>
+        <span class="fp-chip" data-value="abs">{% if current_lang == 'en' %}Abs{% else %}Пресс{% endif %}</span>
+        <span class="fp-chip" data-value="full_body">{% if current_lang == 'en' %}Full body{% else %}Всё тело{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Health (avoid or limit){% else %}Здоровье (избегать или ограничить){% endif %}</h3>
+      <div class="fp-chips" data-field="health_limits">
+        <span class="fp-chip" data-value="back">{% if current_lang == 'en' %}Back{% else %}Спина{% endif %}</span>
+        <span class="fp-chip" data-value="knee">{% if current_lang == 'en' %}Knee{% else %}Колени{% endif %}</span>
+        <span class="fp-chip" data-value="hip_joints">{% if current_lang == 'en' %}Hip joints{% else %}Тазобедренные{% endif %}</span>
+        <span class="fp-chip" data-value="shoulders">{% if current_lang == 'en' %}Shoulders{% else %}Плечи{% endif %}</span>
+        <span class="fp-chip" data-value="no_jumps">{% if current_lang == 'en' %}Can't do jumps{% else %}Без прыжков{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Equipment{% else %}Оборудование{% endif %}</h3>
+      <div class="fp-chips" data-field="equipment">
+        <span class="fp-chip" data-value="bodyweight">{% if current_lang == 'en' %}Bodyweight{% else %}Свой вес{% endif %}</span>
+        <span class="fp-chip" data-value="gym">{% if current_lang == 'en' %}Gym{% else %}Зал{% endif %}</span>
+        <span class="fp-chip" data-value="barbell">{% if current_lang == 'en' %}Barbell{% else %}Штанга{% endif %}</span>
+        <span class="fp-chip" data-value="dumbbell">{% if current_lang == 'en' %}Dumbbell{% else %}Гантели{% endif %}</span>
+        <span class="fp-chip" data-value="machine">{% if current_lang == 'en' %}Machine{% else %}Тренажёры{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Fitness level{% else %}Уровень подготовки{% endif %}</h3>
+      <div class="fp-chips" data-field="fitness_level" data-single="true">
+        <span class="fp-chip" data-value="beginner">{% if current_lang == 'en' %}Beginner{% else %}Новичок{% endif %}</span>
+        <span class="fp-chip" data-value="intermediate">{% if current_lang == 'en' %}Intermediate{% else %}Средний{% endif %}</span>
+        <span class="fp-chip" data-value="advanced">{% if current_lang == 'en' %}Advanced{% else %}Продвинутый{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Activity level{% else %}Уровень активности{% endif %}</h3>
+      <div class="fp-chips" data-field="activity_level" data-single="true">
+        <span class="fp-chip" data-value="sedentary">{% if current_lang == 'en' %}Sedentary{% else %}Сидячий{% endif %}</span>
+        <span class="fp-chip" data-value="light">{% if current_lang == 'en' %}Light{% else %}Лёгкий{% endif %}</span>
+        <span class="fp-chip" data-value="moderate">{% if current_lang == 'en' %}Moderate{% else %}Умеренный{% endif %}</span>
+        <span class="fp-chip" data-value="active">{% if current_lang == 'en' %}Active{% else %}Активный{% endif %}</span>
+        <span class="fp-chip" data-value="very_active">{% if current_lang == 'en' %}Very Active{% else %}Очень активный{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Workouts per week{% else %}Тренировок в неделю{% endif %}</h3>
+      <div class="fp-row">
+        <div style="max-width: 120px;">
+          <label class="fp-label">1–7</label>
+          <input type="number" name="workouts_per_week" class="fp-input" min="1" max="7" value="3" />
+        </div>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Motivation{% else %}Мотивация{% endif %}</h3>
+      <div class="fp-chips" data-field="motivation">
+        <span class="fp-chip" data-value="health">{% if current_lang == 'en' %}Health{% else %}Здоровье{% endif %}</span>
+        <span class="fp-chip" data-value="appearance">{% if current_lang == 'en' %}Appearance{% else %}Внешность{% endif %}</span>
+        <span class="fp-chip" data-value="stress_relief">{% if current_lang == 'en' %}Stress relief{% else %}Снятие стресса{% endif %}</span>
+        <span class="fp-chip" data-value="social">{% if current_lang == 'en' %}Social{% else %}Общение{% endif %}</span>
+        <span class="fp-chip" data-value="enjoyment">{% if current_lang == 'en' %}Enjoyment{% else %}Удовольствие{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="fp-section">
+      <h3>{% if current_lang == 'en' %}Additional notes{% else %}Доп. заметки{% endif %}</h3>
+      <textarea name="notes" class="fp-input" rows="3" placeholder="{% if current_lang == 'en' %}Mental or physical health, preferences...{% else %}Ментальное/физическое здоровье, предпочтения...{% endif %}"></textarea>
+    </div>
+
+    <div id="fp-message" class="fp-message"></div>
+    <div class="fp-actions">
+      <button type="button" id="fp-save" class="fp-btn fp-btn-ghost">{% if current_lang == 'en' %}Save profile{% else %}Сохранить профиль{% endif %}</button>
+      <button type="button" id="fp-generate" class="fp-btn fp-btn-primary">{% if current_lang == 'en' %}Generate my plan{% else %}Получить план тренировок{% endif %}</button>
+    </div>
+  </form>
+
+  <div id="fp-plan" class="fp-plan">
+    <div class="fp-plan-title">{% if current_lang == 'en' %}Your workout plan{% else %}Ваш план на сегодня{% endif %}</div>
+    <div id="fp-plan-subtitle" class="fp-plan-subtitle" style="font-size:0.9rem;color:var(--muted);margin-bottom:12px;"></div>
+    <div id="fp-plan-items"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const lang = '{{ current_lang|default:"ru" }}';
+  const saveUrl = '{% url "api_fitness_profile_save" %}';
+  const planUrl = '{% url "api_ai_workout_plan" %}';
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+
+  const profile = (function(){ try { return JSON.parse("{{ profile_data|escapejs }}"); } catch(e) { return {}; } })();
+
+  const form = document.getElementById('fp-form');
+  const messageEl = document.getElementById('fp-message');
+  const planEl = document.getElementById('fp-plan');
+  const planItems = document.getElementById('fp-plan-items');
+  const btnSave = document.getElementById('fp-save');
+  const btnGenerate = document.getElementById('fp-generate');
+
+  function showMessage(text, type) {
+    messageEl.textContent = text;
+    messageEl.className = 'fp-message ' + (type === 'error' ? 'error' : 'success');
+  }
+  function clearMessage() {
+    messageEl.textContent = '';
+    messageEl.className = 'fp-message';
+  }
+
+  // Load saved profile into form
+  if (profile) {
+    if (profile.age) form.querySelector('[name="age"]').value = profile.age;
+    if (profile.height_cm) form.querySelector('[name="height_cm"]').value = profile.height_cm;
+    if (profile.weight_kg) form.querySelector('[name="weight_kg"]').value = profile.weight_kg;
+    if (profile.target_weight_kg) form.querySelector('[name="target_weight_kg"]').value = profile.target_weight_kg;
+    if (profile.workouts_per_week) form.querySelector('[name="workouts_per_week"]').value = profile.workouts_per_week;
+    if (profile.notes) form.querySelector('[name="notes"]').value = profile.notes || '';
+    document.querySelectorAll('.fp-chips[data-field]').forEach(function(container) {
+      const field = container.getAttribute('data-field');
+      const single = container.getAttribute('data-single') === 'true';
+      const values = profile[field];
+      if (!values) return;
+      const list = Array.isArray(values) ? values : [values];
+      container.querySelectorAll('.fp-chip').forEach(function(chip) {
+        if (list.indexOf(chip.getAttribute('data-value')) !== -1) chip.classList.add('selected');
+      });
+    });
+  }
+
+  // Chips toggle
+  document.querySelectorAll('.fp-chips[data-field]').forEach(function(container) {
+    const single = container.getAttribute('data-single') === 'true';
+    container.querySelectorAll('.fp-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        if (single) container.querySelectorAll('.fp-chip').forEach(function(c) { c.classList.remove('selected'); });
+        chip.classList.toggle('selected');
+      });
+    });
+  });
+
+  function getPayload() {
+    const payload = {
+      age: form.querySelector('[name="age"]').value ? parseInt(form.querySelector('[name="age"]').value, 10) : null,
+      height_cm: form.querySelector('[name="height_cm"]').value ? parseInt(form.querySelector('[name="height_cm"]').value, 10) : null,
+      weight_kg: form.querySelector('[name="weight_kg"]').value ? parseFloat(form.querySelector('[name="weight_kg"]').value) : null,
+      target_weight_kg: form.querySelector('[name="target_weight_kg"]').value ? parseFloat(form.querySelector('[name="target_weight_kg"]').value) : null,
+      workouts_per_week: form.querySelector('[name="workouts_per_week"]').value ? parseInt(form.querySelector('[name="workouts_per_week"]').value, 10) : 3,
+      notes: form.querySelector('[name="notes"]').value || '',
+      goals: [],
+      muscle_focus: [],
+      health_limits: [],
+      equipment: [],
+      motivation: [],
+      fitness_level: '',
+      activity_level: '',
+    };
+    document.querySelectorAll('.fp-chips[data-field]').forEach(function(container) {
+      const field = container.getAttribute('data-field');
+      const single = container.getAttribute('data-single') === 'true';
+      const selected = [];
+      container.querySelectorAll('.fp-chip.selected').forEach(function(c) { selected.push(c.getAttribute('data-value')); });
+      if (single && selected.length) payload[field] = selected[0];
+      else payload[field] = selected;
+    });
+    return payload;
+  }
+
+  btnSave.addEventListener('click', function() {
+    clearMessage();
+    btnSave.disabled = true;
+    fetch(saveUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+      body: JSON.stringify(getPayload()),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok) showMessage(lang === 'en' ? 'Profile saved.' : 'Профиль сохранён.', 'success');
+        else showMessage(data.error || (lang === 'en' ? 'Error saving.' : 'Ошибка сохранения.'), 'error');
+      })
+      .catch(function() { showMessage(lang === 'en' ? 'Network error.' : 'Ошибка сети.', 'error'); })
+      .finally(function() { btnSave.disabled = false; });
+  });
+
+  btnGenerate.addEventListener('click', function() {
+    clearMessage();
+    btnGenerate.disabled = true;
+    fetch(saveUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+      body: JSON.stringify(getPayload()),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function() { return fetch(planUrl, { method: 'POST', headers: { 'X-CSRFToken': csrfToken } }); })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok && data.plan && data.plan.length) {
+          planItems.innerHTML = '';
+          data.plan.forEach(function(p) {
+            const name = lang === 'en' ? (p.name_en || p.name) : p.name;
+            const div = document.createElement('div');
+            div.className = 'fp-plan-item';
+            div.innerHTML = '<span>' + (name || p.id) + '</span><span>' + (p.sets || '') + ' × ' + (p.reps || '') + '</span><a href="' + (p.url || '#') + '">' + (lang === 'en' ? 'Start' : 'Начать') + '</a>';
+            planItems.appendChild(div);
+          });
+          var subEl = document.getElementById('fp-plan-subtitle');
+          if (subEl) {
+            if (data.generated_by === 'ai') {
+              subEl.textContent = lang === 'en' ? 'Generated by AI based on your profile.' : 'Сгенерировано ИИ по вашему профилю.';
+            } else {
+              subEl.textContent = lang === 'en' ? 'Recommended plan (no API key). Add GROQ_API_KEY or OPENAI_API_KEY in .env for AI plan.' : 'Рекомендованный план (без ИИ). Добавьте GROQ_API_KEY или OPENAI_API_KEY в .env для плана от ИИ.';
+            }
+          }
+          planEl.classList.add('visible');
+          planEl.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          showMessage(data.message || (lang === 'en' ? 'Fill in age and goals in the profile first.' : 'Заполните возраст и цели в профиле.'), 'error');
+        }
+      })
+      .catch(function() { showMessage(lang === 'en' ? 'Network error.' : 'Ошибка сети.', 'error'); })
+      .finally(function() { btnGenerate.disabled = false; });
+  });
+})();
+</script>
+{% endblock %}

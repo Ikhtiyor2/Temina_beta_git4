@@ -1,0 +1,1108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}Statistics{% else %}Статистика{% endif %} • TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===================== STATS • PURPLE CLEAN ===================== */
+
+  .stats-page { padding: 0 0 40px; }
+
+  .stats-hero {
+    position: relative;
+    padding: 24px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(168,85,247,0.2);
+    background: linear-gradient(145deg, rgba(168,85,247,0.06) 0%, rgba(217,70,239,0.03) 50%, var(--bg-card) 100%);
+    box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .stats-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end), #06b6d4);
+    opacity: 0.9;
+  }
+  .stats-hero::after{
+    content:"";
+    position:absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -30%, rgba(168,85,247,0.08), transparent 50%);
+    pointer-events:none;
+  }
+
+  .stats-hero-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .stats-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stats-title h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.15;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stats-title p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 700px;
+  }
+
+  .stats-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+    font-size: 0.92rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .meta-pill i {
+    color: rgba(139, 92, 246, 0.95);
+    font-size: 1.15rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero-actions .btn {
+    border-radius: 999px;
+  }
+
+  /* ===================== GRID ===================== */
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .stat-card {
+    grid-column: span 3;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 16px 16px 14px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+    transition: transform 180ms ease, border-color 180ms ease;
+    min-height: 124px;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(168, 85, 247, 0.35);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 30px rgba(168,85,247,0.08);
+  }
+  .stat-card:nth-child(1) .stat-ico { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.25); color: var(--purple2); }
+  .stat-card:nth-child(2) .stat-ico { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.25); color: #22d3ee; }
+  .stat-card:nth-child(3) .stat-ico { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.25); color: #fbbf24; }
+  .stat-card:nth-child(4) .stat-ico { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.2); color: #f87171; }
+  .stat-card:nth-child(5) .stat-ico { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.25); color: #4ade80; }
+  .stat-card:nth-child(6) .stat-ico { background: rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.25); color: #f472b6; }
+  .stat-card:nth-child(1):hover { border-color: rgba(168,85,247,0.4); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(168,85,247,0.12); }
+  .stat-card:nth-child(2):hover { border-color: rgba(6,182,212,0.35); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(6,182,212,0.1); }
+  .stat-card:nth-child(3):hover { border-color: rgba(251,191,36,0.35); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(251,191,36,0.08); }
+  .stat-card:nth-child(4):hover { border-color: rgba(239,68,68,0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(239,68,68,0.08); }
+  .stat-card:nth-child(5):hover { border-color: rgba(34,197,94,0.35); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(34,197,94,0.08); }
+  .stat-card:nth-child(6):hover { border-color: rgba(236,72,153,0.35); box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 28px rgba(236,72,153,0.08); }
+
+  .stat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .stat-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-name strong {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.92);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stat-name span {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.60);
+  }
+
+  .stat-ico {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.18);
+    color: rgba(139,92,246,0.95);
+    font-size: 1.35rem;
+    transition: transform .2s;
+  }
+  .stat-card:hover .stat-ico { transform: scale(1.05); }
+
+  .stat-value {
+    font-size: 2.05rem;
+    font-weight: 900;
+    letter-spacing: -0.6px;
+    margin: 0 0 8px;
+    line-height: 1;
+  }
+
+  .stat-sub {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.72);
+    font-size: 0.9rem;
+  }
+
+  .stat-sub b {
+    color: rgba(255,255,255,0.92);
+  }
+
+  .stat-unit {
+    opacity: 0.65;
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+
+  /* Секции */
+  .stats-section {
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+  .stats-section:first-of-type { margin-top: 0; }
+  .stats-section-title {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.95);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stats-section-title i {
+    color: var(--purple2);
+    font-size: 1.25rem;
+  }
+  .stats-section-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  /* ===================== PANELS ===================== */
+
+  .panel {
+    grid-column: span 6;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 22px;
+    padding: 16px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .panel-title h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: rgba(255,255,255,0.92);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title h2 i {
+    color: rgba(139,92,246,0.95);
+    font-size: 1.2rem;
+  }
+
+  .panel-note {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .panel-hint {
+    margin: 0 0 12px;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.4;
+  }
+
+  .stats-panel-full {
+    grid-column: span 12;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    height: 220px;
+    position: relative;
+  }
+
+  /* Progress list */
+  .progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 6px;
+  }
+
+  .progress-item {
+    padding: 12px 12px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 8px 14px;
+    align-items: center;
+  }
+  .progress-item .progress-top { grid-column: 1; margin-bottom: 0; }
+  .progress-item .progress-percent { grid-column: 2; grid-row: 1; }
+  .progress-item .bar { grid-column: 1 / -1; }
+  .progress-item .progress-bottom { grid-column: 1; }
+  .progress-item .progress-link { grid-column: 2; grid-row: 2 / 4; }
+  .progress-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: rgba(168,85,247,0.15);
+    border: 1px solid rgba(168,85,247,0.25);
+    color: var(--purple2);
+    text-decoration: none;
+    transition: background .2s, border-color .2s;
+  }
+  .progress-link:hover {
+    background: rgba(168,85,247,0.25);
+    border-color: rgba(168,85,247,0.4);
+  }
+
+  .progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .progress-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .progress-label i {
+    color: rgba(139,92,246,0.95);
+    font-size: 1.2rem;
+  }
+
+  .progress-percent {
+    font-weight: 900;
+    color: rgba(139,92,246,0.95);
+  }
+
+  .bar {
+    height: 9px;
+    background: rgba(139,92,246,0.10);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid rgba(139,92,246,0.12);
+  }
+
+  .bar > div {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    transition: width 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .progress-bottom {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: rgba(255,255,255,0.70);
+    font-size: 0.9rem;
+  }
+
+  .progress-bottom b {
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* Achievements */
+  .achievements {
+    grid-column: span 12;
+    padding: 18px;
+  }
+
+  .ach-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .ach-card {
+    grid-column: span 3;
+    border-radius: 20px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+
+  .ach-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(139,92,246,0.22);
+  }
+
+  .ach-card.unlocked {
+    background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(0,255,157,0.06));
+    border-color: rgba(0,255,157,0.22);
+  }
+
+  .ach-ico {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.16);
+    color: rgba(139,92,246,0.95);
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  .ach-card.unlocked .ach-ico {
+    background: rgba(0,255,157,0.10);
+    border-color: rgba(0,255,157,0.18);
+    color: rgba(0,255,157,0.95);
+  }
+
+  .ach-title {
+    font-weight: 900;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .ach-desc {
+    color: rgba(255,255,255,0.70);
+    font-size: 0.92rem;
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+
+  .ach-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(139,92,246,0.10);
+    border: 1px solid rgba(139,92,246,0.14);
+    color: rgba(139,92,246,0.95);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  .ach-card.unlocked .ach-tag {
+    background: rgba(0,255,157,0.10);
+    border-color: rgba(0,255,157,0.14);
+    color: rgba(0,255,157,0.95);
+  }
+
+  /* Loader */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.82);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    transition: opacity 180ms ease;
+  }
+
+  .overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .overlay .spin {
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    border: 4px solid rgba(139,92,246,0.22);
+    border-top-color: rgba(139,92,246,0.95);
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .overlay span {
+    color: rgba(255,255,255,0.85);
+    font-weight: 800;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .stat-card { grid-column: span 6; }
+    .panel { grid-column: span 12; }
+    .ach-card { grid-column: span 6; }
+  }
+
+  @media (max-width: 768px) {
+    .stats-hero-top {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stats-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .hero-actions {
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+    .hero-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .stat-card { grid-column: span 6; }
+  }
+
+  @media (max-width: 640px) {
+    .stats-title h1 { font-size: 1.4rem; }
+    .stats-title p { font-size: 0.9rem; }
+    .stat-card { grid-column: span 12; }
+    .ach-card { grid-column: span 12; }
+    .chart-wrap { height: 180px; }
+    .stats-grid { gap: 10px; }
+    .stat-value { font-size: 1.75rem; }
+    .panel { padding: 12px; }
+    .progress-item {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto auto;
+    }
+    .progress-item .progress-percent { grid-column: 1; grid-row: 1; }
+    .progress-item .progress-link { grid-column: 1; grid-row: 4; justify-self: start; }
+    .meta-pill { font-size: 0.82rem; padding: 8px 10px; }
+  }
+
+  @media (max-width: 420px) {
+    .stats-hero { padding: 16px 14px; }
+    .stats-title h1 { font-size: 1.25rem; }
+    .ach-grid { gap: 8px; }
+    .ach-card { padding: 12px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ds-container stats-page">
+
+  <!-- Loader -->
+  <div id="loadingOverlay" class="overlay">
+    <div class="spin"></div>
+    <span>{% if current_lang == 'en' %}Loading statistics...{% else %}Загрузка статистики...{% endif %}</span>
+  </div>
+
+  <!-- HERO -->
+  <section class="stats-hero">
+    <div class="stats-hero-top">
+      <div class="stats-title">
+        <h1 class="text-gradient">{% if current_lang == 'en' %}Statistics{% else %}Статистика{% endif %}</h1>
+        <p id="statsSubtitle">{% if current_lang == 'en' %}Loading progress…{% else %}Загрузка прогресса…{% endif %}</p>
+      </div>
+
+      <div class="stats-meta">
+        <div class="meta-pill">
+          <i class="ri-time-line"></i>
+          <span id="statsUpdateTime">—</span>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/workouts/">
+            <i class="ri-play-circle-line"></i> {% if current_lang == 'en' %}Workout{% else %}Тренировка{% endif %}
+          </a>
+          <button class="btn btn-secondary" onclick="loadStats(true)">
+            <i class="ri-refresh-line"></i> {% if current_lang == 'en' %}Refresh{% else %}Обновить{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Секция: главные показатели -->
+  <section class="stats-section">
+    <h2 class="stats-section-title"><i class="ri-dashboard-3-line"></i> {% if current_lang == 'en' %}Key metrics{% else %}Главные показатели{% endif %}</h2>
+    <p class="stats-section-desc">{% if current_lang == 'en' %}Overview of your workouts{% else %}Общая картина ваших тренировок{% endif %}</p>
+  </section>
+
+  <!-- MAIN STATS -->
+  <section class="stats-grid">
+
+    <!-- 1 -->
+    <div class="stat-card">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Sessions{% else %}Занятий{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}workout count{% else %}количество тренировок{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-heart-pulse-line"></i></div>
+      </div>
+      <div class="stat-value" id="totalWorkouts">0</div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}today{% else %}сегодня{% endif %}</span>
+        <b id="todayWorkouts">0</b>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="stat-card">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Reps{% else %}Повторений{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}total all time{% else %}всего за всё время{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-repeat-2-line"></i></div>
+      </div>
+      <div class="stat-value" id="totalReps">0</div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}today{% else %}сегодня{% endif %}</span>
+        <b id="todayReps">0</b>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="stat-card" title="{% if current_lang == 'en' %}Consecutive days with at least one workout{% else %}Дни подряд с хотя бы одной тренировкой{% endif %}">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Streak{% else %}Серия{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}consecutive days with workout{% else %}дней подряд с тренировкой{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-flashlight-line"></i></div>
+      </div>
+      <div class="stat-value" id="currentStreak">0</div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}your best{% else %}ваш рекорд{% endif %}</span>
+        <b id="maxStreak">0</b>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="stat-card">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Calories{% else %}Калории{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}approx burned{% else %}примерно сожжено{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-fire-line"></i></div>
+      </div>
+      <div class="stat-value"><span id="totalCalories">0</span><span class="stat-unit"> {% if current_lang == 'en' %}kcal{% else %}ккал{% endif %}</span></div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}today{% else %}сегодня{% endif %}</span>
+        <b><span id="todayCalories">0</span> {% if current_lang == 'en' %}kcal{% else %}ккал{% endif %}</b>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="stat-card">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Time{% else %}Время{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}total in workouts{% else %}в тренировках всего{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-timer-line"></i></div>
+      </div>
+      <div class="stat-value"><span id="workoutHours">0</span><span class="stat-unit"> {% if current_lang == 'en' %}h{% else %}ч{% endif %}</span></div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}efficiency{% else %}эффективность{% endif %}</span>
+        <b id="workoutEfficiency">0%</b>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="stat-card">
+      <div class="stat-head">
+        <div class="stat-name">
+          <strong>{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %}</strong>
+          <span>{% if current_lang == 'en' %}game progress{% else %}игровой прогресс{% endif %}</span>
+        </div>
+        <div class="stat-ico"><i class="ri-trophy-line"></i></div>
+      </div>
+      <div class="stat-value" id="playerLevel">1</div>
+      <div class="stat-sub">
+        <span>{% if current_lang == 'en' %}XP to next lvl{% else %}опыт до след. ур.{% endif %}</span>
+        <b id="xpProgress">0/100</b>
+      </div>
+    </div>
+
+    <!-- Секция: неделя -->
+    <div class="panel stats-panel-full">
+      <div class="panel-title">
+        <h2><i class="ri-line-chart-line"></i> {% if current_lang == 'en' %}Weekly activity{% else %}Активность за неделю{% endif %}</h2>
+        <div class="panel-note">{% if current_lang == 'en' %}Today:{% else %}Сегодня:{% endif %} <b><span id="todayIntensity">0</span>%</b> {% if current_lang == 'en' %}of goal{% else %}от цели{% endif %}</div>
+      </div>
+      <p class="panel-hint">{% if current_lang == 'en' %}Load by day. Goal: 30 min/day; higher line = closer to goal.{% else %}Нагрузка по дням недели. Цель — 30 мин в день; чем выше линия, тем ближе к цели.{% endif %}</p>
+      <div class="chart-wrap">
+        <canvas id="intensityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Секция: по упражнениям -->
+    <div class="panel stats-panel-full">
+      <div class="panel-title">
+        <h2><i class="ri-bar-chart-grouped-line"></i> {% if current_lang == 'en' %}By exercise{% else %}По упражнениям{% endif %}</h2>
+        <div class="panel-note">{% if current_lang == 'en' %}total and personal best per set{% else %}всего и личный рекорд за подход{% endif %}</div>
+      </div>
+      <p class="panel-hint">{% if current_lang == 'en' %}Bar = % of your best. Click "To workout" to add reps.{% else %}Полоска — процент от вашего лучшего результата. Нажмите «К тренировке», чтобы добавить повторения.{% endif %}</p>
+
+      <div class="progress-list">
+
+        <!-- Pushups -->
+        <div class="progress-item">
+          <div class="progress-top">
+            <div class="progress-label"><i class="ri-hand-heart-line"></i> {% if current_lang == 'en' %}Push-ups{% else %}Отжимания{% endif %}</div>
+            <div class="progress-percent" id="pushupsPercent">0%</div>
+          </div>
+          <div class="bar"><div id="pushupsBar"></div></div>
+          <div class="progress-bottom">
+            <span id="pushupsCount">{% if current_lang == 'en' %}Total: 0 reps{% else %}Всего: 0 повт.{% endif %}</span>
+            <span>{% if current_lang == 'en' %}Best:{% else %}Рекорд:{% endif %} <b id="pushupsMax">0</b></span>
+          </div>
+          <a href="/train/pushups/" class="progress-link"><i class="ri-run-line"></i> {% if current_lang == 'en' %}To workout{% else %}К тренировке{% endif %}</a>
+        </div>
+
+        <!-- Squats -->
+        <div class="progress-item">
+          <div class="progress-top">
+            <div class="progress-label"><i class="ri-walk-line"></i> {% if current_lang == 'en' %}Squats{% else %}Приседания{% endif %}</div>
+            <div class="progress-percent" id="squatsPercent">0%</div>
+          </div>
+          <div class="bar"><div id="squatsBar"></div></div>
+          <div class="progress-bottom">
+            <span id="squatsCount">{% if current_lang == 'en' %}Total: 0 reps{% else %}Всего: 0 повт.{% endif %}</span>
+            <span>{% if current_lang == 'en' %}Best:{% else %}Рекорд:{% endif %} <b id="squatsMax">0</b></span>
+          </div>
+          <a href="/train/squats/" class="progress-link"><i class="ri-run-line"></i> {% if current_lang == 'en' %}To workout{% else %}К тренировке{% endif %}</a>
+        </div>
+
+        <!-- Crunches -->
+        <div class="progress-item">
+          <div class="progress-top">
+            <div class="progress-label"><i class="ri-body-scan-line"></i> {% if current_lang == 'en' %}Crunches{% else %}Скручивания{% endif %}</div>
+            <div class="progress-percent" id="crunchesPercent">0%</div>
+          </div>
+          <div class="bar"><div id="crunchesBar"></div></div>
+          <div class="progress-bottom">
+            <span id="crunchesCount">{% if current_lang == 'en' %}Total: 0 reps{% else %}Всего: 0 повт.{% endif %}</span>
+            <span>{% if current_lang == 'en' %}Best:{% else %}Рекорд:{% endif %} <b id="crunchesMax">0</b></span>
+          </div>
+          <a href="/train/crunches/" class="progress-link"><i class="ri-run-line"></i> {% if current_lang == 'en' %}To workout{% else %}К тренировке{% endif %}</a>
+        </div>
+
+        <!-- Planks -->
+        <div class="progress-item">
+          <div class="progress-top">
+            <div class="progress-label"><i class="ri-timer-line"></i> {% if current_lang == 'en' %}Plank{% else %}Планка{% endif %}</div>
+            <div class="progress-percent" id="planksPercent">0%</div>
+          </div>
+          <div class="bar"><div id="planksBar"></div></div>
+          <div class="progress-bottom">
+            <span id="planksCount">{% if current_lang == 'en' %}Total: 0 sec{% else %}Всего: 0 сек{% endif %}</span>
+            <span>{% if current_lang == 'en' %}Best:{% else %}Рекорд:{% endif %} <b id="planksMax">0</b> {% if current_lang == 'en' %}sec{% else %}сек{% endif %}</span>
+          </div>
+          <a href="/train/planks/" class="progress-link"><i class="ri-run-line"></i> {% if current_lang == 'en' %}To workout{% else %}К тренировке{% endif %}</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Achievements -->
+    <div class="panel achievements">
+      <div class="panel-title">
+        <h2><i class="ri-medal-line"></i> {% if current_lang == 'en' %}Achievements{% else %}Достижения{% endif %}</h2>
+        <div class="panel-note">{% if current_lang == 'en' %}unlock with workouts{% else %}открываются за тренировки{% endif %}</div>
+      </div>
+      <p class="panel-hint">{% if current_lang == 'en' %}Do exercises and quests to earn badges.{% else %}Выполняйте упражнения и квесты, чтобы получать значки.{% endif %}</p>
+
+      <div class="ach-grid" id="achievementsContainer">
+        <!-- будет заполнено JS -->
+      </div>
+    </div>
+
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const TEMINA_LANG = '{{ current_lang|default:"ru" }}';
+  const S_EN = (TEMINA_LANG === 'en');
+
+  // ======================= API =======================
+  const API_CONFIG = {
+    combined: '/api/stats/combined/',
+    timeout: 10000,
+  };
+
+  let intensityChart = null;
+  let lastUpdateTime = null;
+
+  // ======================= HELPERS =======================
+  function setLoading(isLoading) {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    overlay.classList.toggle('hidden', !isLoading);
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString(S_EN ? 'en-GB' : 'ru-RU', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString(S_EN ? 'en-GB' : 'ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function getIntensityLevel(percent) {
+    if (percent >= 85) return S_EN ? 'High' : 'Высокая';
+    if (percent >= 60) return S_EN ? 'Medium' : 'Средняя';
+    if (percent >= 35) return S_EN ? 'Low' : 'Низкая';
+    return S_EN ? 'Very low' : 'Очень низкая';
+  }
+
+  function safeNum(v, def = 0) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : def;
+  }
+
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function setBar(barId, percentId, percent) {
+    const bar = document.getElementById(barId);
+    const perc = document.getElementById(percentId);
+    const p = Math.max(0, Math.min(100, safeNum(percent, 0)));
+
+    if (bar) bar.style.width = p + '%';
+    if (perc) perc.textContent = Math.round(p) + '%';
+  }
+
+  // ======================= CHART =======================
+  function initIntensityChart(values = []) {
+    const canvas = document.getElementById('intensityChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (intensityChart) intensityChart.destroy();
+
+    intensityChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: S_EN ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] : ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
+        datasets: [{
+          data: values.length === 7 ? values : [0,0,0,0,0,0,0],
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderColor: 'rgb(168, 85, 247)',
+          backgroundColor: 'rgba(168, 85, 247, 0.15)',
+          pointBackgroundColor: 'rgb(168, 85, 247)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            displayColors: false,
+            callbacks: {
+              label: (ctx) => (S_EN ? `Intensity: ${ctx.parsed.y}%` : `Интенсивность: ${ctx.parsed.y}%`)
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { callback: (v) => v + '%' }
+          }
+        }
+      }
+    });
+  }
+
+  function updateIntensityChart(values) {
+    if (!intensityChart) {
+      initIntensityChart(values);
+      return;
+    }
+    intensityChart.data.datasets[0].data = values;
+    intensityChart.update();
+  }
+
+  // ======================= UI UPDATE =======================
+  function updateStats(data) {
+    const basic = data.basicStats || {};
+    const comp = data.compStats || {};
+    const time = data.timeStats || {};
+
+    const total = basic.total_stats || {};
+    const today = basic.today_stats || {};
+    const player = comp.player || {};
+    const xp = comp.xp_progress || {};
+    const ex = comp.exercise_stats || {};
+    const timeStats = time.time_stats || {};
+
+    // header
+    lastUpdateTime = new Date();
+    setText('statsUpdateTime', (S_EN ? 'Updated: ' : 'Обновлено: ') + formatTime(lastUpdateTime));
+    setText('statsSubtitle', (S_EN ? 'Progress for ' : 'Прогресс за ') + formatDate(lastUpdateTime) + (S_EN ? ' • Intensity: ' : ' • Интенсивность: ') + getIntensityLevel(safeNum(timeStats.intensity, 0)));
+
+    // cards
+    setText('totalWorkouts', safeNum(total.total_workouts, 0).toLocaleString());
+    setText('todayWorkouts', safeNum(today.today_workouts, 0).toLocaleString());
+
+    setText('totalReps', safeNum(total.total_reps, 0).toLocaleString());
+    setText('todayReps', safeNum(today.today_reps, 0).toLocaleString());
+
+    setText('currentStreak', safeNum(total.current_streak, 0));
+    setText('maxStreak', safeNum(total.max_streak, 0));
+
+    setText('totalCalories', Math.round(safeNum(total.total_calories, 0)).toLocaleString());
+    setText('todayCalories', Math.round(safeNum(today.today_calories, 0)).toLocaleString());
+
+    setText('workoutHours', safeNum(timeStats.workout_time?.hours, 0));
+    setText('workoutEfficiency', Math.round(safeNum(timeStats.efficiency, 0)) + '%');
+
+    setText('playerLevel', safeNum(player.level, 1));
+    setText('xpProgress', `${safeNum(xp.current, 0)}/${safeNum(xp.max, 100)}`);
+
+    // intensity
+    const intensity = Math.round(safeNum(timeStats.intensity, 0));
+    setText('todayIntensity', intensity);
+
+    // weekly chart
+    const weekly = data.weekly_intensity || timeStats.week?.daily_intensity || [];
+    updateIntensityChart(weekly);
+
+    // exercises (3)
+    const push = ex.pushups || {};
+    const squats = ex.squats || {};
+    const crunch = ex.crunches || {};
+    const plank = ex.planks || {};
+
+    setBar('pushupsBar', 'pushupsPercent', safeNum(push.progress, 0));
+    setText('pushupsCount', S_EN ? `Total: ${safeNum(push.total, 0).toLocaleString()} reps` : `Всего: ${safeNum(push.total, 0).toLocaleString()} повт.`);
+    setText('pushupsMax', safeNum(push.max_single, 0));
+
+    setBar('squatsBar', 'squatsPercent', safeNum(squats.progress, 0));
+    setText('squatsCount', S_EN ? `Total: ${safeNum(squats.total, 0).toLocaleString()} reps` : `Всего: ${safeNum(squats.total, 0).toLocaleString()} повт.`);
+    setText('squatsMax', safeNum(squats.max_single, 0));
+
+    setBar('crunchesBar', 'crunchesPercent', safeNum(crunch.progress, 0));
+    setText('crunchesCount', S_EN ? `Total: ${safeNum(crunch.total, 0).toLocaleString()} reps` : `Всего: ${safeNum(crunch.total, 0).toLocaleString()} повт.`);
+    setText('crunchesMax', safeNum(crunch.max_single, 0));
+
+    setBar('planksBar', 'planksPercent', safeNum(plank.progress, 0));
+    setText('planksCount', S_EN ? `Total: ${safeNum(plank.total, 0).toLocaleString()} sec` : `Всего: ${safeNum(plank.total, 0).toLocaleString()} сек`);
+    setText('planksMax', safeNum(plank.max_single, 0));
+
+    // achievements
+    renderAchievements(comp.achievements || data.achievements || []);
+  }
+
+  const ACH_EN = {
+    'Первый шаг': 'First step',
+    'Сделайте первую тренировку.': 'Do your first workout.',
+    'Упорный': 'Determined',
+    'Тренируйтесь 3 дня подряд.': 'Work out 3 days in a row.',
+    'Машина': 'Machine',
+    'Сделайте 1000 повторений.': 'Do 1000 reps.',
+    'Стабильность': 'Consistency',
+    'Выполните 10 тренировок.': 'Complete 10 workouts.'
+  };
+  function trAch(s) {
+    if (!S_EN || !s) return s;
+    return ACH_EN[s] || s;
+  }
+
+  function renderAchievements(items) {
+    const container = document.getElementById('achievementsContainer');
+    if (!container) return;
+
+    if (!items || items.length === 0) {
+      const emptyTitle = S_EN ? 'Achievements will appear after workouts' : 'Достижения появятся после тренировок';
+      const emptyDesc = S_EN ? 'Start doing exercises for TeminaFit to unlock rewards.' : 'Начните выполнять упражнения, чтобы TeminaFit начал открывать награды.';
+      const firstStep = S_EN ? 'First step' : 'Первый шаг';
+      container.innerHTML = `
+        <div class="ach-card unlocked" style="grid-column: 1 / -1;">
+          <div class="ach-ico"><i class="ri-rocket-line"></i></div>
+          <div class="ach-title">${emptyTitle}</div>
+          <div class="ach-desc">${emptyDesc}</div>
+          <div class="ach-tag"><i class="ri-sparkling-2-line"></i> ${firstStep}</div>
+        </div>
+      `;
+      return;
+    }
+
+    const first = items.slice(0, 4);
+    container.innerHTML = first.map(a => {
+      const unlocked = !!a.unlocked || safeNum(a.progress, 0) >= safeNum(a.requirement, 100);
+      const icon = a.icon || 'ri-medal-2-line';
+
+      // если иконка пришла эмодзи — покажем как есть
+      const iconHtml = icon.startsWith('ri-')
+        ? `<i class="${icon}"></i>`
+        : `<span style="font-size:1.35rem">${icon}</span>`;
+
+      const achName = trAch(a.name) || (S_EN ? 'Achievement' : 'Достижение');
+      const achDesc = trAch(a.description) || (a.description || '');
+      const achStatus = unlocked ? (S_EN ? 'Unlocked' : 'Разблокировано') : (S_EN ? `Progress: ${safeNum(a.progress, 0)}%` : `Прогресс: ${safeNum(a.progress, 0)}%`);
+      return `
+        <div class="ach-card ${unlocked ? 'unlocked' : ''}">
+          <div class="ach-ico">${iconHtml}</div>
+          <div class="ach-title">${achName}</div>
+          <div class="ach-desc">${achDesc}</div>
+          <div class="ach-tag">
+            <i class="${unlocked ? 'ri-checkbox-circle-line' : 'ri-loader-2-line'}"></i>
+            ${achStatus}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ======================= LOAD =======================
+  async function loadStats(force = false) {
+    try {
+      setLoading(true);
+
+      const res = await fetch(API_CONFIG.combined, {
+        signal: AbortSignal.timeout(API_CONFIG.timeout),
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      const data = await res.json();
+      if (!data || data.success !== true) throw new Error(data?.error || 'bad response');
+
+      updateStats(data);
+
+    } catch (e) {
+      console.error(e);
+
+      // fallback: пустые данные без краша
+      updateStats({
+        success: true,
+        basicStats: { total_stats: {}, today_stats: {} },
+        compStats: { player: {}, xp_progress: {}, exercise_stats: {}, achievements: [] },
+        timeStats: { time_stats: {} },
+        weekly_intensity: [0,0,0,0,0,0,0]
+      });
+
+      setText('statsSubtitle', S_EN ? 'Failed to load statistics. Check API /api/stats/combined/' : 'Не удалось загрузить статистику. Проверьте API /api/stats/combined/');
+      setText('statsUpdateTime', S_EN ? 'Load error' : 'Ошибка загрузки');
+
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ======================= INIT =======================
+  document.addEventListener('DOMContentLoaded', () => {
+    initIntensityChart([0,0,0,0,0,0,0]);
+    loadStats(false);
+
+    // Обновляем каждые 30 сек (не спамим)
+    setInterval(() => loadStats(true), 30000);
+  });
+
+  window.loadStats = loadStats;
+</script>
+{% endblock %}

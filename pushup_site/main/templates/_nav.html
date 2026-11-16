@@ -1,0 +1,40 @@
+<!-- templates/main/_nav.html -->
+<nav class="navbar backdrop-blur-glass">
+    <div class="nav-container">
+        <a href="{% url 'home' %}" class="nav-brand gradient-text">TEMINAFIT</a>
+        
+        <div class="nav-menu">
+            <a href="{% url 'home' %}" class="nav-btn {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fas fa-running"></i>
+                Тренировки
+            </a>
+            <a href="{% url 'quests' %}" class="nav-btn {% if request.resolver_match.url_name == 'quests' %}active{% endif %}">
+                <i class="fas fa-trophy"></i>
+                Квесты
+            </a>
+            <a href="{% url 'stats' %}" class="nav-btn {% if request.resolver_match.url_name == 'stats' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                Аналитика
+            </a>
+            <a href="{% url 'profile' %}" class="nav-btn {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="fas fa-shield-alt"></i>
+                Профиль10!
+            </a>
+        </div>
+
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <div class="level-badge badge badge-success">
+                    <i class="fas fa-fire"></i>
+                    Ур. {{ player.level|default:1 }}
+                </div>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost btn-sm" style="cursor:pointer;">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login_page' %}" class="btn btn-ghost btn-sm">Войти</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

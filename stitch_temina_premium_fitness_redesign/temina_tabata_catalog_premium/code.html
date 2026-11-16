@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#a04100",
+                        "on-surface": "#1a1b22",
+                        "surface-dim": "#dad9e2",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "on-tertiary-fixed-variant": "#00497b",
+                        "secondary": "#5f5e60",
+                        "inverse-on-surface": "#f1eff9",
+                        "on-secondary-fixed": "#1b1b1d",
+                        "surface-bright": "#fbf8ff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#572000",
+                        "surface-variant": "#e3e1eb",
+                        "secondary-container": "#e5e1e4",
+                        "surface-tint": "#a04100",
+                        "primary-fixed": "#ffdbcc",
+                        "tertiary": "#0062a1",
+                        "on-primary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e9e7f1",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "outline": "#8e7164",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2f3037",
+                        "background": "#fbf8ff",
+                        "on-secondary-container": "#656466",
+                        "error": "#ba1a1a",
+                        "on-background": "#1a1b22",
+                        "on-tertiary-container": "#003357",
+                        "on-tertiary-fixed": "#001d35",
+                        "surface-container-highest": "#e3e1eb",
+                        "outline-variant": "#e2bfb0",
+                        "secondary-fixed": "#e5e1e4",
+                        "inverse-primary": "#ffb693",
+                        "tertiary-container": "#059eff",
+                        "on-surface-variant": "#5a4136",
+                        "tertiary-fixed": "#d0e4ff",
+                        "surface": "#fbf8ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#474649",
+                        "surface-container-low": "#f4f2fc",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container": "#efedf6",
+                        "primary-container": "#ff6b00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-grid": "16px",
+                        "stack-lg": "32px",
+                        "margin-page": "24px",
+                        "stack-sm": "8px",
+                        "section-gap": "48px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-metric": ["Lexend"],
+                        "headline-lg-mobile": ["Lexend"],
+                        "body-secondary": ["Manrope"],
+                        "caption-pill": ["Manrope"],
+                        "section-title": ["Manrope"],
+                        "headline-lg": ["Lexend"],
+                        "body-main": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "display-metric": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "800"}],
+                        "body-secondary": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "caption-pill": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "section-title": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "headline-lg": ["34px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "body-main": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(180deg, #FBF8FF 0%, #F4F2FC 100%);
+            min-height: 844px;
+            width: 390px;
+            margin: 0 auto;
+            color: #1a1b22;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar { display: none; }
+        .glass-pill {
+            background: #F4F2FC;
+            border: 1px solid #E8E8EC;
+        }
+        .scrim-bottom {
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.88) 100%);
+        }
+        .active-tap:active { transform: scale(0.98); transition: transform 0.1s ease; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-main selection:bg-primary-fixed">
+<!-- Header Section -->
+<header class="pt-stack-md px-margin-page flex flex-col gap-stack-md">
+<div class="flex items-center">
+<button class="w-[40px] h-[40px] rounded-full border border-outline-variant flex items-center justify-center text-on-surface active-tap">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 200;">arrow_back</span>
+</button>
+</div>
+<div class="flex flex-col">
+<h1 class="font-headline-lg text-headline-lg text-on-surface leading-none">Tabata</h1>
+<p class="font-body-secondary text-body-secondary text-secondary mt-1">HIIT через камеру · AI считает повторы и калории</p>
+</div>
+</header>
+<!-- AI Capability Strip -->
+<div class="mt-stack-lg px-margin-page overflow-x-auto custom-scrollbar flex gap-stack-sm">
+<div class="glass-pill px-stack-md py-2 rounded-full flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-primary text-[18px]">photo_camera</span>
+<span class="font-caption-pill text-caption-pill text-on-surface">📷 Камера</span>
+</div>
+<div class="glass-pill px-stack-md py-2 rounded-full flex items-center gap-2 whitespace-nowrap border-primary/20">
+<span class="material-symbols-outlined text-primary text-[18px]">auto_awesome</span>
+<span class="font-caption-pill text-caption-pill text-on-surface">✦ AI-счёт</span>
+</div>
+<div class="glass-pill px-stack-md py-2 rounded-full flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-primary text-[18px]">local_fire_department</span>
+<span class="font-caption-pill text-caption-pill text-on-surface">🔥 Ккал live</span>
+</div>
+</div>
+<!-- Hero Featured Card -->
+<section class="mt-stack-lg px-margin-page">
+<div class="relative w-full h-[248px] rounded-[32px] overflow-hidden bg-inverse-surface border border-outline-variant active-tap group cursor-pointer">
+<img alt="High Intensity Athlete" class="w-full h-full object-cover grayscale-[0.2]" data-alt="A professional athlete performing an intense burpee in a high-end, dark charcoal fitness studio. The lighting is cinematic with dramatic shadows, creating a high-performance athletic mood. The color palette is dominated by deep blacks and grays with a focused, premium minimalist feel. Sharp clarity on the athlete's movement conveys power and effortless discipline." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgwHEo85U1GC6chjtE2IN-Vzhq9IXaK38uW_vz8nRVvNFkDAu5-L7VHhFR8sdOdoV2mx2G6Sd6U1_rvkgQ0H8uh2AtHqnaNRwZq4VTRntif_zjCfbqb0Y9eaKn9C6-JIV9dD9worQz4U-j0BWnY3gU99528xjTQs2YMbDnK4rltio1jxVag_2HCK3ZfYLX4sd54EgTCmBmWQaSDd8LiP5hrGKIsjd5MNbk7qkgvn2qop3nAQnu43BgAtWMvczLX7xgMTbnn6I-JF-"/>
+<div class="absolute inset-0 scrim-bottom"></div>
+<div class="absolute top-4 left-4">
+<div class="bg-primary px-3 py-1 rounded-full">
+<span class="font-caption-pill text-[10px] text-white tracking-widest uppercase">РЕКОМЕНДУЕМ</span>
+</div>
+</div>
+<div class="absolute bottom-5 left-5 right-5 flex flex-col gap-3">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-white leading-tight">классика 20/10</h2>
+<div class="flex flex-wrap gap-2">
+<div class="bg-white/10 backdrop-blur-md border border-white/20 px-2 py-1 rounded-lg">
+<span class="font-caption-pill text-[11px] text-white/90">20/10 сек</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md border border-white/20 px-2 py-1 rounded-lg">
+<span class="font-caption-pill text-[11px] text-white/90">8 раундов</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md border border-white/20 px-2 py-1 rounded-lg">
+<span class="font-caption-pill text-[11px] text-white/90">~16 мин</span>
+</div>
+</div>
+<div class="mt-1">
+<button class="bg-primary text-white font-caption-pill px-6 py-2 rounded-full active-tap">Начать</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Programs Section Header -->
+<section class="mt-section-gap px-margin-page flex justify-between items-end">
+<h3 class="font-headline-lg-mobile text-section-title text-on-surface">Программы</h3>
+<span class="font-caption-pill text-secondary">3 из 4</span>
+</section>
+<!-- Difficulty Filter -->
+<div class="mt-stack-md px-margin-page overflow-x-auto custom-scrollbar flex gap-2">
+<button class="px-5 py-2 bg-primary text-white rounded-full font-caption-pill active-tap">Все</button>
+<button class="px-5 py-2 bg-surface-container text-secondary rounded-full font-caption-pill active-tap">Лёгкий</button>
+<button class="px-5 py-2 bg-surface-container text-secondary rounded-full font-caption-pill active-tap">Средний</button>
+<button class="px-5 py-2 bg-surface-container text-secondary rounded-full font-caption-pill active-tap">Интенсивный</button>
+</div>
+<!-- Program List -->
+<div class="mt-stack-lg px-margin-page flex flex-col gap-stack-md pb-stack-lg">
+<!-- Card A -->
+<div class="bg-white border border-[#E8E8EC] rounded-[24px] p-stack-md flex gap-stack-md active-tap cursor-pointer">
+<div class="relative w-[88px] h-[88px] rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Squat Exercise" class="w-full h-full object-cover" data-alt="Close-up shot of a person performing a controlled bodyweight squat in a minimalist bright gym. Soft sunlight illuminates the high-end fitness equipment in the background. The visual style is clean, premium, and focused on form and health, using a soft neutral palette and warm light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvvtYd-s_IsvcAQ715lWrc9i_XiRldFH4aT5KUqiIjGt0uubtM0-g21VJZ7pV6pV30GAsihey6ZjckjI8rVBbcAtw2mFjYJb0PKwRnHvDiYZcZXIuwmvFamz7YGXnJNuyF-rI6-kULdAtj54dyAEkdNVvkixBMd8U5YH9Uo4-tjnAQsk7lZ2tKYm88gZxptdcq2BRBVQIdcmrJDvxG7BOVAtkKDGdlTdvivR61Hyd_bEOe7Jq6_AuACEcu6JNaOl4A739PyC3VzQcG"/>
+<div class="absolute bottom-1 right-1 bg-black/60 px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+<span class="text-[10px] text-white font-bold">~12 мин</span>
+</div>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-1 h-3 bg-green-500 rounded-full"></div>
+<h4 class="font-section-title text-[15px] text-on-surface truncate">жиросжигание (старт)</h4>
+</div>
+<div class="flex gap-3 mb-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Темп</span>
+<span class="font-body-main text-[13px]">30/15</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Раунды</span>
+<span class="font-body-main text-[13px]">4</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Упр.</span>
+<span class="font-body-main text-[13px]">4</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Приседания</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Отжимания</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">+1</span>
+</div>
+</div>
+</div>
+<!-- Card B -->
+<div class="bg-white border border-[#E8E8EC] rounded-[24px] p-stack-md flex gap-stack-md active-tap cursor-pointer">
+<div class="relative w-[88px] h-[88px] rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Burpee Exercise" class="w-full h-full object-cover" data-alt="An athlete in dynamic motion performing a high-intensity burpee jump. The shot captures peak athletic performance with a sense of speed and intensity. The studio setting is minimalist with a modern, high-end feel. Lighting is sharp and bright, highlighting muscle definition and athletic focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxCrI8R7Bwlhx40io1QnpDhv1rGgWOp0EpxEOI0zyh1tgsQs5qeKBVRFUZu3D9H_HqqLEiiQWFN_NaK5kbX7TFyUGCvf6WVev46jtz_d5tykjN5ADnaUtQ-lSUXEt7XhKXxEnLOe5rqvMERlUw9VfXM7GAgjxuccyd-aj1J5fRpx9BAt2zqy32LU5acc1BtTtCw9XVIIpMcL4sqkIxf0_pzoHXSdtSwu9li-uZjP04eiFDKpzyNbsFuf5XJw8Z_a4mv769CKKa4-sf"/>
+<div class="absolute bottom-1 right-1 bg-black/60 px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+<span class="text-[10px] text-white font-bold">~12 мин</span>
+</div>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-1 h-3 bg-error rounded-full"></div>
+<h4 class="font-section-title text-[15px] text-on-surface truncate">экспресс 12 мин</h4>
+</div>
+<div class="flex gap-3 mb-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Темп</span>
+<span class="font-body-main text-[13px]">20/10</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Раунды</span>
+<span class="font-body-main text-[13px]">6</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Упр.</span>
+<span class="font-body-main text-[13px]">5</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Берпи</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Прыжки</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">+2</span>
+</div>
+</div>
+</div>
+<!-- Card C -->
+<div class="bg-white border border-[#E8E8EC] rounded-[24px] p-stack-md flex gap-stack-md active-tap cursor-pointer">
+<div class="relative w-[88px] h-[88px] rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Gentle Movement" class="w-full h-full object-cover" data-alt="A person performing a slow, controlled lunge in a bright, airy fitness studio. The atmosphere is calm and restorative. High-end wood flooring and soft white walls create a premium minimalist wellness aesthetic. The lighting is diffused and natural, emphasizing precision and gentle physical care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDis0U14ONi-umycKQjP1tDDAMVKphvi9d5azz3wrHA18LDsuq2nLFzsWwy6B0VRyYhLuDklkSaeH2ObQ0Ad-bEFhSgSgalZBvc85gQ4O3qnSleQFA3euyt1jMwxDejhruuvJ45rQwU3i7E3GBf08nHVGVVISogJsF7n81PB4PY2cRIAfWSzPzROZGQ9hVTSB79GJQvd80BeXBmbF6KTlVziJFNdeYZ3Ucm6kHcl8bQUBtUTw1Fpc7coUdJfkxwxHSxQ3G9yx7HERcJ"/>
+<div class="absolute bottom-1 right-1 bg-black/60 px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+<span class="text-[10px] text-white font-bold">~15 мин</span>
+</div>
+</div>
+<div class="flex flex-col flex-grow min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-1 h-3 bg-green-500 rounded-full"></div>
+<h4 class="font-section-title text-[15px] text-on-surface truncate">щадящий (колени)</h4>
+</div>
+<div class="flex gap-3 mb-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Темп</span>
+<span class="font-body-main text-[13px]">40/20</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Раунды</span>
+<span class="font-body-main text-[13px]">3</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary uppercase font-semibold">Упр.</span>
+<span class="font-body-main text-[13px]">4</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Выпады</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Махи</span>
+<span class="bg-surface-container-low text-[10px] px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/30">Пресс</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        document.querySelectorAll('.active-tap').forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.style.transform = 'scale(0.98)';
+            });
+            button.addEventListener('touchend', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

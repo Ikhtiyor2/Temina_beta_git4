@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Создать тренировку с ИИ · TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+  .wb-page { max-width: 640px; margin: 0 auto; padding-bottom: 40px; }
+  .wb-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .wb-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+  .wb-chat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; min-height: 320px; }
+  .wb-messages { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; max-height: 400px; overflow-y: auto; }
+  .wb-msg { max-width: 90%; }
+  .wb-msg.bot { align-self: flex-start; }
+  .wb-msg.user { align-self: flex-end; }
+  .wb-msg-bubble { padding: 14px 18px; border-radius: 16px; line-height: 1.5; font-size: 0.95rem; }
+  .wb-msg.bot .wb-msg-bubble { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.2); }
+  .wb-msg.user .wb-msg-bubble { background: rgba(255,255,255,0.06); border: 1px solid var(--border); }
+  .wb-options { display: flex; flex-direction: column; gap: 10px; }
+  .wb-option { display: block; width: 100%; padding: 14px 18px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--txt); font-size: 0.95rem; font-weight: 500; text-align: left; cursor: pointer; transition: background .2s, border-color .2s; font-family: inherit; }
+  .wb-option:hover { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.3); }
+  .wb-plan { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .wb-plan-title { font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+  .wb-plan-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); margin-bottom: 10px; }
+  .wb-plan-item span:first-child { font-weight: 600; }
+  .wb-plan-item a { padding: 10px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+  .wb-plan-item a:hover { opacity: 0.95; }
+  .wb-restart { margin-top: 20px; }
+  .wb-restart a { color: var(--muted); font-size: 0.9rem; }
+  .wb-restart a:hover { color: var(--accent-end); }
+  .wb-loading { color: var(--muted); font-size: 0.9rem; padding: 8px 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wb-page">
+  <h1 class="wb-title">Создать тренировку с ИИ</h1>
+  <p class="wb-sub">Ответь на несколько вопросов: настроение, травмы и уставшие мышцы. ИИ подберёт безопасную тренировку.</p>
+
+  <div class="wb-chat">
+    <div style="display:none;">{% csrf_token %}</div>
+    <div id="wb-messages" class="wb-messages"></div>
+    <div id="wb-options" class="wb-options"></div>
+    <div id="wb-plan" class="wb-plan" style="display:none;"></div>
+    <div id="wb-loading" class="wb-loading" style="display:none;">ИИ думает...</div>
+    <div class="wb-restart" style="margin-top:16px;">
+      <a href="{% url 'workout_builder' %}">Начать заново</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const API = '{% url "api_workout_builder_chat" %}';
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+
+  const messagesEl = document.getElementById('wb-messages');
+  const optionsEl = document.getElementById('wb-options');
+  const planEl = document.getElementById('wb-plan');
+  const loadingEl = document.getElementById('wb-loading');
+
+  function addMessage(text, isUser) {
+    const div = document.createElement('div');
+    div.className = 'wb-msg ' + (isUser ? 'user' : 'bot');
+    div.innerHTML = '<div class="wb-msg-bubble">' + escapeHtml(text) + '</div>';
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showOptions(options) {
+    optionsEl.innerHTML = '';
+    options.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'wb-option';
+      btn.textContent = opt.label;
+      btn.dataset.value = opt.value;
+      btn.addEventListener('click', function() { sendAnswer(opt.value, opt.label); });
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function showPlan(plan) {
+    optionsEl.innerHTML = '';
+    planEl.style.display = 'block';
+    planEl.innerHTML = '<div class="wb-plan-title">Твоя тренировка</div>';
+    plan.forEach(function(p) {
+      const div = document.createElement('div');
+      div.className = 'wb-plan-item';
+      div.innerHTML = '<span>' + escapeHtml(p.name) + '</span><span>' + escapeHtml(p.sets) + ' × ' + escapeHtml(p.reps) + '</span><a href="' + escapeHtml(p.url) + '">Начать</a>';
+      planEl.appendChild(div);
+    });
+  }
+
+  function setLoading(show) {
+    loadingEl.style.display = show ? 'block' : 'none';
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function sendAnswer(optionValue, displayText) {
+    setLoading(true);
+    optionsEl.innerHTML = '';
+    addMessage(displayText != null ? displayText : (Array.isArray(optionValue) ? optionValue.join(', ') : optionValue), true);
+    fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        option_value: optionValue,
+      }),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        setLoading(false);
+        addMessage(data.message, false);
+        if (data.plan && data.plan.length) {
+          showPlan(data.plan);
+        } else if (data.options && data.options.length) {
+          showOptions(data.options);
+        }
+      })
+      .catch(function() {
+        setLoading(false);
+        addMessage('Ошибка соединения. Попробуй ещё раз.', false);
+      });
+  }
+
+  // Загрузить первый вопрос
+  setLoading(true);
+  fetch(API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({}),
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      setLoading(false);
+      addMessage(data.message, false);
+      if (data.options && data.options.length) {
+        showOptions(data.options);
+      }
+    })
+    .catch(function() {
+      setLoading(false);
+      addMessage('Не удалось загрузить чат. Обнови страницу.', false);
+    });
+})();
+</script>
+{% endblock %}

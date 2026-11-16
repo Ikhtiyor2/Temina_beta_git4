@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}{% if current_lang == 'en' %}Privacy Policy{% else %}Политика конфиденциальности{% endif %} — TeminaFit{% endblock %}
+
+{% block content %}
+<style>
+    .privacy-wrap {
+        max-width: 820px;
+        margin: 24px auto 64px;
+    }
+    .privacy-card {
+        padding: 40px 36px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+    }
+    .privacy-card h1 {
+        font-size: 1.85rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .privacy-meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+    .privacy-card h2 {
+        font-size: 1.08rem;
+        font-weight: 700;
+        margin: 32px 0 12px;
+        color: var(--txt);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .privacy-card h3 {
+        font-size: 0.98rem;
+        font-weight: 600;
+        margin: 20px 0 8px;
+        color: rgba(255,255,255,0.92);
+    }
+    .privacy-card p,
+    .privacy-card li {
+        color: rgba(255,255,255,0.76);
+        line-height: 1.72;
+        font-size: 0.94rem;
+        text-align: justify;
+    }
+    .privacy-card ul,
+    .privacy-card ol {
+        margin: 10px 0 14px 22px;
+    }
+    .privacy-card li {
+        margin-bottom: 8px;
+    }
+    .privacy-card a {
+        color: var(--accent-cyan);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .privacy-notice {
+        padding: 16px 18px;
+        border-left: 3px solid rgba(168,85,247,0.5);
+        background: rgba(255,255,255,0.02);
+        margin: 20px 0;
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+    }
+    @media (max-width: 640px) {
+        .privacy-card { padding: 24px 18px; }
+        .privacy-card h1 { font-size: 1.45rem; }
+        .privacy-card p, .privacy-card li { text-align: left; }
+    }
+</style>
+
+<div class="privacy-wrap">
+    <article class="privacy-card">
+        {% if current_lang == 'en' %}
+        <h1>Privacy Policy</h1>
+        <p class="privacy-meta">
+            Document version: 2.0<br>
+            Effective date: May 31, 2026<br>
+            Last revised: May 31, 2026<br>
+            Application: Temina Fit (Google Play package name: com.temina.nativeapp)<br>
+            Website and related services: <a href="https://temina.fit">https://temina.fit</a>
+        </p>
+
+        <div class="privacy-notice">
+            PLEASE READ THIS PRIVACY POLICY CAREFULLY BEFORE ACCESSING, DOWNLOADING, INSTALLING, REGISTERING FOR, OR OTHERWISE USING THE TEMINA FIT MOBILE APPLICATION, WEBSITE, OR ANY RELATED SERVICES (COLLECTIVELY, THE “SERVICES”). BY USING THE SERVICES, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THE TERMS OF THIS PRIVACY POLICY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+        </div>
+
+        <p>This Privacy Policy (“Policy”) describes the practices of the operator of Temina Fit (hereinafter referred to as “Temina Fit,” “we,” “us,” or “our”) regarding the collection, use, storage, disclosure, transfer, retention, and protection of information, including Personal Data and Sensitive Personal Data, obtained from or about individuals who access or use the Services (hereinafter referred to as “User,” “you,” or “your”). This Policy is intended to comply, where applicable, with requirements under the General Data Protection Regulation (EU) 2016/679 (“GDPR”), the UK GDPR, the California Consumer Privacy Act as amended by the CPRA (“CCPA/CPRA”), and other applicable data protection and privacy laws.</p>
+
+        <p>Nothing in this Policy constitutes medical advice, a medical device certification, or a guarantee of fitness outcomes. Temina Fit is a software-based fitness and wellness tool. You should consult a qualified healthcare professional before beginning any exercise program.</p>
+
+        <h2>Article 1. Definitions and Interpretation</h2>
+        <p>For the purposes of this Policy, the following terms shall have the meanings set forth below, unless the context requires otherwise:</p>
+        <ul>
+            <li><strong>“Personal Data”</strong> means any information relating to an identified or identifiable natural person, including but not limited to identifiers such as name, email address, online identifier, or factors specific to physical, physiological, genetic, mental, economic, cultural, or social identity.</li>
+            <li><strong>“Sensitive Personal Data”</strong> or <strong>“Special Category Data”</strong> means Personal Data revealing physical or mental health, biometric data for the purpose of uniquely identifying a natural person, data concerning health, fitness, or wellness where such data is treated as sensitive under applicable law, and any other category of data classified as sensitive or special category data under applicable legislation.</li>
+            <li><strong>“Processing”</strong> means any operation or set of operations performed on Personal Data, whether or not by automated means, including collection, recording, organization, structuring, storage, adaptation, alteration, retrieval, consultation, use, disclosure by transmission, dissemination, alignment, combination, restriction, erasure, or destruction.</li>
+            <li><strong>“Controller”</strong> means the entity that determines the purposes and means of Processing Personal Data. For the Services described herein, Temina Fit acts as the Controller unless otherwise stated.</li>
+            <li><strong>“Processor”</strong> means a natural or legal person, public authority, agency, or other body that Processes Personal Data on behalf of the Controller.</li>
+            <li><strong>“Device Permissions”</strong> means permissions requested by the mobile application through the operating system of your device, including but not limited to camera access, location access, and network access.</li>
+            <li><strong>“AI Features”</strong> means functionality involving automated analysis, recommendation, classification, or generation, including pose estimation, workout plan generation, coaching suggestions, and related machine-learning or large-language-model services.</li>
+        </ul>
+        <p>Headings in this Policy are for convenience only and shall not affect interpretation. References to “including” or “includes” shall be deemed to mean “including, without limitation.”</p>
+
+        <h2>Article 2. Scope of Application</h2>
+        <p>This Policy applies to Personal Data Processed in connection with:</p>
+        <ol>
+            <li>the Temina Fit Android mobile application distributed via Google Play and any subsequent versions thereof;</li>
+            <li>the website located at temina.fit and associated subdomains, progressive web application components, and service workers;</li>
+            <li>account registration, authentication, and session management across the app and website;</li>
+            <li>API endpoints, backend services, databases, and cloud infrastructure used to operate the Services;</li>
+            <li>customer support communications, privacy-related inquiries, and data subject requests.</li>
+        </ol>
+        <p>This Policy does not apply to third-party websites, applications, or services that may be linked from the Services, nor to data collected offline unless expressly incorporated by reference. We are not responsible for the privacy practices of third parties, and your use of third-party services is governed by their respective policies.</p>
+
+        <h2>Article 3. Data Controller and Contact Information</h2>
+        <p>The Controller responsible for Processing your Personal Data in connection with the Services is the operator of Temina Fit. For privacy-related inquiries, data subject requests, or complaints regarding this Policy, you may contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:privacy@temina.fit">privacy@temina.fit</a><br>
+        <strong>Subject line (recommended):</strong> “Privacy Inquiry — Temina Fit”</p>
+        <p>We will endeavor to respond to legitimate requests within the timeframes required by applicable law. We may request additional information to verify your identity before fulfilling certain requests.</p>
+
+        <h2>Article 4. Categories of Personal Data Collected</h2>
+        <p>Depending on your interaction with the Services, the Device Permissions you grant, and the features you enable, we may collect, receive, generate, or otherwise Process the categories of data described below. Not all categories apply to every User at all times.</p>
+
+        <h3>4.1. Account and Identity Data</h3>
+        <p>When you register for an account, we may collect username, email address, authentication credentials (stored in hashed or otherwise protected form), account identifiers, registration timestamps, login history, session tokens, and related metadata necessary to authenticate you and maintain account integrity.</p>
+
+        <h3>4.2. Profile, Demographic, and Fitness-Related Data</h3>
+        <p>During onboarding, assessment questionnaires, fitness profile configuration, or settings updates, you may voluntarily provide age, gender or gender-related selections, height, weight, target weight, fitness level, activity level, training frequency, equipment availability, muscle focus preferences, fitness goals, motivation factors, sleep quality indicators, sleep duration bands, health limitations or chronic condition indicators (where applicable and voluntarily disclosed), notes, and other wellness-related information. Such data may constitute Sensitive Personal Data under certain jurisdictions.</p>
+
+        <h3>4.3. Workout, Activity, and Performance Data</h3>
+        <p>We Process data relating to your use of fitness features, including but not limited to exercise type, repetitions, sets, duration, calories estimated or recorded, step counts, running distance, pace, route coordinates where applicable, workout completion status, streaks, experience points, skill attributes, quest progress, leaderboard rankings, achievements, fatigue indicators, and historical statistics aggregated over time.</p>
+
+        <h3>4.4. Camera, Image, and Biometric-Adjacent Data</h3>
+        <p>If you enable AI form analysis or related camera-based features, the application may access the device camera and Process video frames or still images for pose detection, movement analysis, repetition counting, or technique feedback. Processing may occur locally on your device, on our servers, or through a combination thereof. We do not activate the camera without your explicit permission through the operating system. We do not use camera data for purposes unrelated to the enabled feature without additional notice and, where required, consent.</p>
+
+        <h3>4.5. Location and Geolocation Data</h3>
+        <p>If you use run tracking, map visualization, or related location-dependent features, and if you grant location permissions, we may collect precise or approximate geolocation data, including GPS coordinates, timestamps associated with location fixes, route polylines, elevation where available, and derived metrics such as distance and speed. Location data is collected only when the relevant feature is active and permission has been granted, subject to operating system behavior and device settings.</p>
+
+        <h3>4.6. Technical, Log, and Diagnostic Data</h3>
+        <p>We automatically collect certain technical information when you access the Services, including device model, operating system version, application version, language settings, IP address, network connection type, crash reports, error logs, performance metrics, API request metadata, security event logs, and anti-abuse signals. This information is used to operate, secure, maintain, and improve the Services.</p>
+
+        <h3>4.7. Communications and Support Data</h3>
+        <p>If you contact us for support or submit a privacy request, we may Process the content of your communications, contact details, attachments you provide, and correspondence history for the purpose of responding to and documenting your inquiry.</p>
+
+        <h2>Article 5. Sources of Personal Data</h2>
+        <p>Personal Data may be obtained from the following sources:</p>
+        <ul>
+            <li>directly from you when you register, complete assessments, configure settings, perform workouts, or communicate with us;</li>
+            <li>automatically from your device and application when you use the Services;</li>
+            <li>from synchronized sessions between the mobile application and website where you use the same account;</li>
+            <li>from service providers acting as Processors on our behalf, strictly to the extent necessary to provide contracted services.</li>
+        </ul>
+        <p>Where Personal Data is required to provide core functionality and you choose not to provide it, certain features may be unavailable, degraded, or inoperable.</p>
+
+        <h2>Article 6. Purposes of Processing and Legal Bases</h2>
+        <p>We Process Personal Data for the purposes described below. Where GDPR or similar laws apply, we rely on one or more of the following legal bases: (a) performance of a contract; (b) consent; (c) legitimate interests; (d) compliance with legal obligations; and/or (e) protection of vital interests, where applicable.</p>
+
+        <h3>6.1. Provision and Administration of the Services</h3>
+        <p>We Process account and authentication data to create, maintain, and secure your account, enable login and logout, synchronize data across platforms, and provide core application functionality. Legal basis: contract performance; legitimate interests in account security.</p>
+
+        <h3>6.2. Personalization of Fitness Content</h3>
+        <p>We use profile, assessment, and activity data to generate personalized workout plans, recommendations, difficulty adjustments, gamification elements, and progress visualizations. Legal basis: contract performance; consent where required for sensitive categories.</p>
+
+        <h3>6.3. AI-Assisted Coaching and Automated Analysis</h3>
+        <p>We may use automated systems, including third-party AI services, to analyze movement, generate coaching feedback, produce training suggestions, and improve model performance. Such Processing may involve profiling in a limited sense (i.e., categorizing fitness level or exercise performance). We do not make decisions producing legal or similarly significant effects solely by automated means without human involvement where prohibited by law. Legal basis: contract performance; consent for camera/health-related inputs where required; legitimate interests in product improvement.</p>
+
+        <h3>6.4. Security, Fraud Prevention, and Abuse Detection</h3>
+        <p>We Process technical and behavioral data to detect unauthorized access, enforce rate limits, investigate suspicious activity, protect Users and infrastructure, and comply with security obligations. Legal basis: legitimate interests; legal obligation where applicable.</p>
+
+        <h3>6.5. Service Improvement, Analytics, and Research</h3>
+        <p>We may analyze aggregated or de-identified usage patterns to understand feature adoption, diagnose defects, plan product development, and evaluate service quality. Where feasible, we prefer aggregated or anonymized data for analytics. Legal basis: legitimate interests, balanced against your rights and freedoms.</p>
+
+        <h3>6.6. Legal Compliance and Enforcement</h3>
+        <p>We may Process and retain data as necessary to comply with applicable laws, respond to lawful requests from public authorities, establish, exercise, or defend legal claims, and enforce our terms. Legal basis: legal obligation; legitimate interests.</p>
+
+        <h2>Article 7. Device Permissions</h2>
+        <p>The mobile application may request the following permissions through your device operating system. Denying a permission may limit or disable related functionality but will not necessarily prevent use of unrelated features.</p>
+        <ul>
+            <li><strong>Internet / Network Access:</strong> required for account synchronization, API communication, and content delivery.</li>
+            <li><strong>Camera:</strong> required for AI-based exercise form analysis when such feature is enabled by you.</li>
+            <li><strong>Location (Fine and/or Coarse):</strong> required for run tracking, route mapping, and location-based metrics when such features are enabled by you.</li>
+        </ul>
+        <p>You may revoke permissions at any time through your device settings. Revocation does not affect the lawfulness of Processing based on consent prior to withdrawal, to the extent permitted by applicable law.</p>
+
+        <h2>Article 8. Disclosure and Sharing of Personal Data</h2>
+        <p>We do not sell Personal Data as the term “sell” is defined under the CCPA/CPRA. We do not share Personal Data for cross-context behavioral advertising unless explicitly disclosed and permitted. We may disclose Personal Data to the categories of recipients described below, subject to contractual and legal safeguards.</p>
+
+        <h3>8.1. Infrastructure and Hosting Providers</h3>
+        <p>We use cloud hosting, database, storage, backup, and content delivery providers to operate backend systems on which account, workout, and profile data are stored and Processed.</p>
+
+        <h3>8.2. AI and Machine Learning Service Providers</h3>
+        <p>When you use AI Features, limited data (which may include text prompts, structured profile fields, or derived movement metadata) may be transmitted to third-party AI providers such as Google (Gemini) or Groq for inference, subject to their terms and our instructions. We configure such services for service delivery purposes and do not authorize providers to use your Personal Data to train public models where opt-out or contractual restrictions are available.</p>
+
+        <h3>8.3. Mapping and Location Services</h3>
+        <p>Google Maps Platform or similar mapping services may receive location and map-related data when you use map or route visualization features, in accordance with Google’s applicable terms and policies.</p>
+
+        <h3>8.4. Professional Advisors and Legal Disclosures</h3>
+        <p>We may disclose information to lawyers, auditors, insurers, or consultants under confidentiality obligations, or when required by court order, subpoena, regulatory inquiry, or other lawful process.</p>
+
+        <h3>8.5. Business Transfers</h3>
+        <p>In the event of a merger, acquisition, reorganization, sale of assets, or insolvency proceeding, Personal Data may be transferred to a successor entity, subject to this Policy or a successor policy providing comparable protections and required notice where applicable.</p>
+
+        <p>All Processors are required to Process Personal Data only on documented instructions, implement appropriate security measures, and assist with data subject rights where applicable, pursuant to data processing agreements or equivalent contractual terms.</p>
+
+        <h2>Article 9. International Data Transfers</h2>
+        <p>Your Personal Data may be transferred to, stored in, and Processed in countries other than your country of residence, including countries that may not provide the same level of data protection as your jurisdiction. Where required by GDPR or other applicable law, we implement appropriate safeguards for international transfers, which may include Standard Contractual Clauses approved by the European Commission, supplementary measures where necessary, and assessments of transfer impact. By using the Services, you acknowledge that such transfers may occur as described in this Policy, to the extent permitted by law.</p>
+
+        <h2>Article 10. Data Retention</h2>
+        <p>We retain Personal Data only for as long as necessary to fulfill the purposes described in this Policy, unless a longer retention period is required or permitted by law. Retention periods may vary based on data category, legal requirements, and operational necessity.</p>
+        <ul>
+            <li><strong>Account data:</strong> retained for the duration of account existence and for a limited period thereafter to handle disputes, backups, or legal obligations.</li>
+            <li><strong>Workout and activity history:</strong> retained while your account is active and until deletion is requested or the account is closed, subject to backup retention cycles.</li>
+            <li><strong>Camera and location data:</strong> retained only as long as necessary to provide the relevant feature, generate statistics, or comply with legal obligations; raw frames may be discarded after processing where technically feasible.</li>
+            <li><strong>Logs and security records:</strong> retained for a limited operational period consistent with security and compliance needs.</li>
+        </ul>
+        <p>Upon verified deletion request or account closure, we will delete or anonymize Personal Data within a commercially reasonable timeframe, except where retention is required for legal compliance, fraud prevention, establishment of legal claims, or backup systems that are purged on scheduled cycles.</p>
+
+        <h2>Article 11. Security Measures</h2>
+        <p>We implement administrative, technical, and organizational measures designed to protect Personal Data against unauthorized access, alteration, disclosure, or destruction. Such measures may include, without limitation: encrypted transmission via HTTPS/TLS; password hashing; access controls and authentication for administrative systems; network segmentation; logging and monitoring; and periodic review of security practices.</p>
+        <p>Notwithstanding the foregoing, no method of transmission over the Internet or method of electronic storage is completely secure. We cannot and do not guarantee absolute security. You are responsible for maintaining the confidentiality of your account credentials and for notifying us promptly of any suspected unauthorized access.</p>
+
+        <h2>Article 12. Your Rights and Choices</h2>
+        <p>Depending on your jurisdiction, you may have one or more of the following rights with respect to your Personal Data, subject to exceptions and limitations under applicable law:</p>
+        <ul>
+            <li><strong>Right of access:</strong> to obtain confirmation as to whether Personal Data is being Processed and to receive a copy of such data.</li>
+            <li><strong>Right to rectification:</strong> to request correction of inaccurate or incomplete Personal Data.</li>
+            <li><strong>Right to erasure (“right to be forgotten”):</strong> to request deletion of Personal Data under certain circumstances.</li>
+            <li><strong>Right to restriction of Processing:</strong> to request limitation of Processing under certain circumstances.</li>
+            <li><strong>Right to data portability:</strong> to receive Personal Data in a structured, commonly used, machine-readable format where applicable.</li>
+            <li><strong>Right to object:</strong> to object to Processing based on legitimate interests or for direct marketing, where applicable.</li>
+            <li><strong>Right to withdraw consent:</strong> where Processing is based on consent, without affecting the lawfulness of prior Processing.</li>
+            <li><strong>Right not to be subject to certain automated decisions:</strong> where applicable and required by law.</li>
+        </ul>
+        <p>California residents may additionally have rights to know, delete, correct, and opt out of certain sharing, as defined under CCPA/CPRA. To exercise any applicable right, contact <a href="mailto:privacy@temina.fit">privacy@temina.fit</a>. We may deny requests where an exception applies or where we cannot verify identity. You may lodge a complaint with a supervisory authority in your jurisdiction if you believe Processing violates applicable law.</p>
+
+        <h2>Article 13. Children’s Privacy</h2>
+        <p>The Services are not directed to, marketed to, or intended for use by individuals under the age of thirteen (13), or under the minimum age required for consent in the relevant jurisdiction. We do not knowingly collect Personal Data from children below such age. If you are a parent or guardian and believe that your child has provided Personal Data to us, please contact us immediately at <a href="mailto:privacy@temina.fit">privacy@temina.fit</a>. Upon verification, we will take steps to delete such information as required by applicable law.</p>
+
+        <h2>Article 14. Cookies, Local Storage, and Similar Technologies</h2>
+        <p>The website and progressive web components may use cookies, local storage, session storage, and similar technologies to maintain login sessions, remember preferences (including language selection), and support core functionality. You may control cookies through your browser settings; disabling certain cookies may impair website functionality. We do not use cookies for third-party advertising profiles unless separately disclosed.</p>
+
+        <h2>Article 15. Third-Party Links and Integrations</h2>
+        <p>The Services may contain links to third-party websites, applications, or services. This Policy does not govern those third parties. Your interactions with third parties are subject to their privacy policies and terms. We encourage you to review such policies before providing Personal Data to third parties.</p>
+
+        <h2>Article 16. Health and Medical Disclaimer</h2>
+        <p>Information provided through the Services, including AI-generated recommendations, statistics, calorie estimates, and form feedback, is provided for general fitness and informational purposes only. It is not intended to diagnose, treat, cure, or prevent any disease or medical condition. Temina Fit is not a medical device unless expressly certified otherwise in a specific jurisdiction. Always seek professional medical advice before starting or modifying an exercise program, especially if you have disclosed health limitations or chronic conditions.</p>
+
+        <h2>Article 17. Changes to This Policy</h2>
+        <p>We reserve the right to modify, amend, or update this Policy at any time to reflect changes in law, technology, business practices, or the Services. Material changes will be posted on this page with an updated effective date. Where required by law, we will provide additional notice or obtain consent. Your continued use of the Services after the effective date of a revised Policy constitutes acknowledgment of the updated terms, to the extent permitted by applicable law. If you do not agree with a revised Policy, you must discontinue use of the Services and may request account deletion.</p>
+
+        <h2>Article 18. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by applicable law, Temina Fit shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to unauthorized access to or alteration of your transmissions or data, except where such limitation is prohibited by law. Nothing in this Policy limits liability that cannot be limited under applicable consumer protection legislation.</p>
+
+        <h2>Article 19. Severability and Entire Agreement</h2>
+        <p>If any provision of this Policy is held invalid or unenforceable, the remaining provisions shall remain in full force and effect. This Policy, together with any applicable Terms of Service and platform-specific disclosures (including Google Play Data safety declarations), constitutes the entire privacy disclosure regarding the Services, superseding prior informal communications on the same subject matter, except where otherwise required by law.</p>
+
+        <h2>Article 20. Governing Law and Dispute Resolution</h2>
+        <p>This Policy shall be interpreted in accordance with applicable data protection and consumer protection laws of your jurisdiction where mandatory rules apply. Where no mandatory rule applies, disputes arising from this Policy may be subject to the jurisdiction and venue specified in our Terms of Service or, if none exist, to the courts competent at the Controller’s principal place of business, without prejudice to your statutory rights to bring proceedings in your country of residence where applicable under GDPR or similar laws.</p>
+
+        <h2>Article 21. Contact</h2>
+        <p>For questions, concerns, complaints, or requests relating to this Privacy Policy or our Processing of Personal Data, please contact:</p>
+        <p><strong>Temina Fit — Privacy Office</strong><br>
+        Email: <a href="mailto:privacy@temina.fit">privacy@temina.fit</a><br>
+        Website: <a href="https://temina.fit">https://temina.fit</a></p>
+        <p>We will acknowledge receipt of verified data subject requests and respond within the timeframe required by applicable law, typically within thirty (30) days for GDPR requests unless extension is permitted and communicated.</p>
+
+        {% else %}
+        <h1>Политика конфиденциальности</h1>
+        <p class="privacy-meta">
+            Версия документа: 2.0<br>
+            Дата вступления в силу: 31 мая 2026 г.<br>
+            Дата последнего изменения: 31 мая 2026 г.<br>
+            Приложение: Temina Fit (идентификатор пакета Google Play: com.temina.nativeapp)<br>
+            Веб-сайт и связанные сервисы: <a href="https://temina.fit">https://temina.fit</a>
+        </p>
+
+        <div class="privacy-notice">
+            НАСТОЯЩАЯ ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ ПОДЛЕЖИТ ВНИМАТЕЛЬНОМУ ПРОЧТЕНИЮ ДО НАЧАЛА ИСПОЛЬЗОВАНИЯ МОБИЛЬНОГО ПРИЛОЖЕНИЯ TEMINA FIT, ВЕБ-САЙТА ИЛИ ЛЮБЫХ СВЯЗАННЫХ С НИМИ СЕРВИСОВ (ДАЛЕЕ — «СЕРВИСЫ»). ИСПОЛЬЗУЯ СЕРВИСЫ, ВЫ ПОДТВЕРЖДАЕТЕ, ЧТО ОЗНАКОМИЛИСЬ С НАСТОЯЩЕЙ ПОЛИТИКОЙ, ПОНЯЛИ ЕЁ СОДЕРЖАНИЕ И СОГЛАСНЫ С ИЗЛОЖЕННЫМИ В НЕЙ УСЛОВИЯМИ В ПРЕДЕЛАХ, ДОПУСТИМЫХ ПРИМЕНИМЫМ ЗАКОНОДАТЕЛЬСТВОМ.
+        </div>
+
+        <p>Настоящая Политика конфиденциальности (далее — «Политика») определяет порядок сбора, использования, хранения, передачи, обезличивания, блокирования и уничтожения информации, включая персональные данные и данные, относящиеся к особым категориям, оператором сервиса Temina Fit (далее — «Temina Fit», «Оператор», «мы», «нас», «наш») в отношении физических лиц, получающих доступ к Сервисам или использующих их (далее — «Пользователь», «вы», «ваш»). Политика разработана с учётом требований, применимых в соответствующих юрисдикциях, включая, без ограничения, Общий регламент ЕС о защите данных (GDPR), законодательство Российской Федерации о персональных данных (в части применимости), и иные нормы о защите информации и конфиденциальности.</p>
+
+        <p>Ничто в настоящей Политике не является медицинской рекомендацией, не создаёт отношений «врач — пациент» и не гарантирует достижение каких-либо фитнес-результатов. Temina Fit представляет собой программное обеспечение в сфере фитнеса и wellness. Перед началом тренировочной программы рекомендуется проконсультироваться с квалифицированным медицинским специалистом.</p>
+
+        <h2>Статья 1. Термины и определения</h2>
+        <p>В целях настоящей Политики нижеприведённые термины используются в следующих значениях, если из контекста не следует иное:</p>
+        <ul>
+            <li><strong>«Персональные данные»</strong> — любая информация, относящаяся к прямо или косвенно определённому или определяемому физическому лицу (субъекту персональных данных), включая, но не ограничиваясь: имя, адрес электронной почты, идентификаторы учётной записи, сведения о физических и физиологических характеристиках.</li>
+            <li><strong>«Данные особых категорий»</strong> — персональные данные, касающиеся состояния здоровья, физического или психического благополучия, биометрических показателей (в случаях, когда они используются для идентификации), а также иные категории данных, отнесённые законом к особым или чувствительным.</li>
+            <li><strong>«Обработка персональных данных»</strong> — любое действие (операция) или совокупность действий с персональными данными, совершаемых с использованием средств автоматизации или без них, включая сбор, запись, систематизацию, накопление, хранение, уточнение, извлечение, использование, передачу, обезличивание, блокирование, удаление и уничтожение.</li>
+            <li><strong>«Оператор»</strong> — лицо, самостоятельно или совместно с другими лицами организующее и (или) осуществляющее обработку персональных данных, а также определяющее цели обработки. В рамках Сервисов таким лицом является оператор Temina Fit, если прямо не указано иное.</li>
+            <li><strong>«Обработчик»</strong> — лицо, осуществляющее обработку персональных данных от имени Оператора на основании поручения (договора).</li>
+            <li><strong>«Разрешения устройства»</strong> — системные разрешения мобильной операционной системы, запрашиваемые приложением, включая доступ к камере, геолокации и сети.</li>
+            <li><strong>«Функции ИИ»</strong> — функциональность, основанная на автоматизированном анализе, классификации, рекомендациях или генерации контента, включая распознавание позы, подсчёт повторений, генерацию планов тренировок и иные сервисы машинного обучения.</li>
+        </ul>
+        <p>Заголовки разделов приведены исключительно для удобства навигации и не влияют на толкование Политики. Слова «включая», «в том числе» и аналогичные выражения понимаются как «включая, но не ограничиваясь».</p>
+
+        <h2>Статья 2. Область действия</h2>
+        <p>Настоящая Политика распространяется на обработку персональных данных в связи с:</p>
+        <ol>
+            <li>мобильным приложением Temina Fit для Android, распространяемым через Google Play, и его обновлениями;</li>
+            <li>веб-сайтом temina.fit, связанными поддоменами, PWA-компонентами и service worker;</li>
+            <li>регистрацией, аутентификацией и управлением сеансами пользователя на сайте и в приложении;</li>
+            <li>серверной инфраструктурой, API, базами данных и резервными копиями, используемыми для функционирования Сервисов;</li>
+            <li>обращениями пользователей в поддержку и запросами, связанными с реализацией прав субъекта персональных данных.</li>
+        </ol>
+        <p>Политика не распространяется на сайты, приложения и сервисы третьих лиц, ссылки на которые могут содержаться в Сервисах. Оператор не несёт ответственности за политику конфиденциальности и практики обработки данных таких третьих лиц.</p>
+
+        <h2>Статья 3. Сведения об Операторе и контактные данные</h2>
+        <p>Оператором персональных данных, обрабатываемых в рамках Сервисов, является владелец и оператор сервиса Temina Fit. По вопросам обработки персональных данных, реализации прав субъекта данных и подачи обращений вы можете связаться с нами:</p>
+        <p><strong>Электронная почта:</strong> <a href="mailto:privacy@temina.fit">privacy@temina.fit</a><br>
+        <strong>Рекомендуемая тема письма:</strong> «Запрос по персональным данным — Temina Fit»</p>
+        <p>Оператор обязуется рассмотреть обращение в сроки, установленные применимым законодательством. Для исполнения отдельных запросов Оператор вправе запросить сведения, необходимые для идентификации субъекта персональных данных.</p>
+
+        <h2>Статья 4. Категории обрабатываемых персональных данных</h2>
+        <p>В зависимости от характера использования Сервисов, предоставленных вами разрешений и активированных функций Оператор может осуществлять обработку следующих категорий данных. Не все категории применимы к каждому Пользователю одновременно.</p>
+
+        <h3>4.1. Данные учётной записи и идентификации</h3>
+        <p>При регистрации могут обрабатываться имя пользователя (логин), адрес электронной почты, аутентификационные данные (в том числе пароль в хешированном или ином защищённом виде), внутренние идентификаторы учётной записи, дата и время регистрации, сведения о входах в систему, токены сеанса и иные метаданные, необходимые для аутентификации и обеспечения целостности учётной записи.</p>
+
+        <h3>4.2. Профильные, демографические и фитнес-данные</h3>
+        <p>В ходе онбординга, прохождения анкеты Assessment, заполнения фитнес-профиля или изменения настроек Пользователь может добровольно предоставить сведения о возрасте, поле, росте, весе, целевом весе, уровне физической подготовки, уровне активности, частоте тренировок, доступном оборудовании, приоритетных группах мышц, целях тренировок, мотивации, качестве и продолжительности сна, ограничениях по здоровью и хронических состояниях (при их добровольном указании), текстовых заметках и иной wellness-информации. Указанные сведения могут относиться к данным особых категорий в соответствии с применимым законодательством.</p>
+
+        <h3>4.3. Данные о тренировках, активности и результатах</h3>
+        <p>Обрабатываются сведения об использовании фитнес-функционала, включая, без ограничения: тип упражнений, количество повторений и подходов, длительность, калории (расчётные или введённые), шаги, дистанцию и темп бега, координаты маршрута (при использовании соответствующих функций), статус завершения тренировки, серии (streak), опыт (XP), игровые характеристики, прогресс квестов, позиции в рейтингах, достижения, показатели усталости и агрегированную историческую статистику.</p>
+
+        <h3>4.4. Данные камеры, изображений и биометрически связанной информации</h3>
+        <p>При активации функций ИИ-анализа техники приложение может получать доступ к камере устройства и обрабатывать видеокадры или статичные изображения для распознавания позы, анализа движений, подсчёта повторений и формирования обратной связи. Обработка может осуществляться локально на устройстве, на серверах Оператора или комбинированно. Камера не активируется без явного разрешения Пользователя через операционную систему. Данные камеры не используются для целей, не связанных с активированной функцией, без дополнительного уведомления и, при необходимости, отдельного согласия.</p>
+
+        <h3>4.5. Данные о местоположении и геолокации</h3>
+        <p>При использовании функций бега, отображения карты маршрута и иных location-зависимых возможностей, а также при наличии соответствующих разрешений, могут обрабатываться точные или приблизительные координаты GPS, временные метки, полилинии маршрута, данные о высоте (при наличии) и производные показатели (дистанция, скорость). Сбор геолокации осуществляется только при активной соответствующей функции и предоставленном разрешении, с учётом особенностей ОС и настроек устройства.</p>
+
+        <h3>4.6. Технические, журнальные и диагностические данные</h3>
+        <p>Автоматически могут собираться сведения о модели устройства, версии операционной системы, версии приложения, языковых настройках, IP-адресе, типе сетевого подключения, отчётах о сбоях, журналах ошибок, метриках производительности, метаданных API-запросов, событиях безопасности и сигналах противодействия злоупотреблениям. Указанные данные используются для эксплуатации, защиты, поддержки и улучшения Сервисов.</p>
+
+        <h3>4.7. Данные обращений и переписки</h3>
+        <p>При обращении в поддержку или направлении запроса, связанного с персональными данными, могут обрабатываться содержание сообщений, контактные данные, приложенные файлы и история переписки в целях рассмотрения обращения и документирования ответа.</p>
+
+        <h2>Статья 5. Источники получения персональных данных</h2>
+        <p>Персональные данные могут поступать из следующих источников:</p>
+        <ul>
+            <li>непосредственно от Пользователя при регистрации, заполнении анкет, настройке профиля, выполнении тренировок и обращениях к Оператору;</li>
+            <li>автоматически с устройства и из приложения в процессе использования Сервисов;</li>
+            <li>в результате синхронизации между мобильным приложением и веб-сайтом при использовании единой учётной записи;</li>
+            <li>от обработчиков, действующих по поручению Оператора, исключительно в объёме, необходимом для оказания услуг.</li>
+        </ul>
+        <p>Отказ от предоставления данных, необходимых для оказания основных функций Сервисов, может повлечь невозможность или ограничение использования отдельных возможностей.</p>
+
+        <h2>Статья 6. Цели обработки и правовые основания</h2>
+        <p>Обработка персональных данных осуществляется в следующих целях. В случаях, когда применяется GDPR или аналогичное законодательство, Оператор опирается на одно или несколько оснований: (а) исполнение договора; (б) согласие субъекта данных; (в) законный интерес; (г) исполнение обязанностей, предусмотренных законом; (д) защита жизненно важных интересов — при наличии оснований.</p>
+
+        <h3>6.1. Предоставление и администрирование Сервисов</h3>
+        <p>Обработка данных учётной записи для создания, сопровождения и защиты аккаунта, аутентификации, синхронизации и обеспечения базового функционала. Правовое основание: исполнение договора; законный интерес в обеспечении безопасности.</p>
+
+        <h3>6.2. Персонализация фитнес-контента</h3>
+        <p>Использование профильных, анкетных и активностных данных для формирования индивидуальных планов, рекомендаций, уровня сложности, элементов геймификации и визуализации прогресса. Правовое основание: исполнение договора; согласие — для чувствительных категорий, где это требуется.</p>
+
+        <h3>6.3. ИИ-коучинг и автоматизированный анализ</h3>
+        <p>Могут применяться автоматизированные системы, включая сторонние ИИ-сервисы, для анализа движений, формирования рекомендаций и улучшения алгоритмов. Такая обработка может включать элементы профилирования (классификация уровня подготовки, оценка техники). Оператор не принимает решений, порождающих юридически значимые последствия исключительно на основании автоматизированной обработки, где это запрещено законом. Правовое основание: исполнение договора; согласие на камеру и health-данные; законный интерес в развитии продукта.</p>
+
+        <h3>6.4. Безопасность, предотвращение мошенничества и злоупотреблений</h3>
+        <p>Обработка технических и поведенческих данных для выявления несанкционированного доступа, ограничения частоты запросов, расследования инцидентов и защиты инфраструктуры. Правовое основание: законный интерес; исполнение юридических обязанностей.</p>
+
+        <h3>6.5. Улучшение Сервисов, аналитика и исследования</h3>
+        <p>Анализ агрегированных или обезличенных паттернов использования для оценки качества, диагностики ошибок и планирования развития продукта. По возможности для аналитики используются обезличенные данные. Правовое основание: законный интерес с учётом баланса прав Пользователя.</p>
+
+        <h3>6.6. Соблюдение законодательства и защита прав</h3>
+        <p>Обработка и хранение данных в объёме, необходимом для ответа на законные запросы государственных органов, установления, осуществления или защиты правовых требований, а также исполнения иных юридических обязанностей.</p>
+
+        <h2>Статья 7. Разрешения мобильного устройства</h2>
+        <p>Приложение может запрашивать через операционную систему следующие разрешения. Отказ в предоставлении разрешения может ограничить или сделать недоступной связанную функциональность, не затрагивая при этом иные функции Сервисов:</p>
+        <ul>
+            <li><strong>Доступ к сети Интернет:</strong> необходим для синхронизации, API-взаимодействия и доставки контента.</li>
+            <li><strong>Камера:</strong> необходима для ИИ-анализа техники упражнений при активации соответствующей функции Пользователем.</li>
+            <li><strong>Геолокация (точная и/или приблизительная):</strong> необходима для бега, карт маршрутов и связанных метрик при активации соответствующих функций.</li>
+        </ul>
+        <p>Пользователь вправе отозвать разрешения в любой момент через настройки устройства. Отзыв согласия не влияет на законность обработки, осуществлённой до отзыва, в пределах, допустимых законом.</p>
+
+        <h2>Статья 8. Передача персональных данных третьим лицам</h2>
+        <p>Оператор не осуществляет продажу персональных данных в значении, определяемом применимым законодательством о защите потребителей. Передача персональных данных может осуществляться следующим категориям получателей на основании договоров и при соблюдении мер защиты:</p>
+
+        <h3>8.1. Провайдеры инфраструктуры и хостинга</h3>
+        <p>Облачные провайдеры, сервисы баз данных, резервного копирования и доставки контента, обеспечивающие функционирование серверной части Сервисов.</p>
+
+        <h3>8.2. Поставщики ИИ и машинного обучения</h3>
+        <p>При использовании Функций ИИ ограниченный объём данных (включая структурированные поля профиля, текстовые запросы или производные метаданные движений) может передаваться сторонним провайдерам, таким как Google (Gemini) или Groq, исключительно для оказания соответствующей функциональности и на условиях, не предусматривающих использование данных в целях, не связанных с Сервисами, в пределах доступных договорных ограничений.</p>
+
+        <h3>8.3. Картографические и location-сервисы</h3>
+        <p>Google Maps Platform и аналогичные сервисы могут получать данные о местоположении и отображении карты при использовании соответствующих функций на условиях политик указанных сервисов.</p>
+
+        <h3>8.4. Профессиональные консультанты и раскрытие по закону</h3>
+        <p>Раскрытие информации юристам, аудиторам, страховщикам и иным консультантам при условии конфиденциальности, а также по решению суда, требованию уполномоченного органа или иному законному основанию.</p>
+
+        <h3>8.5. Реорганизация бизнеса</h3>
+        <p>В случае слияния, поглощения, реорганизации, отчуждения активов или процедуры несостоятельности персональные данные могут быть переданы правопреемнику при условии соблюдения положений настоящей Политики или политики правопреемника с сопоставимым уровнем защиты и надлежащего уведомления, где это требуется законом.</p>
+
+        <p>Все обработчики обязуются обрабатывать персональные данные только по документированным инструкциям Оператора, применять меры защиты и содействовать реализации прав субъектов данных в рамках заключённых договоров поручения на обработку.</p>
+
+        <h2>Статья 9. Трансграничная передача персональных данных</h2>
+        <p>Персональные данные могут передаваться, храниться и обрабатываться на территории иностранных государств, уровень защиты которых может отличаться от уровня защиты в стране проживания Пользователя. При необходимости Оператор применяет меры, предусмотренные применимым законодательством, включая стандартные договорные положения, дополнительные технические и организационные меры, а также оценку последствий трансграничной передачи. Используя Сервисы, Пользователь осознаёт возможность такой передачи в пределах, допустимых законом.</p>
+
+        <h2>Статья 10. Сроки хранения персональных данных</h2>
+        <p>Персональные данные хранятся не дольше, чем этого требуют цели обработки, если более длительный срок не установлен законом или не обусловлен операционной необходимостью:</p>
+        <ul>
+            <li><strong>Данные учётной записи:</strong> в течение срока существования аккаунта и ограниченного периода после его закрытия — для разрешения споров, резервного копирования и исполнения юридических обязанностей.</li>
+            <li><strong>История тренировок и активности:</strong> до удаления по запросу или закрытия аккаунта, с учётом циклов хранения резервных копий.</li>
+            <li><strong>Данные камеры и геолокации:</strong> в объёме и срок, необходимые для оказания функции и формирования статистики; исходные кадры могут удаляться после обработки, если это технически осуществимо.</li>
+            <li><strong>Журналы и записи безопасности:</strong> в пределах операционно обоснованного срока.</li>
+        </ul>
+        <p>По подтверждённому запросу на удаление или при закрытии аккаунта Оператор удаляет или обезличивает персональные данные в разумный срок, за исключением случаев, когда хранение требуется законом, необходимо для предотвращения мошенничества, защиты правовых требований или обусловлено резервным копированием с последующим плановым уничтожением.</p>
+
+        <h2>Статья 11. Меры по защите персональных данных</h2>
+        <p>Оператор принимает необходимые и достаточные правовые, организационные и технические меры для защиты персональных данных от неправомерного или случайного доступа, уничтожения, изменения, блокирования, копирования, предоставления и распространения, включая, без ограничения: шифрование передачи по HTTPS/TLS; хеширование паролей; разграничение доступа к административным системам; журналирование; мониторинг инцидентов.</p>
+        <p>Несмотря на принимаемые меры, Оператор не может гарантировать абсолютную безопасность передачи и хранения информации в сети Интернет. Пользователь обязан обеспечивать конфиденциальность своих учётных данных и незамедлительно уведомлять Оператора о подозрении на несанкционированный доступ.</p>
+
+        <h2>Статья 12. Права субъекта персональных данных</h2>
+        <p>В зависимости от применимого законодательства Пользователь может обладать следующими правами, с учётом установленных законом исключений и ограничений:</p>
+        <ul>
+            <li><strong>Право на получение информации и доступ к данным;</strong></li>
+            <li><strong>Право на уточнение (исправление) неточных или неполных данных;</strong></li>
+            <li><strong>Право на удаление («право быть забытым») при наличии оснований;</strong></li>
+            <li><strong>Право на ограничение обработки;</strong></li>
+            <li><strong>Право на переносимость данных в структурированном машиночитаемом формате;</strong></li>
+            <li><strong>Право на возражение против обработки на основании законного интереса;</strong></li>
+            <li><strong>Право на отзыв согласия без ущерба для законности обработки до отзыва;</strong></li>
+            <li><strong>Право не подвергаться решению, основанному исключительно на автоматизированной обработке, если это предусмотрено законом.</strong></li>
+        </ul>
+        <p>Для реализации прав направьте запрос на <a href="mailto:privacy@temina.fit">privacy@temina.fit</a>. Оператор вправе отказать в удовлетворении запроса при наличии законных оснований или невозможности идентификации заявителя. Пользователь вправе обжаловать действия Оператора в уполномоченный орган по защите прав субъектов персональных данных.</p>
+
+        <h2>Статья 13. Политика в отношении несовершеннолетних</h2>
+        <p>Сервисы не предназначены для лиц младше тринадцати (13) лет либо младше минимального возраста, установленного законом для дачи согласия на обработку персональных данных в соответствующей юрисдикции. Оператор сознательно не осуществляет сбор персональных данных таких лиц. Если вы являетесь родителем или законным представителем и полагаете, что несовершеннолетний передал нам персональные данные, незамедлительно свяжитесь с нами по адресу <a href="mailto:privacy@temina.fit">privacy@temina.fit</a>. После проверки сведений Оператор предпримет меры по удалению данных в соответствии с законом.</p>
+
+        <h2>Статья 14. Файлы cookie, локальное хранилище и аналогичные технологии</h2>
+        <p>Веб-сайт и PWA-компоненты могут использовать cookie, localStorage, sessionStorage и аналогичные технологии для поддержания сеанса авторизации, сохранения настроек (в том числе языка) и обеспечения базовой функциональности. Управление cookie осуществляется через настройки браузера; отключение отдельных cookie может ограничить работу сайта. Оператор не использует cookie для профилирования в рекламных сетях третьих лиц, если иное прямо не раскрыто отдельно.</p>
+
+        <h2>Статья 15. Ссылки и интеграции третьих лиц</h2>
+        <p>Сервисы могут содержать гиперссылки на ресурсы третьих лиц. Настоящая Политика на такие ресурсы не распространяется. Перед передачей персональных данных третьим лицам рекомендуется ознакомиться с их политиками конфиденциальности и пользовательскими соглашениями.</p>
+
+        <h2>Статья 16. Отказ от медицинской ответственности</h2>
+        <p>Информация, предоставляемая через Сервисы, включая рекомендации, сгенерированные ИИ, статистику, расчёт калорий и оценку техники, носит общий информационный и фитнес-характер. Она не предназначена для постановки диагноза, лечения, профилактики или предотвращения заболеваний. Temina Fit не является медицинским изделием, если иное прямо не подтверждено в конкретной юрисдикции. При наличии ограничений по здоровью или хронических состояний необходима консультация врача до начала или изменения программы тренировок.</p>
+
+        <h2>Статья 17. Изменение Политики</h2>
+        <p>Оператор вправе в одностороннем порядке изменять настоящую Политику в связи с изменениями законодательства, технологий, бизнес-процессов или функционала Сервисов. Актуальная редакция публикуется на настоящей странице с указанием даты вступления в силу. При существенных изменениях, где это требуется законом, Оператор может направить дополнительное уведомление или запросить согласие. Продолжение использования Сервисов после вступления изменений в силу означает принятие обновлённой Политики в пределах, допустимых законом. При несогласии с изменениями Пользователь обязан прекратить использование Сервисов и вправе запросить удаление учётной записи.</p>
+
+        <h2>Статья 18. Ограничение ответственности</h2>
+        <p>В максимально допустимой применимым законом степени Оператор не несёт ответственности за косвенные, случайные, специальные, последующие или штрафные убытки, возникшие в связи с несанкционированным доступом к передаваемой информации или её изменением, за исключением случаев, когда такое ограничение прямо запрещено законом о защите прав потребителей. Ничто в Политике не ограничивает ответственность, которую нельзя ограничить императивными нормами.</p>
+
+        <h2>Статья 19. Делимость положений и полнота соглашения</h2>
+        <p>Если какое-либо положение настоящей Политики будет признано недействительным или неисполнимым, остальные положения сохраняют силу. Настоящая Политика в совокупности с Пользовательским соглашением (при его наличии) и декларациями в Google Play (Data safety) составляет полное раскрытие информации об обработке персональных данных в рамках Сервисов и заменяет прежние неформальные разъяснения по тому же предмету, если иное не требуется законом.</p>
+
+        <h2>Статья 20. Применимое право и разрешение споров</h2>
+        <p>Настоящая Политика толкуется с учётом императивных норм законодательства о защите персональных данных и прав потребителей страны проживания Пользователя, где такие нормы применимы. В иных случаях споры могут подлежать рассмотрению в суде по месту нахождения Оператора либо в ином порядке, установленном Пользовательским соглашением, без ущерба для права Пользователя обратиться в суд по месту жительства, если такое право предусмотрено GDPR или аналогичными актами.</p>
+
+        <h2>Статья 21. Контактная информация</h2>
+        <p>По всем вопросам, связанным с настоящей Политикой конфиденциальности и обработкой персональных данных, обращайтесь:</p>
+        <p><strong>Temina Fit — служба по вопросам конфиденциальности</strong><br>
+        E-mail: <a href="mailto:privacy@temina.fit">privacy@temina.fit</a><br>
+        Сайт: <a href="https://temina.fit">https://temina.fit</a></p>
+        <p>Оператор подтверждает получение проверенных запросов субъектов персональных данных и направляет ответ в срок, установленный применимым законодательством, как правило — в течение тридцати (30) календарных дней, если закон не допускает продление с уведомлением заявителя.</p>
+        {% endif %}
+    </article>
+</div>
+{% endblock %}

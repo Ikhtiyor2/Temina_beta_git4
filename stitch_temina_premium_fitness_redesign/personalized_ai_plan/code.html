@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Temina - Generated Plan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800;900&amp;family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#e5e1e4",
+                        "surface-tint": "#a04100",
+                        "on-primary-container": "#572000",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#ffdbcc",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#5f5e60",
+                        "on-surface-variant": "#5a4136",
+                        "on-secondary-fixed": "#1b1b1d",
+                        "surface-dim": "#dad9e2",
+                        "inverse-on-surface": "#f1eff9",
+                        "surface-variant": "#e3e1eb",
+                        "on-secondary-container": "#656466",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb693",
+                        "surface-container-high": "#e9e7f1",
+                        "on-tertiary-container": "#003357",
+                        "tertiary": "#0062a1",
+                        "tertiary-container": "#059eff",
+                        "background": "#fbf8ff",
+                        "outline-variant": "#e2bfb0",
+                        "outline": "#8e7164",
+                        "on-tertiary-fixed": "#001d35",
+                        "inverse-surface": "#2f3037",
+                        "primary-fixed-dim": "#ffb693",
+                        "secondary-fixed": "#e5e1e4",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "surface-container-highest": "#e3e1eb",
+                        "on-tertiary-fixed-variant": "#00497b",
+                        "surface-bright": "#fbf8ff",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f4f2fc",
+                        "tertiary-fixed": "#d0e4ff",
+                        "surface-container": "#efedf6",
+                        "primary-container": "#ff6b00",
+                        "error": "#ba1a1a",
+                        "surface": "#fbf8ff",
+                        "on-background": "#1a1b22",
+                        "on-surface": "#1a1b22",
+                        "on-primary-fixed": "#351000",
+                        "primary": "#a04100",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "on-secondary-fixed-variant": "#474649",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "margin-page": "24px",
+                        "gutter-grid": "16px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "section-title": ["manrope"],
+                        "body-secondary": ["manrope"],
+                        "headline-lg": ["lexend"],
+                        "display-metric": ["lexend"],
+                        "headline-lg-mobile": ["lexend"],
+                        "caption-pill": ["manrope"],
+                        "body-main": ["manrope"]
+                    },
+                    "fontSize": {
+                        "section-title": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-secondary": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["34px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "display-metric": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "800"}],
+                        "caption-pill": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-main": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-pill {
+            position: relative;
+        }
+        .active-nav-pill::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 48px;
+            height: 4px;
+            background-color: #a04100;
+            border-radius: 9999px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-main selection:bg-primary-fixed">
+<!-- Top AppBar - Following JSON specification -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface border-b border-secondary-container">
+<div class="flex justify-between items-center w-full px-margin-page py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden">
+<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDy9Xqu0epglC4v-Pm9fDDM19b1BRSQeJ2KjV5Hakpqvqssr2d38wLu-L8gVFgVrg4b9w9e6w14e8gYAhb03dGLswO5k3kj7hX9CfOG9VuYG2cIsDzdjMPf4QLq0M4OHcJaFtHf54d5GyfzK7xeM7oSX501K5ja79vzd7hjDA8dLlnA4FyXGNCO8B1m1k8jcY9pbuRpIcFAvam4Ozlqx7egtx0pSQfySaipHi7Eomf3NTa21X6VLC_dtxbQr3V4OkHAK3VaEmK0Ktb"/>
+</div>
+</div>
+<h1 class="font-headline-lg text-headline-lg-mobile font-black text-on-surface">Temina</h1>
+<button class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 max-w-7xl mx-auto px-margin-page">
+<!-- Hero Card: Celebratory & Premium -->
+<section class="mb-section-gap">
+<div class="relative overflow-hidden rounded-[32px] bg-on-background p-stack-lg min-h-[340px] flex flex-col justify-end shadow-xl transform transition-transform duration-200 active:scale-[0.98]">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-60" data-alt="A high-performance athlete in mid-motion during a workout, captured in dramatic low-light with cinematic orange highlights. The atmosphere is energetic and professional, emphasizing strength and precision. A sophisticated dark aesthetic with soft gradients ensures the white typography stands out. The overall mood is one of elite discipline and success." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqiDAW6H3t3Ak8ti1vvNKkdy_jUBEJ9a0PdDayFEGAxKovnJtF7gtxQwQAOmkvcS6tS5Urxy9FRUvEgx8cVOYuEvbGzrGi0wp9d75kCzrC4_Ey75_kzRk4uqxexjDu7DT4EBFq9YSffWjwzoxufj7np9Q1fcU5dg2AlEohxQ3-0rhnifTaqvz0F7g9rB1Yt0wtQqiZ4XrKD2EXVomTGiDGE9f0fTawCp4Ua60-Vl6Hb1aMvv5c3EDFIgrSDnS5FjiHDQbdONUarhWK"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background via-on-background/40 to-transparent"></div>
+</div>
+<div class="relative z-10 space-y-2">
+<span class="inline-block px-3 py-1 rounded-full bg-primary-container text-white font-caption-pill text-caption-pill">
+                        ПЕРСОНАЛЬНАЯ ПРОГРАММА
+                    </span>
+<h2 class="font-headline-lg text-white leading-none">План готов</h2>
+<p class="font-body-main text-surface-variant">Собрано по твоим ответам для достижения максимального результата</p>
+</div>
+</div>
+</section>
+<!-- Plan Overview: Steps Section -->
+<section class="mb-section-gap">
+<div class="flex items-center justify-between mb-stack-md">
+<h3 class="font-section-title text-section-title">Что дальше</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-grid">
+<!-- Step 1 -->
+<div class="bg-white border border-secondary-container p-stack-md rounded-[24px] hover:border-primary transition-colors duration-300">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-stack-md">
+<span class="material-symbols-outlined font-bold" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<h4 class="font-section-title text-body-main mb-1">Старт</h4>
+<p class="font-body-secondary text-secondary">Вводная тренировка на 20 минут для оценки текущей формы.</p>
+</div>
+<!-- Step 2 -->
+<div class="bg-white border border-secondary-container p-stack-md rounded-[24px] hover:border-primary transition-colors duration-300">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-stack-md">
+<span class="material-symbols-outlined font-bold" data-icon="nutrition">nutrition</span>
+</div>
+<h4 class="font-section-title text-body-main mb-1">Питание</h4>
+<p class="font-body-secondary text-secondary">Расчет КБЖУ и список рекомендованных продуктов на неделю.</p>
+</div>
+<!-- Step 3 -->
+<div class="bg-white border border-secondary-container p-stack-md rounded-[24px] hover:border-primary transition-colors duration-300">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-stack-md">
+<span class="material-symbols-outlined font-bold" data-icon="query_stats">query_stats</span>
+</div>
+<h4 class="font-section-title text-body-main mb-1">Прогресс</h4>
+<p class="font-body-secondary text-secondary">Еженедельные замеры и корректировка плана ИИ-тренером.</p>
+</div>
+</div>
+</section>
+<!-- Warnings / Tips -->
+<section class="mb-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter-grid">
+<div class="flex items-start gap-stack-md p-stack-md rounded-[24px] bg-surface-container-low border border-outline-variant/30">
+<div class="text-primary mt-1">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</div>
+<div>
+<h5 class="font-section-title text-body-secondary font-bold">Оборудование</h5>
+<p class="font-body-secondary text-secondary">Для этой программы тебе понадобятся только фитнес-резинки и коврик.</p>
+</div>
+</div>
+<div class="flex items-start gap-stack-md p-stack-md rounded-[24px] bg-surface-container-low border border-outline-variant/30">
+<div class="text-tertiary mt-1">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+</div>
+<div>
+<h5 class="font-section-title text-body-secondary font-bold">Здоровье</h5>
+<p class="font-body-secondary text-secondary">Учитываем твою травму колена: исключили прыжки и осевые нагрузки.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Summary Stats Bento Grid -->
+<section class="mb-section-gap">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter-grid">
+<div class="bg-secondary-container/20 p-stack-md rounded-[24px] flex flex-col justify-center text-center">
+<p class="font-caption-pill text-secondary uppercase tracking-wider">Длительность</p>
+<p class="font-display-metric text-headline-lg-mobile text-on-surface">4 <span class="text-body-main font-bold">нед</span></p>
+</div>
+<div class="bg-secondary-container/20 p-stack-md rounded-[24px] flex flex-col justify-center text-center">
+<p class="font-caption-pill text-secondary uppercase tracking-wider">Занятий</p>
+<p class="font-display-metric text-headline-lg-mobile text-on-surface">12</p>
+</div>
+<div class="bg-secondary-container/20 p-stack-md rounded-[24px] flex flex-col justify-center text-center">
+<p class="font-caption-pill text-secondary uppercase tracking-wider">Уровень</p>
+<p class="font-display-metric text-headline-lg-mobile text-on-surface">PRO</p>
+</div>
+<div class="bg-secondary-container/20 p-stack-md rounded-[24px] flex flex-col justify-center text-center">
+<p class="font-caption-pill text-secondary uppercase tracking-wider">Фокус</p>
+<p class="font-display-metric text-headline-lg-mobile text-on-surface">CORE</p>
+</div>
+</div>
+</section>
+<!-- Primary CTA Area -->
+<div class="fixed bottom-24 left-0 w-full px-margin-page flex justify-center z-40 md:relative md:bottom-0 md:px-0 md:mt-stack-lg">
+<button class="w-full max-w-md bg-primary-container text-white py-5 px-stack-lg rounded-full font-section-title flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all duration-200">
+                Перейти к плану
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Bottom Navigation Bar - Following JSON specification -->
+<nav class="fixed bottom-0 left-0 w-full bg-surface border-t border-secondary-container flex justify-around items-center px-4 py-3 pb-safe z-50">
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-body-secondary text-caption-pill">Home</span>
+</button>
+<!-- Active State: Workouts -->
+<button class="flex flex-col items-center justify-center text-primary relative active-nav-pill active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-body-secondary text-caption-pill">Workouts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="emoji_events">emoji_events</span>
+<span class="font-body-secondary text-caption-pill">Quests</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-body-secondary text-caption-pill">Stats</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-secondary text-caption-pill">Profile</span>
+</button>
+</nav>
+</body></html>

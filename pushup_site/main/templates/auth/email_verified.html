@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Подтверждение email — Temina{% endblock %}
+
+{% block content %}
+<div style="max-width: 480px; margin: 80px auto; padding: 32px; text-align: center;">
+  {% if ok %}
+    <h1 style="margin-bottom: 12px;">Email подтверждён</h1>
+    <p style="opacity: 0.85; margin-bottom: 24px;">
+      Адрес <strong>{{ email }}</strong> успешно подтверждён. Можно вернуться в приложение.
+    </p>
+  {% else %}
+    <h1 style="margin-bottom: 12px;">Ссылка недействительна</h1>
+    <p style="opacity: 0.85; margin-bottom: 24px;">
+      {{ message|default:"Ссылка устарела или уже использована. Запросите новое письмо в приложении." }}
+    </p>
+  {% endif %}
+  <p><a href="{% url 'home' %}">На главную</a></p>
+</div>
+{% endblock %}

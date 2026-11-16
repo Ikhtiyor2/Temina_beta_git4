@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Приседания • Тренировка{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header, .footer { display: none !important; }
+    .main { padding: 0 !important; margin: 0 !important; }
+    body { background: #000; overflow: hidden; height: 100vh; margin: 0; }
+
+    .workout {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #000;
+    }
+
+    .camera-container {
+        flex: 1;
+        min-height: 0;
+        padding: 1.4rem 1.4rem 0.3rem;
+        background: radial-gradient(ellipse at center, rgba(139,92,246,0.15) 0%, transparent 70%);
+    }
+
+    .camera-box {
+        width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 0 35px rgba(139,92,246,0.7), 0 0 70px rgba(236,72,153,0.3);
+        background: linear-gradient(135deg, #1a0033 0%, #0f0a1f 50%, #2a0055 100%);
+    }
+
+    .camera-box::before {
+        content: '';
+        position: absolute;
+        top: -4px; left: -4px; right: -4px; bottom: -4px;
+        background: linear-gradient(45deg, #9d4edd, #e04ef3, #5ce1e6, #9d4edd);
+        border-radius: 28px;
+        z-index: -1;
+        animation: neonPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes neonPulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; filter: hue-rotate(30deg); }
+    }
+
+    .camera-box::after {
+        content: 'TEMINAFIT AI';
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #9d4edd, #e04ef3);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px rgba(157,78,221,0.8);
+        z-index: 10;
+    }
+
+    #camera {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: transparent;
+    }
+
+    /* === КРАСИВЫЙ HUD — как у отжиманий === */
+    .hud {
+        padding: 0.8rem 1.2rem 1.2rem;
+        background: rgba(15,10,31,0.97);
+        backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(139,92,246,0.5);
+    }
+
+    .reps {
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 900;
+        background: linear-gradient(90deg, #9d4edd, #e04ef3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 0.3rem 0;
+        line-height: 1;
+    }
+
+    .timer {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #c8a2ff;
+        margin-bottom: 0.6rem;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 0.6rem;
+        font-size: 0.95rem;
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: #e6d0ff;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: #aaa;
+        text-transform: uppercase;
+    }
+
+    .ai {
+        text-align: center;
+        font-size: 0.95rem;
+        color: #e0c3fc;
+        background: rgba(139,92,246,0.18);
+        padding: 0.6rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 0.8rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 12px;
+        background: #6b21d4;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background: #333;
+    }
+
+    @media (max-width: 768px) {
+        .camera-container { padding: 1rem 1rem 0.2rem; }
+        .reps { font-size: 2.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display:none">{% csrf_token %}</div>
+<div class="workout">
+    <!-- КАМЕРА -->
+    <div class="camera-container">
+        <div class="camera-box">
+            <img id="camera" src="/video/squats/" alt="Камера">
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="reps" id="repsCounter">0</div>
+        <div class="timer" id="timer">00:00</div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-value" id="xpValue">0.0</div><div class="stat-label">XP</div></div>
+            <div class="stat"><div class="stat-value" id="qualityValue">—</div><div class="stat-label">Качество</div></div>
+            <div class="stat"><div class="stat-value" id="errorsCount">0</div><div class="stat-label">Ошибки</div></div>
+        </div>
+
+        <div class="ai" id="aiFeedback">AI: Готовимся...</div>
+
+        <div class="buttons">
+            <button type="button" id="addRepBtn" class="btn btn-secondary">+ 1 повтор</button>
+            <button id="saveSetButton" class="btn">Сохранить</button>
+            <a href="/workouts/" class="btn btn-secondary">Выйти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Элементы
+    const reps = document.getElementById('repsCounter');
+    const xp = document.getElementById('xpValue');
+    const quality = document.getElementById('qualityValue');
+    const errors = document.getElementById('errorsCount');
+    const ai = document.getElementById('aiFeedback');
+    const timer = document.getElementById('timer');
+    const saveBtn = document.getElementById('saveSetButton');
+
+    let startTime = Date.now();
+    let localReps = 0;
+    setInterval(() => {
+        const s = Math.floor((Date.now() - startTime) / 1000);
+        timer.textContent = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+    }, 500);
+    document.getElementById('addRepBtn').onclick = () => { localReps++; reps.textContent = localReps; };
+    function updateStats() {
+        fetch('/api/pushup-stats/').then(r => r.json()).then(d => {
+            if (d.status === 'success') {
+                xp.textContent = (d.data.xp || 0).toFixed(1);
+                quality.textContent = Math.round(d.data.quality || 92) + '%';
+                errors.textContent = d.data.errors || 0;
+                ai.textContent = 'AI: ' + (d.data.ai_feedback || 'Отличная форма!');
+            }
+        }).catch(() => {});
+    }
+    setInterval(updateStats, 5000);
+    updateStats();
+    function getCsrf() {
+        var el = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (el) return el.value;
+        var m = document.cookie.match(/\bcsrftoken=([^;]+)/);
+        return m ? m[1] : '';
+    }
+    saveBtn.onclick = () => {
+        var count = parseInt(reps.textContent, 10) || 0;
+        saveBtn.disabled = true;
+        ai.textContent = 'Сохранение...';
+        var headers = { 'Content-Type': 'application/json' };
+        var csrf = getCsrf();
+        if (csrf) headers['X-CSRFToken'] = csrf;
+        fetch('/api/save-set/SQUAT/', {
+            method: 'POST',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify({ reps: count })
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+            if (d.success) {
+                ai.textContent = 'Готово! +' + (d.xp_earned || d.xp_gained || 0) + ' XP';
+                setTimeout(() => location.href = '/workouts/', 1500);
+            } else throw new Error(d.error || 'Ошибка');
+        })
+        .catch(() => { ai.textContent = 'Ошибка сохранения'; saveBtn.disabled = false; });
+    };
+</script>
+{% endblock %}

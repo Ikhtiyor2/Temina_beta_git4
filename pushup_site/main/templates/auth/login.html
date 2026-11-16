@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Вход — TeminaFit v3.0{% endblock %}
+
+{% block content %}
+<style>
+    /* ПЕРЕОПРЕДЕЛЯЕМ СТИЛИ ДЛЯ СТРАНИЦЫ ВХОДА */
+    body.login-page { 
+        background-color: #0b0013 !important;
+        color: #ffffff !important;
+        font-family: 'Montserrat', sans-serif !important;
+    }
+    
+    .login-page .navbar {
+        background: rgba(11, 0, 19, 0.9) !important;
+    }
+    
+    .login-container {
+        max-width: 400px;
+        margin: 80px auto;
+        padding: 35px;
+        background-color: #1a0030;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+        border: 1px solid #00e5ff;
+        color: #d4b3ff;
+    }
+
+    .login-container h2 {
+        color: #8a2be2;
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 700;
+        font-size: 1.8rem;
+    }
+
+    .login-container label {
+        display: block;
+        font-weight: 500;
+        color: #bfaaff;
+        margin-bottom: 5px;
+    }
+
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        background-color: #2a0040;
+        border: 1px solid #5e00cc;
+        color: #ffffff;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .login-container input:focus {
+        border-color: #00e5ff;
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        outline: none;
+    }
+
+    .login-container .btn-primary {
+        background-color: #008040;
+        border: none;
+        padding: 14px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        transition: background-color 0.3s, transform 0.1s;
+        color: white !important;
+    }
+
+    .login-container .btn-primary:hover {
+        background-color: #00a050; 
+        transform: translateY(-1px);
+        color: white !important;
+    }
+    
+    .errorlist {
+        color: #ff4d4d;
+        list-style: none;
+        padding-left: 0;
+        margin-top: -10px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .non-field-errors {
+        color: #ff0000;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
+
+<script>
+    // Добавляем класс к body для специфичных стилей
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('login-page');
+    });
+</script>
+
+<div class="login-container">
+    <h2 class="mb-4">Авторизация</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            <div class="errorlist">{{ form.username.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <div class="errorlist">{{ form.password.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Войти</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #00e5ff;">
+        <p style="color: #bfaaff; margin-bottom: 1rem;">Нет аккаунта?</p>
+        <a href="{% url 'registration' %}" class="btn" style="background-color: #2a0040; color: #bfaaff; border: 1px solid #5e00cc; width: 100%;">
+            Зарегистрироваться
+        </a>
+    </div>
+</div>
+{% endblock %}

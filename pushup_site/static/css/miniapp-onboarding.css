@@ -1,0 +1,25 @@
+/* Isolated onboarding styles: existing application screens retain their theme. */
+.temina-intro[hidden]{display:none!important}
+.temina-intro{position:fixed;inset:0;z-index:1000;background:#09070e;color:#fff;overflow:hidden;isolation:isolate;touch-action:pan-y;font-family:Onest,sans-serif;transition:opacity 220ms ease-in;overscroll-behavior:contain}
+.intro-stage{position:relative;width:100%;height:100%;max-width:560px;margin:0 auto;overflow:hidden;background:#09070e}
+.intro-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%;opacity:0;transform:scale(1);transition:opacity 380ms ease-out,transform 9s linear;pointer-events:none}
+.intro-photo.is-current{opacity:1;transform:scale(1.045)}
+.intro-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(6,4,12,.5) 0%,transparent 28%,rgba(6,4,12,.06) 43%,rgba(6,4,12,.84) 70%,#09070e 100%)}
+.intro-top{position:absolute;top:0;left:0;right:0;padding:calc(16px + max(env(safe-area-inset-top,0px),var(--tg-content-safe-area-inset-top,0px))) 24px 0}
+.intro-progress{display:flex;gap:6px}
+.intro-segment{height:3px;flex:1;background:rgba(255,255,255,.25);border-radius:4px;transition:background 180ms ease}
+.intro-segment.is-done{background:#f8e7ff}
+.intro-topline{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.intro-brand{font-size:23px;font-weight:900;letter-spacing:-1px;font-style:italic}.intro-brand b{color:#ed4ac9}
+.intro-skip{color:#fff!important;font:inherit;font-size:12px!important;min-height:44px;padding:0 14px!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:30px;background:rgba(9,7,14,.35)!important;backdrop-filter:blur(12px)}
+.intro-copy{position:absolute;bottom:0;left:0;right:0;padding:24px 28px calc(24px + max(env(safe-area-inset-bottom,0px),var(--tg-content-safe-area-inset-bottom,0px)))}
+.intro-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px}.intro-kicker{font-size:10px;font-weight:800;letter-spacing:2px;color:#f5a7e7}.intro-meta:before{content:'';height:2px;width:24px;background:#ed4ac9}.intro-count{margin-left:auto;font-size:11px;color:#c4b8ce;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.intro-title{margin:0!important;font-size:clamp(30px,8.3vw,48px)!important;line-height:1.04!important;font-weight:900!important;letter-spacing:-1.6px;white-space:pre-line;color:#fff!important;font-style:italic;text-wrap:balance}
+.intro-description{margin:18px 0 24px!important;font-size:14px!important;line-height:1.65!important;color:#d0c7d8!important;max-width:410px}
+.intro-actions{display:flex;gap:10px}.intro-next{flex:1;display:flex;align-items:center;justify-content:space-between;border:0;border-radius:16px;padding:0 22px!important;height:56px;color:#fff!important;background:linear-gradient(110deg,#b636ce,#e438ab)!important;font:inherit;font-size:14px!important;font-weight:800!important;box-shadow:0 10px 32px #d635b02b}.intro-next svg{width:22px;height:22px}.intro-back{display:grid;place-items:center;width:56px;height:56px;border:1px solid #ffffff30!important;border-radius:16px;background:#ffffff08!important;color:#fff!important;font-size:22px!important}.intro-back:disabled{opacity:.25;cursor:default}
+.intro-hint{text-align:center;font-size:10px!important;letter-spacing:.2px;color:#9b8fa6!important;margin:15px 0 0!important}
+.temina-intro button{cursor:pointer;-webkit-tap-highlight-color:transparent}.temina-intro button:focus-visible{outline:2px solid #fff;outline-offset:4px}.temina-intro button:active{transform:scale(.98)}
+.temina-intro.intro-leaving{opacity:0;pointer-events:none}
+@media(min-width:600px){.temina-intro{background:radial-gradient(ellipse at 50% 60%,#29122d,#09070e 70%)}.intro-stage{box-shadow:0 0 120px #0009;border-inline:1px solid #ffffff0d}.intro-title{font-size:44px!important}.intro-copy{padding-inline:36px}}
+@media(max-height:670px){.intro-copy{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.intro-title{font-size:30px!important}.intro-description{font-size:12px!important;line-height:1.5!important;margin:12px 0 16px!important}.intro-meta{margin-bottom:10px}.intro-hint{margin-top:10px!important}.intro-next,.intro-back{height:48px}.intro-shade{background:linear-gradient(180deg,#09070e66,transparent 24%,#09070e99 45%,#09070e 85%)}}
+@media(prefers-reduced-motion:reduce){.temina-intro,.intro-photo,.intro-segment{transition:none!important}.intro-photo.is-current{transform:none}}

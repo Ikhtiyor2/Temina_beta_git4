@@ -1,0 +1,314 @@
+{
+  "rulesVersion": 4,
+  "locale": "en",
+  "antiCheat": {
+    "minTrackedFrameRatio": 0.65,
+    "maxRepsPerMinute": 45,
+    "minRepDurationMs": 600,
+    "maxBodyCenterShiftPerFrame": 0.09
+  },
+  "exercises": [
+    {
+      "id": "dumbbell_curl_bicep",
+      "rules": [
+        {
+          "id": "curl_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 28,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Elbows drifting forward",
+          "hint": "Pin your elbows to your torso — safer for shoulders and better biceps work",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "curl_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Jerking the movement",
+          "hint": "Lower the weight and slow down — jerks increase injury risk"
+        },
+        {
+          "id": "curl_asymmetry",
+          "phase": "any",
+          "metric": "elbow_asymmetry_deg",
+          "warnAbove": 25,
+          "severity": "WARNING",
+          "blockRep": false,
+          "message": "Uneven arm work",
+          "hint": "Sync both arms"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_hammer_curl",
+      "rules": [
+        {
+          "id": "hammer_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 30,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Elbows drifting forward",
+          "hint": "Keep elbows at your sides in hammer grip",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "hammer_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Jerk",
+          "hint": "Control the tempo"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_press_shoulder",
+      "rules": [
+        {
+          "id": "press_back_lean",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 155,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Lower back arching",
+          "hint": "Brace your core, don\\'t lean back — reduce dumbbell weight",
+          "healthTighten": [
+            "back"
+          ]
+        },
+        {
+          "id": "press_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 24,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Press jerk",
+          "hint": "Press smoothly"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_triceps",
+      "rules": [
+        {
+          "id": "tri_elbow_spread",
+          "phase": "down",
+          "metric": "elbow_spread_ratio",
+          "dangerAbove": 1.12,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Elbows flared out",
+          "hint": "Keep elbows closer to your head — triceps load, less joint stress",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "tri_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Jerk",
+          "hint": "Extend arms under control"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_lateral_raise",
+      "rules": [
+        {
+          "id": "lateral_too_high",
+          "phase": "down",
+          "metric": "shoulder_abduction_deg",
+          "dangerAbove": 93,
+          "warnAbove": 88,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Arm above shoulder",
+          "hint": "Stop at shoulder level — above 90° increases shoulder joint risk",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "lateral_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 20,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Swing jerk",
+          "hint": "Raise dumbbells smoothly"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_chest_fly",
+      "rules": [
+        {
+          "id": "fly_elbow_lock",
+          "phase": "down",
+          "metric": "elbow_lock_deg",
+          "dangerAbove": 168,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Elbows locked",
+          "hint": "Keep a slight bend in elbows — don\\'t lock the joint",
+          "healthTighten": [
+            "shoulders"
+          ]
+        },
+        {
+          "id": "fly_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Jerk",
+          "hint": "Control the squeeze and open"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_row",
+      "rules": [
+        {
+          "id": "row_round_back",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 145,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Rounded back",
+          "hint": "Hinge from hips, back straight — otherwise load shifts to lower back",
+          "healthTighten": [
+            "back"
+          ]
+        },
+        {
+          "id": "row_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Row jerk",
+          "hint": "Pull elbow to hip smoothly"
+        }
+      ]
+    },
+    {
+      "id": "pullup_classic",
+      "rules": [
+        {
+          "id": "pullup_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 16,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Sudden movement",
+          "hint": "Pull up smoothly — jerks and kipping don\\'t count",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_kip",
+          "phase": "any",
+          "metric": "body_center_shift_norm",
+          "dangerAbove": 0.08,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Body swinging",
+          "hint": "Keep your body stable — no swings or momentum",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_incomplete_hang",
+          "phase": "top",
+          "metric": "wrist_elevation_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Incomplete hang",
+          "hint": "At the bottom fully extend arms — wrists above shoulders",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_not_hanging",
+          "phase": "top",
+          "metric": "wrist_above_nose_px",
+          "dangerBelow": 10,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Not a bar hang",
+          "hint": "Wrists must be above your head. Arm swings don\\'t count",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_shallow",
+          "phase": "down",
+          "metric": "elbow_flexion_deg",
+          "dangerAbove": 108,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Insufficient pull height",
+          "hint": "Pull higher — elbows need more bend",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_wrist_drift",
+          "phase": "any",
+          "metric": "wrist_drift_px",
+          "dangerAbove": 34,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Wrists drifting",
+          "hint": "Hold the bar grip — pull your body, don\\'t move your hands",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_no_body_rise",
+          "phase": "down",
+          "metric": "body_rise_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Body not rising",
+          "hint": "Pull shoulders and chin up — wrists stay in place",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_asymmetry",
+          "phase": "down",
+          "metric": "elbow_asymmetry_deg",
+          "warnAbove": 28,
+          "severity": "WARNING",
+          "blockRep": false,
+          "message": "Uneven arm work",
+          "hint": "Pull symmetrically with both arms",
+          "healthTighten": [
+            "shoulders"
+          ]
+        }
+      ]
+    }
+  ]
+}

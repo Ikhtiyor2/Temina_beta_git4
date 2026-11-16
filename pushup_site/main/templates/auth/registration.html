@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Регистрация — TeminaFit v3.0{% endblock %}
+
+{% block content %}
+<style>
+    /* ПЕРЕОПРЕДЕЛЯЕМ СТИЛИ ДЛЯ СТРАНИЦЫ РЕГИСТРАЦИИ */
+    body.registration-page { 
+        background-color: #0b0013 !important;
+        color: #ffffff !important;
+        font-family: 'Montserrat', sans-serif !important;
+    }
+    
+    .registration-page .navbar {
+        background: rgba(11, 0, 19, 0.9) !important;
+    }
+    
+    .register-container {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #1a0030;
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(138, 43, 226, 0.4);
+        border: 1px solid #4a0080;
+        color: #d4b3ff;
+    }
+
+    .register-container h2 {
+        color: #00e5ff;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        background-color: #2a0040;
+        border: 1px solid #5e00cc;
+        color: #ffffff;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .register-container input:focus {
+        border-color: #00e5ff;
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        outline: none;
+    }
+    
+    .register-container label {
+        display: block;
+        font-weight: 500;
+        color: #bfaaff;
+    }
+
+    .register-container .btn-primary {
+        background-color: #8a2be2;
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.1s;
+        color: white !important;
+    }
+
+    .register-container .btn-primary:hover {
+        background-color: #9a4cff;
+        transform: translateY(-1px);
+        color: white !important;
+    }
+    
+    .errorlist {
+        color: #ff4d4d;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .non-field-errors {
+        color: #ff0000;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
+
+<script>
+    // Добавляем класс к body для специфичных стилей
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('registration-page');
+    });
+</script>
+
+<div class="register-container">
+    <h2 class="mb-4">Регистрация в TeminaFit</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+
+        {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            <div class="errorlist">{{ field.errors }}</div>
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-100 mt-3">Создать аккаунт</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #4a0080;">
+        <p style="color: #bfaaff; margin-bottom: 1rem;">Уже есть аккаунт?</p>
+        <a href="{% url 'login_page' %}" class="btn" style="background-color: #2a0040; color: #bfaaff; border: 1px solid #5e00cc; width: 100%;">
+            Войти
+        </a>
+    </div>
+</div>
+{% endblock %}

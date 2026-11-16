@@ -1,0 +1,1195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %} • TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Quests — design system alignment */
+  .quests-page { padding: 0 0 40px; }
+
+  /* HERO */
+  .quests-hero {
+    position: relative;
+    padding: 26px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(168,85,247,0.2);
+    background: linear-gradient(145deg, rgba(168,85,247,0.06) 0%, rgba(217,70,239,0.03) 50%, var(--bg-card) 100%);
+    box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .quests-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end), #fbbf24);
+    opacity: 0.9;
+  }
+  .quests-hero::after{
+    content:"";
+    position:absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -30%, rgba(168,85,247,0.08), transparent 50%);
+    pointer-events:none;
+  }
+
+  .quests-hero-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .quests-title {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 260px;
+  }
+
+  .quests-title h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.12;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .quests-title p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 780px;
+  }
+
+  .quests-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: rgba(255,255,255,0.88);
+    font-weight: 800;
+    font-size: 0.92rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .meta-pill i {
+    color: rgba(139, 92, 246, 0.95);
+    font-size: 1.15rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero-actions .btn {
+    border-radius: 999px;
+    font-weight: 900;
+    letter-spacing: -0.2px;
+  }
+
+  /* PLAYER BAR */
+  .player-bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 14px 0 8px;
+  }
+
+  .pstat {
+    border-radius: 20px;
+    padding: 14px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+    backdrop-filter: blur(16px);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .pstat::after{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.14), rgba(0,217,255,0.06), transparent);
+    opacity: 0.18;
+    pointer-events:none;
+  }
+
+  .pico{
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.16);
+    color: rgba(139,92,246,0.95);
+    font-size: 1.35rem;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ptext{
+    display:flex;
+    flex-direction:column;
+    gap: 2px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .pval{
+    font-size: 1.15rem;
+    font-weight: 950;
+    letter-spacing: -0.4px;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.1;
+  }
+
+  .plabel{
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.66);
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 14px 0 12px;
+  }
+
+  .segmented {
+    display: inline-flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(18px);
+  }
+
+  .seg-btn {
+    border: none;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-weight: 950;
+    color: rgba(255,255,255,0.78);
+    background: transparent;
+    transition: 180ms ease;
+    font-size: 0.95rem;
+  }
+
+  .seg-btn:hover {
+    color: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .seg-btn.active {
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    color: white;
+    box-shadow: 0 8px 24px var(--glow);
+  }
+
+  .search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 260px;
+    justify-content: flex-end;
+  }
+
+  .search {
+    width: 100%;
+    max-width: 440px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.92);
+    font-weight: 800;
+    outline: none;
+    transition: 180ms ease;
+  }
+
+  .search:focus {
+    border-color: rgba(139,92,246,0.35);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+  }
+
+  /* GRID */
+  .quests-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  .quest-card {
+    grid-column: span 6;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 24px;
+    padding: 16px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.26);
+    transition: transform 180ms ease, border-color 180ms ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .quest-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(139, 92, 246, 0.22);
+  }
+
+  .quest-card::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.16), rgba(0,217,255,0.05), transparent);
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  .quest-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .quest-left {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .quest-ico {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.18);
+    color: rgba(139,92,246,0.95);
+    font-size: 1.6rem;
+    flex: 0 0 auto;
+  }
+
+  .quest-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 520px;
+  }
+
+  .quest-title {
+    margin: 0;
+    font-size: 1.18rem;
+    font-weight: 950;
+    letter-spacing: -0.35px;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.2;
+  }
+
+  .quest-desc {
+    margin: 0;
+    color: rgba(255,255,255,0.70);
+    font-size: 0.96rem;
+    line-height: 1.35;
+  }
+
+  .quest-mini {
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.78);
+    font-weight: 900;
+    font-size: 0.86rem;
+  }
+
+  .mini i { opacity: 0.95; }
+
+  .mini-purple {
+    background: rgba(139,92,246,0.10);
+    border-color: rgba(139,92,246,0.16);
+    color: rgba(139,92,246,0.95);
+  }
+
+  .mini-green {
+    background: rgba(0,255,157,0.10);
+    border-color: rgba(0,255,157,0.16);
+    color: rgba(0,255,157,0.95);
+  }
+
+  .mini-yellow {
+    background: rgba(255,204,0,0.10);
+    border-color: rgba(255,204,0,0.16);
+    color: rgba(255,204,0,0.92);
+  }
+
+  /* PROGRESS */
+  .quest-progress {
+    position: relative;
+    z-index: 2;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.78);
+    font-weight: 900;
+  }
+
+  .progress-top b {
+    color: rgba(255,255,255,0.92);
+  }
+
+  .bar {
+    height: 10px;
+    background: rgba(139,92,246,0.10);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid rgba(139,92,246,0.12);
+  }
+
+  .bar > div {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    transition: width 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ACTIONS */
+  .quest-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .qbtn {
+    border: none;
+    cursor: pointer;
+    padding: 12px 14px;
+    border-radius: 999px;
+    font-weight: 950;
+    font-size: 0.95rem;
+    transition: 180ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .qbtn-primary {
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    color: white;
+    box-shadow: 0 8px 24px var(--glow);
+  }
+
+  .qbtn-primary:hover { transform: translateY(-2px); }
+
+  .qbtn-ghost {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.88);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .qbtn-ghost:hover {
+    transform: translateY(-2px);
+    border-color: rgba(139,92,246,0.18);
+  }
+
+  .qbtn-success {
+    background: rgba(0,255,157,0.12);
+    border: 1px solid rgba(0,255,157,0.18);
+    color: rgba(0,255,157,0.95);
+  }
+
+  .qbtn-success:hover { transform: translateY(-2px); }
+
+  .qbtn-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* EMPTY */
+  .empty {
+    grid-column: 1 / -1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+    backdrop-filter: blur(18px);
+  }
+
+  .empty h3 {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+    font-weight: 950;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .empty p {
+    margin: 0;
+    color: rgba(255,255,255,0.70);
+  }
+
+  /* LOADER */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.78);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    transition: opacity 180ms ease;
+  }
+
+  .overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .overlay .spin {
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    border: 4px solid rgba(139,92,246,0.22);
+    border-top-color: rgba(139,92,246,0.95);
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .overlay span {
+    color: rgba(255,255,255,0.85);
+    font-weight: 900;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .quest-card { grid-column: span 12; }
+  }
+
+  @media (max-width: 860px) {
+    .player-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 640px) {
+    .quests-title h1 { font-size: 1.5rem; }
+    .qbtn { min-width: 100%; }
+    .search-wrap { justify-content: stretch; }
+    .search { max-width: 100%; }
+    .player-bar { grid-template-columns: repeat(2, 1fr); }
+
+    /* Фильтр-бар: горизонтальный скролл */
+    .filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .segmented {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      justify-content: flex-start;
+      white-space: nowrap;
+      padding: 6px 8px;
+    }
+    .segmented::-webkit-scrollbar { display: none; }
+    .seg-btn {
+      flex-shrink: 0;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+    }
+    .search-wrap {
+      min-width: 0;
+    }
+    .quests-hero-top {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .quests-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .hero-actions {
+      width: 100%;
+    }
+    .hero-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .pval { font-size: 1rem; }
+    .plabel { font-size: 0.8rem; }
+    .pico { width: 36px; height: 36px; font-size: 1.1rem; }
+  }
+
+  @media (max-width: 420px) {
+    .player-bar { grid-template-columns: 1fr; }
+    .quest-ico { width: 44px; height: 44px; font-size: 1.3rem; }
+    .quest-title { font-size: 1rem; }
+  }
+
+  /* Fitness Rewards Shop */
+  .quests-rewards-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; color: var(--txt); }
+  .quests-rewards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .quests-rewards-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .quests-rewards-grid { grid-template-columns: 1fr; } }
+  .quests-reward-item {
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .quests-reward-item:hover { border-color: rgba(168,85,247,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+  .quests-reward-ico {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168,85,247,0.12);
+    border: 1px solid rgba(168,85,247,0.2);
+    color: var(--purple2);
+    font-size: 1.4rem;
+  }
+  .quests-reward-item span { font-size: 0.9rem; font-weight: 600; color: var(--txt); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ds-container quests-page">
+
+  <!-- Loader -->
+  <div id="loadingOverlay" class="overlay">
+    <div class="spin"></div>
+    <span>{% if current_lang == 'en' %}Loading quests...{% else %}Загрузка квестов...{% endif %}</span>
+  </div>
+
+  <!-- HERO -->
+  <section class="quests-hero">
+    <div class="quests-hero-top">
+      <div class="quests-title">
+        <h1 class="text-gradient">{% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}</h1>
+        <p id="questsSubtitle">{% if current_lang == 'en' %}Loading tasks…{% else %}Загрузка заданий…{% endif %}</p>
+      </div>
+
+      <div class="quests-meta">
+        <div class="meta-pill">
+          <i class="ri-time-line"></i>
+          <span id="questsUpdateTime">—</span>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/workouts/">
+            <i class="ri-play-circle-line"></i> {% if current_lang == 'en' %}Workout{% else %}Тренировка{% endif %}
+          </a>
+          <button class="btn btn-secondary" onclick="loadQuests(true)">
+            <i class="ri-refresh-line"></i> {% if current_lang == 'en' %}Refresh{% else %}Обновить{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYER -->
+  <section class="player-bar">
+    <div class="pstat">
+      <div class="pico"><i class="ri-star-smile-line"></i></div>
+      <div class="ptext">
+        <div class="pval" id="pLevel">—</div>
+        <div class="plabel">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %}</div>
+      </div>
+    </div>
+
+    <div class="pstat">
+      <div class="pico"><i class="ri-flashlight-line"></i></div>
+      <div class="ptext">
+        <div class="pval" id="pXP">—</div>
+        <div class="plabel">{% if current_lang == 'en' %}XP{% else %}Опыт{% endif %}</div>
+      </div>
+    </div>
+
+    <div class="pstat">
+      <div class="pico"><i class="ri-coins-line"></i></div>
+      <div class="ptext">
+        <div class="pval" id="pGold">—</div>
+        <div class="plabel">{% if current_lang == 'en' %}Gold{% else %}Золото{% endif %}</div>
+      </div>
+    </div>
+
+    <div class="pstat">
+      <div class="pico"><i class="ri-diamond-line"></i></div>
+      <div class="ptext">
+        <div class="pval" id="pSP">—</div>
+        <div class="plabel">{% if current_lang == 'en' %}Skill points{% else %}Очки навыков{% endif %}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <div class="segmented">
+      <button class="seg-btn active" data-filter="all" onclick="setFilter('all')">{% if current_lang == 'en' %}All{% else %}Все{% endif %}</button>
+      <button class="seg-btn" data-filter="active" onclick="setFilter('active')">{% if current_lang == 'en' %}Active{% else %}Активные{% endif %}</button>
+      <button class="seg-btn" data-filter="ready" onclick="setFilter('ready')">{% if current_lang == 'en' %}Ready{% else %}Готовые{% endif %}</button>
+      <button class="seg-btn" data-filter="done" onclick="setFilter('done')">{% if current_lang == 'en' %}Done{% else %}Выполнено{% endif %}</button>
+    </div>
+
+    <div class="search-wrap">
+      <input id="questSearch" class="search" type="text" placeholder="{% if current_lang == 'en' %}Search quests...{% else %}Поиск квестов...{% endif %}" oninput="renderQuests()" />
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <section class="quests-grid" id="questsGrid"></section>
+
+  <!-- Fitness Rewards Shop (стиль как на референсе) -->
+  <section class="quests-rewards" style="margin-top: 32px;">
+    <h2 class="quests-rewards-title">{% if current_lang == 'en' %}Rewards shop{% else %}Магазин наград{% endif %}</h2>
+    <div class="quests-rewards-grid">
+      <div class="quests-reward-item">
+        <div class="quests-reward-ico"><i class="ri-trophy-line"></i></div>
+        <span>{% if current_lang == 'en' %}Premium workout plans{% else %}Премиум-планы тренировок{% endif %}</span>
+      </div>
+      <div class="quests-reward-item">
+        <div class="quests-reward-ico"><i class="ri-t-shirt-2-line"></i></div>
+        <span>{% if current_lang == 'en' %}Avatar clothing{% else %}Одежда для аватара{% endif %}</span>
+      </div>
+      <div class="quests-reward-item">
+        <div class="quests-reward-ico"><i class="ri-bar-chart-box-line"></i></div>
+        <span>{% if current_lang == 'en' %}Extended stats{% else %}Расширенная статистика{% endif %}</span>
+      </div>
+      <div class="quests-reward-item">
+        <div class="quests-reward-ico"><i class="ri-flashlight-line"></i></div>
+        <span>{% if current_lang == 'en' %}Workout boosts{% else %}Бусты к тренировкам{% endif %}</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const TEMINA_LANG = '{{ current_lang|default:"ru" }}';
+  const Q_EN = (TEMINA_LANG === 'en');
+
+  // ======================= API (REAL URLS) =======================
+  const API = {
+    quests: '/api/quests/',
+    questsData: '/api/quests-data/',      // добавим в urls.py
+    startQuest: '/api/quests/start/',
+    completeQuest: '/api/quests/complete/',
+    timeout: 12000,
+  };
+
+  let questsCache = [];
+  let playerCache = null;
+  let currentFilter = 'all';
+
+  // ======================= CSRF =======================
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+
+  const CSRF_TOKEN = getCookie('csrftoken') || '{{ csrf_token }}';
+
+  // ======================= HELPERS =======================
+  function setLoading(isLoading) {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    overlay.classList.toggle('hidden', !isLoading);
+  }
+
+  function safeNum(v, def = 0) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : def;
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString(Q_EN ? 'en-GB' : 'ru-RU', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function getSearchValue() {
+    const input = document.getElementById('questSearch');
+    return (input?.value || '').trim().toLowerCase();
+  }
+
+  const TRAINING_URLS = {
+    'PUSHUP': '/train/pushups/',
+    'SQUAT': '/train/squats/',
+    'CRUNCH': '/train/crunches/',
+    'PLANK': '/train/planks/',
+    'PULLUP': '/train/pullups/'
+  };
+
+  const QUEST_TITLE_EN = {
+    'Сила отжиманий': 'Push-up strength',
+    'Стойкость планки': 'Plank stamina',
+    'Выносливость ног': 'Leg endurance',
+    'Ежедневный вход': 'Daily login',
+    'Сила': 'Strength',
+    'Стойкость': 'Stamina',
+    'Выносливость': 'Endurance',
+    'Ежедневный': 'Daily'
+  };
+  function translateQuestTitle(title) {
+    if (!Q_EN || !title) return title || '';
+    const t = String(title).replace(/\s*[💪⏱️🦵📅]\s*/g, '').trim();
+    for (const [ru, en] of Object.entries(QUEST_TITLE_EN)) {
+      if (t.includes(ru)) return en + (t.length > ru.length ? ': ' + t.replace(ru, '').trim() : '');
+    }
+    return title;
+  }
+
+  function mapExerciseType(exType) {
+    const x = String(exType || '').toUpperCase();
+    if (x.includes('PUSH')) return { name: Q_EN ? 'Push-ups' : 'Отжимания', icon: 'ri-hand-heart-line' };
+    if (x.includes('SQUAT')) return { name: Q_EN ? 'Squats' : 'Приседания', icon: 'ri-run-line' };
+    if (x.includes('CRUNCH')) return { name: Q_EN ? 'Crunches' : 'Скручивания', icon: 'ri-bear-smile-line' };
+    if (x.includes('PLANK')) return { name: Q_EN ? 'Plank' : 'Планка', icon: 'ri-timer-line' };
+    if (x.includes('PULL')) return { name: Q_EN ? 'Pull-ups' : 'Подтягивания', icon: 'ri-bar-chart-horizontal-line' };
+    return { name: Q_EN ? 'Exercise' : 'Упражнение', icon: 'ri-shield-star-line' };
+  }
+
+  function normalizeQuest(q) {
+    // Форматы:
+    // - QuestManager.get_quests_for_api() (полный)
+    // - quests_data (компактный)
+    const rawTitle = q.title || q.name || (Q_EN ? 'Quest' : 'Квест');
+    const title = translateQuestTitle(rawTitle) || rawTitle;
+    const description = q.description || q.desc || '';
+    const reward = safeNum(q.reward_xp || q.reward || q.xp_reward || 0, 0);
+
+    const progress = safeNum(q.progress, 0);
+    const goal = safeNum(q.goal || q.target || q.requirement || 1, 1);
+
+    const isActive = !!q.is_active || !!q.active;
+    const isCompleted = !!q.is_completed || !!q.completed || false;
+
+    const percent = goal > 0 ? Math.round((progress / goal) * 100) : 0;
+    const isReady = !isCompleted && progress >= goal;
+
+    const icon = q.icon || 'ri-flag-2-line';
+    const difficulty = q.difficulty || q.level || (Q_EN ? 'Normal' : 'Обычный');
+
+    const exType = q.exercise_type || q.exercise || q.exerciseType || '';
+    const ex = mapExerciseType(exType);
+
+    let actionText;
+    if (Q_EN && exType && goal) {
+      const x = String(exType).toUpperCase();
+      if (x.includes('DAILY') || x.includes('LOGIN')) actionText = 'Log in to get the bonus!';
+      else if (x.includes('PLANK')) actionText = `Hold plank ${goal} sec`;
+      else actionText = `Do ${goal} reps: ${ex.name}`;
+    } else {
+      actionText = q.action_text || q.task || q.objective ||
+        (exType ? (Q_EN ? `Do ${goal} reps: ${ex.name}` : `Сделайте ${goal} повторений: ${ex.name}`) : (Q_EN ? `Complete goal: ${goal}` : `Выполните цель: ${goal}`));
+    }
+
+    const trainingUrl = q.training_url || TRAINING_URLS[String(exType || '').toUpperCase()] || '';
+
+    return {
+      id: q.id || q.quest_id || title,
+      title,
+      description,
+      reward,
+      progress,
+      goal,
+      percent: Math.max(0, Math.min(100, percent)),
+      isActive,
+      isCompleted,
+      isReady,
+      icon,
+      difficulty,
+      exType,
+      actionText,
+      exName: ex.name,
+      exIcon: ex.icon,
+      trainingUrl,
+    };
+  }
+
+  function updatePlayerUI(player) {
+    if (!player) return;
+    playerCache = player;
+
+    document.getElementById('pLevel').textContent = safeNum(player.level, 1);
+    document.getElementById('pXP').textContent = Math.round(safeNum(player.exp, 0));
+    document.getElementById('pGold').textContent = safeNum(player.currency, 0);
+    document.getElementById('pSP').textContent = safeNum(player.skill_points, 0);
+  }
+
+  // ======================= FILTER =======================
+  function setFilter(filter) {
+    currentFilter = filter;
+
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+
+    renderQuests();
+  }
+
+  function filterQuest(q) {
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'active') return q.isActive && !q.isCompleted;
+    if (currentFilter === 'ready') return q.isReady;
+    if (currentFilter === 'done') return q.isCompleted;
+    return true;
+  }
+
+  // ======================= RENDER =======================
+  function renderQuests() {
+    const grid = document.getElementById('questsGrid');
+    if (!grid) return;
+
+    const search = getSearchValue();
+    const normalized = questsCache.map(normalizeQuest);
+
+    const filtered = normalized
+      .filter(filterQuest)
+      .filter(q => {
+        if (!search) return true;
+        return (
+          q.title.toLowerCase().includes(search) ||
+          q.description.toLowerCase().includes(search) ||
+          q.actionText.toLowerCase().includes(search) ||
+          q.exName.toLowerCase().includes(search)
+        );
+      });
+
+    const subtitle = document.getElementById('questsSubtitle');
+    if (subtitle) {
+      if (questsCache.length === 0) subtitle.textContent = Q_EN ? 'No quests available.' : 'Нет доступных квестов.';
+      else subtitle.textContent = Q_EN ? `Quests: ${questsCache.length} • Showing: ${filtered.length}` : `Квестов: ${questsCache.length} • Показано: ${filtered.length}`;
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty">
+          <h3>${Q_EN ? 'No quests found' : 'Квесты не найдены'}</h3>
+          <p>${Q_EN ? 'Try changing the filter or clearing the search.' : 'Попробуйте изменить фильтр или убрать поиск.'}</p>
+        </div>
+      `;
+      return;
+    }
+
+    const sDone = Q_EN ? 'Done' : 'Выполнено';
+    const sClaim = Q_EN ? 'Claim reward' : 'Можно забрать';
+    const sActive = Q_EN ? 'Active' : 'Активен';
+    const sNotStarted = Q_EN ? 'Not started' : 'Не начат';
+
+    grid.innerHTML = filtered.map(q => {
+      const statusTag = q.isCompleted
+        ? `<span class="mini mini-green"><i class="ri-checkbox-circle-line"></i> ${sDone}</span>`
+        : q.isReady
+          ? `<span class="mini mini-yellow"><i class="ri-gift-line"></i> ${sClaim}</span>`
+          : q.isActive
+            ? `<span class="mini mini-purple"><i class="ri-play-circle-line"></i> ${sActive}</span>`
+            : `<span class="mini"><i class="ri-pause-circle-line"></i> ${sNotStarted}</span>`;
+
+      const difficultyTag =
+        `<span class="mini"><i class="ri-sparkling-2-line"></i> ${esc(q.difficulty)}</span>`;
+
+      const rewardTag =
+        `<span class="mini mini-purple"><i class="ri-flashlight-line"></i> +${safeNum(q.reward, 0)} XP</span>`;
+
+      const actionTag =
+        `<span class="mini"><i class="${esc(q.exIcon)}"></i> ${esc(q.actionText)}</span>`;
+
+      let buttons = '';
+
+      const btnDone = Q_EN ? 'Completed' : 'Завершено';
+      const btnClaim = Q_EN ? 'Claim reward' : 'Забрать награду';
+      const btnToCounter = Q_EN ? 'To AI counter' : 'К ИИ-счётчику';
+      const btnInProgress = Q_EN ? 'In progress' : 'Выполняется';
+      const btnStart = Q_EN ? 'Start' : 'Начать';
+      const btnToWorkout = Q_EN ? 'To workout' : 'К тренировке';
+
+      if (q.isCompleted) {
+        buttons = `
+          <button class="qbtn qbtn-success qbtn-disabled">
+            <i class="ri-checkbox-circle-line"></i> ${btnDone}
+          </button>
+        `;
+      } else if (q.isReady) {
+        buttons = `
+          <button class="qbtn qbtn-success" onclick="completeQuest('${esc(q.id)}')">
+            <i class="ri-gift-line"></i> ${btnClaim}
+          </button>
+        `;
+      } else if (q.isActive && q.trainingUrl) {
+        buttons = `
+          <a href="${esc(q.trainingUrl)}" class="qbtn qbtn-primary">
+            <i class="ri-run-line"></i> ${btnToCounter}
+          </a>
+        `;
+      } else if (q.isActive) {
+        buttons = `
+          <button class="qbtn qbtn-ghost qbtn-disabled">
+            <i class="ri-loader-2-line"></i> ${btnInProgress}
+          </button>
+        `;
+      } else if (q.trainingUrl) {
+        buttons = `
+          <button class="qbtn qbtn-primary" onclick="startQuest('${esc(q.id)}')">
+            <i class="ri-play-circle-line"></i> ${btnStart}
+          </button>
+          <a href="${esc(q.trainingUrl)}" class="qbtn qbtn-ghost">
+            <i class="ri-run-line"></i> ${btnToWorkout}
+          </a>
+        `;
+      } else {
+        buttons = `
+          <button class="qbtn qbtn-primary" onclick="startQuest('${esc(q.id)}')">
+            <i class="ri-play-circle-line"></i> ${btnStart}
+          </button>
+        `;
+      }
+
+      return `
+        <div class="quest-card">
+          <div class="quest-top">
+            <div class="quest-left">
+              <div class="quest-ico">
+                <i class="${esc(q.icon)}"></i>
+              </div>
+              <div class="quest-info">
+                <h3 class="quest-title">${esc(q.title)}</h3>
+                <p class="quest-desc">${esc(q.description || (Q_EN ? 'Complete the goal and claim the reward.' : 'Выполните цель и заберите награду.'))}</p>
+
+                <div class="quest-mini">
+                  ${statusTag}
+                  ${difficultyTag}
+                  ${rewardTag}
+                </div>
+
+                <div class="quest-mini">
+                  ${actionTag}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quest-progress">
+            <div class="progress-top">
+              <span>${Q_EN ? 'Progress' : 'Прогресс'}</span>
+              <b>${safeNum(q.progress, 0)}/${safeNum(q.goal, 1)} • ${q.percent}%</b>
+            </div>
+
+            <div class="bar">
+              <div style="width:${q.percent}%;"></div>
+            </div>
+
+            <div class="quest-actions">
+              ${buttons}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ======================= LOAD =======================
+  async function loadQuests(force = false) {
+    try {
+      setLoading(true);
+
+      // ВАЖНО:
+      // /api/quests/ отдаёт полный список + player
+      const res = await fetch(API.quests, {
+        signal: AbortSignal.timeout(API.timeout),
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      const data = await res.json();
+      if (!data || data.success !== true) throw new Error(data?.error || 'bad response');
+
+      questsCache = data.quests || [];
+      updatePlayerUI(data.player || null);
+
+      document.getElementById('questsUpdateTime').textContent = (Q_EN ? 'Updated: ' : 'Обновлено: ') + nowTime();
+
+      renderQuests();
+
+    } catch (e) {
+      console.error(e);
+
+      questsCache = [];
+      document.getElementById('questsUpdateTime').textContent = Q_EN ? 'Error' : 'Ошибка';
+      document.getElementById('questsSubtitle').textContent = Q_EN ? 'Failed to load quests. Check API /api/quests/' : 'Не удалось загрузить квесты. Проверьте API /api/quests/';
+
+      renderQuests();
+
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ======================= ACTIONS =======================
+  async function startQuest(questId) {
+    try {
+      setLoading(true);
+
+      const res = await fetch(API.startQuest, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': CSRF_TOKEN
+        },
+        body: JSON.stringify({ quest_id: questId })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success !== true) throw new Error(data?.error || (Q_EN ? 'Failed to start quest' : 'Не удалось начать квест'));
+
+      await loadQuests(true);
+
+      if (window.showNotification) window.showNotification(Q_EN ? 'Quest started! 🎯' : 'Квест начат! 🎯', 'success');
+
+    } catch (e) {
+      console.error(e);
+      if (window.showNotification) window.showNotification(Q_EN ? 'Error: quest not started' : 'Ошибка: квест не запущен', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function completeQuest(questId) {
+    try {
+      setLoading(true);
+
+      const res = await fetch(API.completeQuest, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': CSRF_TOKEN
+        },
+        body: JSON.stringify({ quest_id: questId })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success !== true) throw new Error(data?.error || (Q_EN ? 'Failed to complete quest' : 'Не удалось завершить квест'));
+
+      await loadQuests(true);
+
+      if (window.showNotification) window.showNotification(Q_EN ? 'Reward claimed! 🔥' : 'Награда получена! 🔥', 'success');
+
+    } catch (e) {
+      console.error(e);
+      if (window.showNotification) window.showNotification(Q_EN ? 'Error: reward not claimed' : 'Ошибка: награда не получена', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ======================= INIT =======================
+  document.addEventListener('DOMContentLoaded', () => {
+    loadQuests(false);
+    setInterval(() => loadQuests(true), 30000);
+  });
+
+  window.loadQuests = loadQuests;
+  window.startQuest = startQuest;
+  window.completeQuest = completeQuest;
+  window.setFilter = setFilter;
+  window.renderQuests = renderQuests;
+</script>
+{% endblock %}

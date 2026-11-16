@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>TeminaFit v3.0</title>
+  <style>
+    body {
+      background: linear-gradient(180deg, #14001E, #0A0010);
+      font-family: 'Montserrat', sans-serif;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .nav {
+      display: flex;
+      justify-content: center;
+      background-color: #1A0028;
+      padding: 10px;
+    }
+    .nav button {
+      background: linear-gradient(90deg, #4A00E0, #8E2DE2);
+      border: none;
+      padding: 15px 30px;
+      margin: 0 10px;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    h1 { margin: 30px 0; }
+    .exercise-btn {
+      background-color: #3A3563;
+      border: none;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px auto;
+      width: 60%;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+    }
+    .exercise-btn:hover { background-color: #514B80; }
+  </style>
+</head>
+<body> 
+
+{% comment %} 
+
+  <div class="nav">
+    <button>Тренировка</button>
+    <button>Квесты</button>
+    <button>Статистика</button>
+    <button>Навыки</button>
+    <button>Настройки</button>
+    
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'registration' %}">Registration</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'login_page' %}">Authorization</a>
+    </li>
+  </div> {% endcomment %}
+
+  <h1>ТРЕНИРОВКА</h1>
+
+  <a href="{% url 'pushups' %}" class="exercise-btn">Начать отжимания</a>
+  <a href="{% url 'squats' %}" class="exercise-btn">Начать приседания</a>
+  <a href="{% url 'pull_ups' %}" class="exercise-btn">Начать подтягивания</a>
+
+
+</body>
+</html> 
+{% endblock content %}

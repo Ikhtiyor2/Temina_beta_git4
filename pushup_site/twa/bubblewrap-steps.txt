@@ -1,0 +1,54 @@
+TeminaFit — TWA через Bubblewrap (Google)
+========================================
+
+На сервере уже отдаётся:
+  GET https://<ваш-домен>/.well-known/assetlinks.json
+Пока в .env не заданы TWA_ANDROID_PACKAGE_NAME и TWA_SHA256_CERT_FINGERPRINTS,
+файл будет пустым массивом [] — это нормально до первой сборки APK.
+
+1) Установите Node.js LTS, JDK 17, Android Studio (SDK + build-tools).
+
+   В SDK Manager → SDK Tools обязательно:
+   - Android SDK Command-line Tools (latest) — иначе не будет cmdline-tools и папки bin для Bubblewrap.
+
+2) Исправление пути SDK под Bubblewrap (Windows):
+   В корне SDK должны быть папки "bin" или "tools". Скрипт создаёт junction на cmdline-tools.
+   Самый простой запуск (из папки Desktop\Temina_beta_git, где видна вложенная Temina_beta_git\):
+   powershell -ExecutionPolicy Bypass -File .\Temina_beta_git\RUN-TWA-FIX.ps1
+   Если вы уже внутри вложенной папки репозитория (рядом с pushup_site):
+   powershell -ExecutionPolicy Bypass -File .\RUN-TWA-FIX.ps1
+   Либо напрямую: .\Temina_beta_git\pushup_site\twa\fix-android-sdk-for-bubblewrap.ps1
+   Затем: npx @bubblewrap/cli doctor
+
+3) Инициализация — лучше с ЛОКАЛЬНЫМ manifest (если по URL ошибка "Unexpected token '<'" — сервер отдаёт HTML, не JSON):
+   powershell -ExecutionPolicy Bypass -File .\Temina_beta_git\RUN-TWA-INIT.ps1
+   или .\Temina_beta_git\pushup_site\twa\init-bubblewrap.ps1
+   Либо вручную:
+   npx @bubblewrap/cli init --manifest="C:\...\Temina_beta_git\pushup_site\static\manifest.json"
+
+   Вариант по URL (если в браузере по адресу манифеста открывается именно JSON, без HTML):
+   npx @bubblewrap/cli init --manifest=https://temina.fit/static/manifest.json
+
+   Если ставили npm install -g @bubblewrap/cli, а bubblewrap «не найден» — используйте npx или добавьте в PATH
+   папку из: npm config get prefix
+
+4) Соберите проект (из папки, где после init появился twa-manifest.json):
+   npx @bubblewrap/cli build
+
+5) Возьмите SHA-256 подписи:
+   — Bubblewrap часто показывает fingerprint после init/build;
+   — debug: keytool -list -v -keystore %USERPROFILE%\.android\debug.keystore -alias androiddebugkey -storepass android -keypass android
+   — release: ваш upload keystore.
+
+6) Пропишите на сервере в .env и перезапустите gunicorn/uwsgi:
+   TWA_ANDROID_PACKAGE_NAME=fit.temina.app
+   TWA_SHA256_CERT_FINGERPRINTS=AA:BB:CC:...,11:22:33:...
+
+7) Проверка: откройте в браузере /.well-known/assetlinks.json и инструмент
+   https://developers.google.com/digital-asset-links/tools/generator
+
+8) APK/AAB загрузите в Google Play Console (внутреннее тестирование — достаточно для проверки на устройстве).
+
+Заметки:
+- Для листинга в Play обычно нужны PNG-иконки 512×512 (maskable). Сейчас в manifest указан SVG — при необходимости добавьте PNG в static/icons/ и обновите manifest.json.
+- Домен в assetlinks и в Bubblewrap должен совпадать с тем, по которому пользователь открывает сайт в TWA.

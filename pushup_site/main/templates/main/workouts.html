@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %} · TeminaFit{% endblock %}
+
+{% block extra_head %}
+  <!-- Предзагрузка MediaPipe и клиента для быстрого старта тренировки -->
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js">
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js">
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js">
+  <link rel="prefetch" href="{% static 'js/mediapipe-client.js' %}">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .workouts-page { max-width: 1100px; margin: 0 auto; padding-bottom: 48px; }
+  .workouts-hero {
+    margin-bottom: 36px;
+    padding: 32px 28px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(168,85,247,0.08) 0%, rgba(217,70,239,0.04) 50%, transparent 100%);
+    border: 1px solid rgba(168,85,247,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .workouts-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-start), var(--accent-end), transparent);
+    opacity: 0.8;
+  }
+  .workouts-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(168,85,247,0.15);
+    border: 1px solid rgba(168,85,247,0.25);
+    color: var(--purple2);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .workouts-hero-badge i { font-size: 1.1rem; }
+  .workouts-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .workouts-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .workouts-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .workouts-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+  }
+  .workouts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 768px) { .workouts-grid { grid-template-columns: 1fr; } }
+  .workout-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0;
+    transition: border-color .25s, box-shadow .25s, transform .25s;
+    overflow: hidden;
+    position: relative;
+  }
+  .workout-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    opacity: 0;
+    transition: opacity .25s;
+  }
+  .workout-card:hover {
+    border-color: rgba(168,85,247,0.4);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+    transform: translateY(-4px);
+  }
+  .workout-card:hover::before { opacity: 1; }
+  .workout-card-top {
+    padding: 24px 24px 16px;
+    min-height: 100px;
+    position: relative;
+  }
+  .workout-card-top.push { background: linear-gradient(160deg, rgba(168,85,247,0.12) 0%, transparent 60%); }
+  .workout-card-top.squat { background: linear-gradient(160deg, rgba(34,197,94,0.1) 0%, transparent 60%); }
+  .workout-card-top.crunch { background: linear-gradient(160deg, rgba(236,72,153,0.1) 0%, transparent 60%); }
+  .workout-card-top.plank { background: linear-gradient(160deg, rgba(251,191,36,0.12) 0%, transparent 60%); }
+  .workout-card-ico {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .workout-card.push .workout-card-ico { color: var(--purple2); }
+  .workout-card.squat .workout-card-ico { color: var(--green); }
+  .workout-card.crunch .workout-card-ico { color: #ec4899; }
+  .workout-card.plank .workout-card-ico { color: #fbbf24; }
+  .workout-card h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .workout-card-body { padding: 0 24px 24px; }
+  .workout-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .workout-tag {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .workout-tag.beginner { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
+  .workout-tag.intermediate { background: rgba(249,115,22,0.2); color: #f97316; border: 1px solid rgba(249,115,22,0.35); }
+  .workout-tag.advanced { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.35); }
+  .workout-xp {
+    font-size: 0.88rem;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .workout-xp i { font-size: 1rem; opacity: 0.9; }
+  .workout-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .workout-muscles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .workout-muscle {
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .workout-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    color: #fff;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+  .workout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px var(--glow);
+  }
+  .workout-btn i { font-size: 1.15rem; }
+  .ai-banner {
+    border-radius: 24px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+    background: linear-gradient(145deg, rgba(168,85,247,0.06) 0%, rgba(217,70,239,0.03) 100%);
+    border: 1px solid rgba(168,85,247,0.2);
+    position: relative;
+    overflow: hidden;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .ai-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-start), var(--accent-end), transparent);
+    opacity: 0.6;
+  }
+  .ai-banner:hover {
+    border-color: rgba(168,85,247,0.35);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  }
+  .ai-banner-ico {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.85rem;
+    flex-shrink: 0;
+    color: #fff;
+    box-shadow: 0 8px 24px var(--glow);
+  }
+  .ai-banner-text { flex: 1; min-width: 240px; }
+  .ai-banner-text h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
+  .ai-banner-text p { color: var(--muted); font-size: 0.98rem; line-height: 1.55; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workouts-page">
+  <section class="workouts-hero">
+    <div class="workouts-hero-badge">
+      <i class="ri-run-line"></i>
+      {% if current_lang == 'en' %}AI counts reps in real time{% else %}AI считает повторения в реальном времени{% endif %}
+    </div>
+    <h1 class="workouts-title">{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}</h1>
+    <p class="workouts-sub">{% if current_lang == 'en' %}Pick an exercise and start. The camera tracks your pose and counts only correct reps.{% else %}Выберите упражнение и начните занятие. Камера отслеживает позу и засчитывает только правильные повторения.{% endif %}</p>
+  </section>
+
+  <h2 class="workouts-section-title">{% if current_lang == 'en' %}Exercises{% else %}Упражнения{% endif %}</h2>
+  <div class="workouts-grid">
+    <article class="workout-card push">
+      <div class="workout-card-top push">
+        <div class="workout-card-ico"><i class="ri-run-line"></i></div>
+        <h3>{% if current_lang == 'en' %}Push-ups{% else %}Отжимания{% endif %}</h3>
+      </div>
+      <div class="workout-card-body">
+        <div class="workout-meta">
+          <span class="workout-tag beginner">{% if current_lang == 'en' %}Beginner{% else %}Начальный{% endif %}</span>
+          <span class="workout-xp"><i class="ri-flashlight-line"></i> +50 XP · 5–10 {% if current_lang == 'en' %}min{% else %}мин{% endif %}</span>
+        </div>
+        <p class="workout-desc">{% if current_lang == 'en' %}Chest, triceps and shoulders. Core and depth control.{% else %}Укрепление груди, трицепсов и плеч. Контроль корпуса и глубины.{% endif %}</p>
+        <div class="workout-muscles">
+          <span class="workout-muscle">{% if current_lang == 'en' %}Chest{% else %}Грудь{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Triceps{% else %}Трицепсы{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Shoulders{% else %}Плечи{% endif %}</span>
+        </div>
+        <a href="{% url 'train_pushups' %}" class="workout-btn"><i class="ri-play-fill"></i> {% if current_lang == 'en' %}Start workout{% else %}Начать тренировку{% endif %}</a>
+      </div>
+    </article>
+
+    <article class="workout-card squat">
+      <div class="workout-card-top squat">
+        <div class="workout-card-ico"><i class="ri-walk-line"></i></div>
+        <h3>{% if current_lang == 'en' %}Squats{% else %}Приседания{% endif %}</h3>
+      </div>
+      <div class="workout-card-body">
+        <div class="workout-meta">
+          <span class="workout-tag beginner">{% if current_lang == 'en' %}Beginner{% else %}Начальный{% endif %}</span>
+          <span class="workout-xp"><i class="ri-flashlight-line"></i> +50 XP · 5–10 {% if current_lang == 'en' %}min{% else %}мин{% endif %}</span>
+        </div>
+        <p class="workout-desc">{% if current_lang == 'en' %}Legs and glutes. Depth and knee position control.{% else %}Ноги и ягодицы. Контроль глубины и положения коленей.{% endif %}</p>
+        <div class="workout-muscles">
+          <span class="workout-muscle">{% if current_lang == 'en' %}Legs{% else %}Ноги{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Glutes{% else %}Ягодицы{% endif %}</span>
+        </div>
+        <a href="{% url 'train_squats' %}" class="workout-btn"><i class="ri-play-fill"></i> {% if current_lang == 'en' %}Start workout{% else %}Начать тренировку{% endif %}</a>
+      </div>
+    </article>
+
+    <article class="workout-card crunch">
+      <div class="workout-card-top crunch">
+        <div class="workout-card-ico"><i class="ri-body-scan-line"></i></div>
+        <h3>{% if current_lang == 'en' %}Crunches{% else %}Скручивания{% endif %}</h3>
+      </div>
+      <div class="workout-card-body">
+        <div class="workout-meta">
+          <span class="workout-tag intermediate">{% if current_lang == 'en' %}Intermediate{% else %}Средний{% endif %}</span>
+          <span class="workout-xp"><i class="ri-flashlight-line"></i> +50 XP · 5–10 {% if current_lang == 'en' %}min{% else %}мин{% endif %}</span>
+        </div>
+        <p class="workout-desc">{% if current_lang == 'en' %}Abs and core. Technique and posture control.{% else %}Пресс и кора. Контроль техники и осанки.{% endif %}</p>
+        <div class="workout-muscles">
+          <span class="workout-muscle">{% if current_lang == 'en' %}Abs{% else %}Пресс{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Core{% else %}Кор{% endif %}</span>
+        </div>
+        <a href="{% url 'train_crunches' %}" class="workout-btn"><i class="ri-play-fill"></i> {% if current_lang == 'en' %}Start workout{% else %}Начать тренировку{% endif %}</a>
+      </div>
+    </article>
+
+    <article class="workout-card plank">
+      <div class="workout-card-top plank">
+        <div class="workout-card-ico"><i class="ri-timer-line"></i></div>
+        <h3>{% if current_lang == 'en' %}Plank{% else %}Планка{% endif %}</h3>
+      </div>
+      <div class="workout-card-body">
+        <div class="workout-meta">
+          <span class="workout-tag intermediate">{% if current_lang == 'en' %}Intermediate{% else %}Средний{% endif %}</span>
+          <span class="workout-xp"><i class="ri-flashlight-line"></i> {% if current_lang == 'en' %}+XP per second · hold{% else %}+XP за секунды · удержание{% endif %}</span>
+        </div>
+        <p class="workout-desc">{% if current_lang == 'en' %}Hold in plank: abs, core, shoulders. AI checks body line and anti-cheat.{% else %}Удержание в упоре: пресс, кор, плечи. ИИ проверяет прямую линию корпуса и античит.{% endif %}</p>
+        <div class="workout-muscles">
+          <span class="workout-muscle">{% if current_lang == 'en' %}Abs{% else %}Пресс{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Core{% else %}Кор{% endif %}</span>
+          <span class="workout-muscle">{% if current_lang == 'en' %}Shoulders{% else %}Плечи{% endif %}</span>
+        </div>
+        <a href="{% url 'train_planks' %}" class="workout-btn"><i class="ri-play-fill"></i> {% if current_lang == 'en' %}Start workout{% else %}Начать тренировку{% endif %}</a>
+      </div>
+    </article>
+  </div>
+
+  <h2 class="workouts-section-title">{% if current_lang == 'en' %}AI coach{% else %}ИИ-тренер{% endif %}</h2>
+  <div class="ai-banner">
+    <div class="ai-banner-ico"><i class="ri-flashlight-fill"></i></div>
+    <div class="ai-banner-text">
+      <h4>{% if current_lang == 'en' %}AI personal coach{% else %}ИИ-персональный тренер{% endif %}</h4>
+      <p>{% if current_lang == 'en' %}Describe your mood, injuries and tired muscles — get a personalised workout for how you feel.{% else %}Опишите настроение, травмы и уставшие мышцы — получите персональную тренировку под ваше состояние.{% endif %}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  setTimeout(function() {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+      .then(function(stream) {
+        stream.getTracks().forEach(function(t) { t.stop(); });
+      })
+      .catch(function() {});
+  }, 1500);
+})();
+</script>
+{% endblock %}

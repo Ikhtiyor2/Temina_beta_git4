@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Quests</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1a0030; color: white; }
+        .quest { background: #2a0040; padding: 20px; margin: 10px 0; border-radius: 10px; }
+        .success { color: #00ff9d; }
+        .error { color: #ff4444; }
+        button { background: #00e5ff; color: black; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .progress-bar { background: #333; height: 20px; border-radius: 10px; margin: 10px 0; }
+        .progress-fill { background: #00e5ff; height: 100%; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Отладочная страница квестов</h1>
+    
+    <div class="info">
+        <p>👤 Игрок: <strong>{{ player.user.username }}</strong></p>
+        <p>⭐ Уровень: <strong>{{ player.level }}</strong></p>
+        <p>📊 Квестов в базе: <strong>{{ quests_count }}</strong></p>
+    </div>
+    
+    <div class="actions">
+        <button onclick="testAPI()">🧪 Тест API /api/quests/</button>
+        <button onclick="location.reload()">🔄 Обновить страницу</button>
+        <button onclick="window.location.href='/quests/'">📱 Перейти к квестам</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <h2>Квесты из базы данных:</h2>
+    <div id="quests-list">
+        {% for quest in quests_data %}
+        <div class="quest">
+            <h3>{{ quest.title }}</h3>
+            <p>{{ quest.description }}</p>
+            <p>Тип: {{ quest.quest_type }} | Сложность: {{ quest.difficulty }}</p>
+            <p>Цель: {{ quest.goal }} | Прогресс: {{ quest.progress }}</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ quest.progress_percent }}%"></div>
+            </div>
+            <p>Награда: {{ quest.reward_xp }} XP + {{ quest.reward_currency }} монет</p>
+        </div>
+        {% empty %}
+        <p>❌ Нет квестов в базе данных</p>
+        {% endfor %}
+    </div>
+    
+    <script>
+        function testAPI() {
+            console.log("🧪 Тестируем API /api/quests/...");
+            showResult("🔄 Тестируем API...");
+            
+            fetch('/api/quests/')
+                .then(response => {
+                    console.log("Статус:", response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Данные API:", data);
+                    displayAPIResult(data);
+                })
+                .catch(error => {
+                    console.error("Ошибка:", error);
+                    showResult(`❌ Ошибка: ${error.message}`, 'error');
+                });
+        }
+        
+        function displayAPIResult(data) {
+            let html = `<h2>Результат API:</h2>`;
+            
+            if (data.success) {
+                html += `<p class="success">✅ УСПЕХ! Квестов: ${data.quests.length}</p>`;
+                
+                if (data.quests.length > 0) {
+                    data.quests.forEach(quest => {
+                        html += `
+                            <div class="quest">
+                                <h3>${quest.title}</h3>
+                                <p>${quest.description}</p>
+                                <p>Прогресс: ${quest.progress}/${quest.goal} (${quest.progress_percent}%)</p>
+                                <p>Награда: ${quest.reward_xp} XP + ${quest.reward_currency} монет</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<p>📭 Нет квестов для отображения</p>`;
+                }
+            } else {
+                html += `<p class="error">❌ ОШИБКА: ${data.error}</p>`;
+            }
+            
+            document.getElementById('result').innerHTML = html;
+        }
+        
+        function showResult(message, type = 'info') {
+            document.getElementById('result').innerHTML = `<p class="${type}">${message}</p>`;
+        }
+        
+        // Авто-тест при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 Авто-тест API...");
+            testAPI();
+        });
+    </script>
+</body>
+</html>

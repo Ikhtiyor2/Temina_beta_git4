@@ -1,0 +1,918 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}TeminaFit • Тренировки{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ======================= DASHBOARD STYLES ======================= */
+.dashboard-hero {
+    padding: 2rem 0 3rem;
+    position: relative;
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero-text {
+    max-width: 600px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid var(--neon-purple);
+    border-radius: 2rem;
+    color: var(--neon-purple-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.hero-stat {
+    text-align: center;
+}
+
+.hero-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.25rem;
+}
+
+.hero-stat-label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* User Class Card */
+.user-class-card {
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.class-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.class-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.class-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.class-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.class-stat {
+    text-align: center;
+}
+
+.class-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--neon-purple-light);
+    margin-bottom: 0.25rem;
+}
+
+.class-stat-label {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* ======================= TRAINING SECTION ======================= */
+.training-section {
+    margin: 3rem 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.exercises-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.exercise-card {
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+
+.exercise-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0.1;
+    transition: left 0.6s ease;
+}
+
+.exercise-card:hover::before {
+    left: 0;
+}
+
+.exercise-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--neon-purple);
+    box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
+}
+
+.exercise-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.exercise-icon {
+    font-size: 3rem;
+}
+
+.exercise-difficulty {
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid var(--neon-purple);
+    border-radius: 1rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--neon-purple-light);
+}
+
+.exercise-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.exercise-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.exercise-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.exercise-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.exercise-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.exercise-reward {
+    background: var(--gradient-primary);
+    color: var(--bg-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* ======================= ACHIEVEMENTS SECTION ======================= */
+.achievements-section {
+    margin: 3rem 0;
+}
+
+.achievements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.achievement-card {
+    padding: 1.5rem;
+    transition: var(--transition-smooth);
+}
+
+.achievement-card.unlocked {
+    border-color: var(--neon-purple);
+}
+
+.achievement-card.unlocked:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2);
+}
+
+.achievement-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.achievement-description {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.achievement-progress {
+    margin-top: 1rem;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 3px;
+    transition: width 0.8s ease;
+}
+
+/* ======================= LEADERBOARD SECTION ======================= */
+.leaderboard-section {
+    margin: 3rem 0;
+}
+
+.leaderboard-card {
+    padding: 2rem;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.leaderboard-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.leaderboard-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.leaderboard-tab {
+    padding: 0.5rem 1rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.leaderboard-tab.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple-light);
+}
+
+.leaderboard-list {
+    space-y: 0.75rem;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    transition: var(--transition-smooth);
+}
+
+.leaderboard-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.leaderboard-item.current-user {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid var(--neon-purple);
+}
+
+.leaderboard-rank {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neon-purple-light);
+    width: 30px;
+    text-align: center;
+}
+
+.leaderboard-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.1rem;
+}
+
+.user-class {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.leaderboard-score {
+    font-weight: 700;
+    color: var(--neon-purple-light);
+}
+
+/* ======================= RESPONSIVE DESIGN ======================= */
+@media (max-width: 1024px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .hero-text {
+        max-width: 100%;
+    }
+    
+    .exercises-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        gap: 1rem;
+    }
+    
+    .exercises-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .exercise-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .class-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ======================= ANIMATIONS ======================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+
+/* Fix for links */
+.view-all-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--neon-purple-light);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.view-all-link:hover {
+    color: var(--neon-purple);
+    transform: translateX(5px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="dashboard-hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge animate-fade-in-up">
+                    <span>⚡</span>
+                    УРОВЕНЬ {{ player.level|default:1 }} • {{ player.class|default:"НОВИЧОК" }}
+                </div>
+                <h1 class="hero-title animate-fade-in-up delay-100">
+                    Готов к тренировке,<br><span class="gradient-text">{{ user.username|default:"Боец" }}</span>?
+                </h1>
+                <p class="hero-subtitle animate-fade-in-up delay-200">
+                    AI-трекер ждет твоих движений. Выбери упражнение и покажи, на что способен.
+                </p>
+                <div class="hero-stats animate-fade-in-up delay-300">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ player.total_workouts|default:0 }}</div>
+                        <div class="hero-stat-label">Тренировок</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ player.total_reps|default:0 }}</div>
+                        <div class="hero-stat-label">Повторений</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">{{ player.streak|default:0 }}д</div>
+                        <div class="hero-stat-label">Стрик</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Class Card -->
+            <div class="glass-panel user-class-card animate-fade-in-up delay-400">
+                <div class="class-icon">🦾</div>
+                <h2 class="class-name">{{ player.class|default:"НОВИЧОК" }}</h2>
+                <p class="class-description">
+                    {% if player.class == "НОВИЧОК" %}
+                    Ты только начинаешь свой путь. Каждая тренировка приближает тебя к новым вершинам.
+                    {% elif player.class == "БОЕЦ" %}
+                    Опытный боец с отточенной техникой. Продолжай в том же духе!
+                    {% elif player.class == "МАСТЕР" %}
+                    Истинный мастер своего дела. Твои движения — эталон техники.
+                    {% else %}
+                    Начни тренироваться чтобы определить свой класс.
+                    {% endif %}
+                </p>
+                <div class="class-stats">
+                    <div class="class-stat">
+                        <div class="class-stat-value">+{{ player.xp_multiplier|default:5 }}%</div>
+                        <div class="class-stat-label">Бонус опыта</div>
+                    </div>
+                    <div class="class-stat">
+                        <div class="class-stat-value">{{ player.accuracy|default:75 }}%</div>
+                        <div class="class-stat-label">Точность</div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ player.class_progress|default:25 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Training Section -->
+<section class="training-section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Тренировочные модули</h2>
+                <p class="section-subtitle">Выбери упражнение для старта</p>
+            </div>
+        </div>
+
+        <div class="exercises-grid">
+            <!-- ОТЖИМАНИЯ - исправленная ссылка -->
+            <a href="/pushups/" onclick="console.log('Click on pushups link')" class="glass-panel exercise-card">
+                <div class="exercise-header">
+                    <div class="exercise-icon">💪</div>
+                    <div class="exercise-difficulty">СРЕДНЯЯ</div>
+                </div>
+                <h3 class="exercise-title">Отжимания</h3>
+                <p class="exercise-description">
+                    ИИ отслеживает форму и глубину. Идеально для груди и трицепсов.
+                </p>
+                <div class="exercise-meta">
+                    <div class="exercise-stats">
+                        <div class="exercise-stat">
+                            <span>⏱️</span>
+                            <span>8-12 мин</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span>🔥</span>
+                            <span>210 ккал</span>
+                        </div>
+                    </div>
+                    <div class="exercise-reward">+75 XP</div>
+                </div>
+            </a>
+
+            <a href="/squats/" class="glass-panel exercise-card animate-fade-in-up delay-200">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🦵</div>
+                    <div class="exercise-difficulty">ЛЁГКАЯ</div>
+                </div>
+                <h3 class="exercise-title">Приседания</h3>
+                <p class="exercise-description">
+                    Контроль глубины и положения спины. Укрепление ног.
+                </p>
+                <div class="exercise-meta">
+                    <div class="exercise-stats">
+                        <div class="exercise-stat">
+                            <span>⏱️</span>
+                            <span>6-10 мин</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span>🔥</span>
+                            <span>120 ккал</span>
+                        </div>
+                    </div>
+                    <div class="exercise-reward">+50 XP</div>
+                </div>
+            </a>
+
+            <a href="/pull-ups/" class="glass-panel exercise-card animate-fade-in-up delay-300">
+                <div class="exercise-header">
+                    <div class="exercise-icon">🚀</div>
+                    <div class="exercise-difficulty">СЛОЖНАЯ</div>
+                </div>
+                <h3 class="exercise-title">Подтягивания</h3>
+                <p class="exercise-description">
+                    Полная амплитуда и контроль. Развитие спины и бицепсов.
+                </p>
+                <div class="exercise-meta">
+                    <div class="exercise-stats">
+                        <div class="exercise-stat">
+                            <span>⏱️</span>
+                            <span>10-15 мин</span>
+                        </div>
+                        <div class="exercise-stat">
+                            <span>🔥</span>
+                            <span>180 ккал</span>
+                        </div>
+                    </div>
+                    <div class="exercise-reward">+80 XP</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Achievements Section -->
+<section class="achievements-section">
+    <div class="container">
+        <div class="achievements-header">
+            <h2 class="section-title">Ближайшие достижения</h2>
+            <a href="/achievements/" class="view-all-link">
+                <span>Все достижения</span>
+                <span>→</span>
+            </a>
+        </div>
+
+        <div class="achievements-grid">
+            <div class="glass-panel achievement-card unlocked animate-fade-in-up delay-100">
+                <div class="achievement-header">
+                    <div class="achievement-icon">🏁</div>
+                    <div class="achievement-info">
+                        <h3 class="achievement-title">Первая тренировка</h3>
+                        <p class="achievement-description">Выполните свою первую тренировку с AI-трекером</p>
+                    </div>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-text">
+                        <span>Завершено</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel achievement-card animate-fade-in-up delay-200">
+                <div class="achievement-header">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-info">
+                        <h3 class="achievement-title">Серия из 3 дней</h3>
+                        <p class="achievement-description">Тренируйтесь 3 дня подряд</p>
+                    </div>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-text">
+                        <span>Прогресс</span>
+                        <span>{{ player.streak|default:0 }}/3 дней</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ player.streak|default:0|add:"0"|divisibleby:3|yesno:"100,33,66" }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel achievement-card animate-fade-in-up delay-300">
+                <div class="achievement-header">
+                    <div class="achievement-icon">💎</div>
+                    <div class="achievement-info">
+                        <h3 class="achievement-title">Мастер точности</h3>
+                        <p class="achievement-description">Выполните 50 повторений с идеальной формой</p>
+                    </div>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-text">
+                        <span>Прогресс</span>
+                        <span>{{ player.perfect_reps|default:0 }}/50</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ player.perfect_reps|default:0|divisibleby:50|yesno:"100,2" }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Leaderboard Section -->
+<section class="leaderboard-section">
+    <div class="container">
+        <div class="glass-panel leaderboard-card">
+            <div class="leaderboard-header">
+                <h2 class="leaderboard-title">Топ игроков</h2>
+                <div class="leaderboard-tabs">
+                    <div class="leaderboard-tab active">Неделя</div>
+                    <div class="leaderboard-tab">Месяц</div>
+                    <div class="leaderboard-tab">Все время</div>
+                </div>
+            </div>
+
+            <div class="leaderboard-list">
+                {% for leader in leaders|slice:":5" %}
+                <div class="leaderboard-item {% if leader.is_current %}current-user{% endif %}">
+                    <div class="leaderboard-rank">#{{ forloop.counter }}</div>
+                    <div class="leaderboard-user">
+                        <div class="user-avatar">{{ leader.name|first|upper }}</div>
+                        <div class="user-info">
+                            <div class="user-name">{{ leader.name }}</div>
+                            <div class="user-class">{{ leader.class }}</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-score">{{ leader.score }} XP</div>
+                </div>
+                {% empty %}
+                <!-- Fallback leaderboard data -->
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">#1</div>
+                    <div class="leaderboard-user">
+                        <div class="user-avatar">N</div>
+                        <div class="user-info">
+                            <div class="user-name">NeonWarrior</div>
+                            <div class="user-class">МАСТЕР</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-score">15,240 XP</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">#2</div>
+                    <div class="leaderboard-user">
+                        <div class="user-avatar">C</div>
+                        <div class="user-info">
+                            <div class="user-name">CyberAthlete</div>
+                            <div class="user-class">БОЕЦ</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-score">12,850 XP</div>
+                </div>
+                <div class="leaderboard-item current-user">
+                    <div class="leaderboard-rank">#3</div>
+                    <div class="leaderboard-user">
+                        <div class="user-avatar">{{ user.username|first|default:"Y"|upper }}</div>
+                        <div class="user-info">
+                            <div class="user-name">{{ user.username|default:"Вы" }}</div>
+                            <div class="user-class">{{ player.class|default:"НОВИЧОК" }}</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-score">{{ player.xp|default:8450 }} XP</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Leaderboard tabs
+    const tabs = document.querySelectorAll('.leaderboard-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Animate elements on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe glass panels
+    document.querySelectorAll('.glass-panel').forEach(panel => {
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateY(20px)';
+        panel.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(panel);
+    });
+
+    // Exercise card hover effects
+    const exerciseCards = document.querySelectorAll('.exercise-card');
+    exerciseCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Fix for exercise card links
+    exerciseCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Добавляем индикатор загрузки
+            this.style.opacity = '0.7';
+            setTimeout(() => {
+                this.style.opacity = '1';
+            }, 1000);
+        });
+    });
+});
+</script>
+{% endblock %}

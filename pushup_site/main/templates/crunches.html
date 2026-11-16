@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Скручивания</title>
+</head>
+<body>
+    <h1>Скручивания</h1>
+    <img src="{% url 'video_feed3' %}" width="640" height="480">
+    <div>
+        <button onclick="saveWorkout('CRUNCH')">Сохранить подход</button>
+    </div>
+    
+    <script>
+    function saveWorkout(exerciseType) {
+        fetch(`/save-workout/${exerciseType}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        });
+    }
+    </script>
+
+    
+</body>
+</html>

@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отжимания — TeminaFit v3.0</title>
+    {% csrf_token %} 
+    
+    <style>
+        /* Стили из вашего предыдущего кода */
+        body { background-color: #0b0013; color: #ffffff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        header { background-color: #2a0040; width: 100%; text-align: center; padding: 15px 0; font-size: 1.5rem; font-weight: bold; color: #d4b3ff; border-bottom: 2px solid #4a0080; }
+        #camera-container { position: relative; background-color: #150022; border: 2px solid #4a0080; border-radius: 12px; margin-top: 30px; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        #camera { border-radius: 8px; width: 640px; height: 480px; }
+        .stats-top { display: flex; justify-content: center; align-items: center; margin-top: 10px; color: #bfaaff; font-weight: 500; gap: 50px; }
+        .stats-top div span { display: block; color: #00e5ff; font-size: 1.4rem; }
+        .stats-bottom { display: flex; justify-content: center; align-items: center; width: 650px; background-color: #210032; border: 1px solid #5e00cc; border-radius: 10px; margin-top: 15px; padding: 10px; color: #d0bfff; font-size: 1rem; gap: 30px; }
+        .stats-bottom div { padding: 5px 15px; border-radius: 6px; }
+        .reps-box { border: 1px solid #00eaff; }
+        .ai-box { border: 1px solid #8a2be2; }
+        .error-box { border: 1px solid #ff0048; }
+
+        /* Стиль для кнопки сохранения */
+        #saveSetButton { margin-top: 25px; padding: 12px 25px; font-size: 1.1rem; color: #ffffff; background-color: #008040; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+        #saveSetButton:hover { background-color: #00a050; }
+        #message { margin-top: 10px; font-size: 1rem; font-weight: bold; }
+
+        a { margin-top: 25px; color: #a86cff; text-decoration: none; border: 1px solid #7b32ff; padding: 10px 20px; border-radius: 10px; transition: all 0.3s; }
+        a:hover { background-color: #4a0080; color: white; }
+    </style>
+</head>
+<body>
+
+    <header>Отжимания — TeminaFit v3.0</header>
+
+    <div class="stats-top">
+        {% comment %} <div><span>0.0</span>XP</div>
+        <div><span id="repsCounter">0</span>REPS</div> 
+        <div><span>23</span>SECONDS</div> {% endcomment %}
+        <div><span style="color:#00ff9d;">PUSHUPS</span>MODE</div>
+    </div>
+
+    <div id="camera-container">
+        <img id="camera" src="{% url 'video_feed' %}" alt="Камера">
+    </div>
+
+    <div style="display:none">{% csrf_token %}</div>
+    <div class="stats-top">
+        <div><span id="repsCounter">0</span> повторений</div>
+    </div>
+    <p style="margin-top:12px;">
+        <button type="button" id="addRepBtn" style="margin-right:8px; padding:8px 14px; background:#4a0080; color:#fff; border:none; border-radius:8px; cursor:pointer;">+ 1 повтор</button>
+        <button id="saveSetButton">Сохранить подход</button>
+    </p>
+    <div id="message"></div>
+    <a href="/workouts/">← Назад</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function getCsrf() {
+                var el = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (el) return el.value;
+                var m = document.cookie.match(/\bcsrftoken=([^;]+)/);
+                return m ? m[1] : '';
+            }
+            var repsEl = document.getElementById('repsCounter');
+            var saveButton = document.getElementById('saveSetButton');
+            var messageDiv = document.getElementById('message');
+            if (document.getElementById('addRepBtn')) document.getElementById('addRepBtn').addEventListener('click', function() {
+                repsEl.textContent = (parseInt(repsEl.textContent, 10) || 0) + 1;
+            });
+            saveButton.addEventListener('click', function() {
+                var count = parseInt(repsEl ? repsEl.textContent : 0, 10) || 0;
+                messageDiv.innerHTML = 'Сохранение...';
+                saveButton.disabled = true;
+                var headers = { 'Content-Type': 'application/json' };
+                var csrf = getCsrf();
+                if (csrf) headers['X-CSRFToken'] = csrf;
+                fetch('/api/save-set/PUSHUP/', {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ reps: count })
+                })
+                .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        messageDiv.innerHTML = '✅ Готово! +' + (data.xp_earned || data.xp_gained || 0) + ' XP';
+                        setTimeout(function() { window.location.href = '/workouts/'; }, 1500);
+                    } else { messageDiv.innerHTML = '❌ ' + (data.error || 'Ошибка'); saveButton.disabled = false; }
+                })
+                .catch(function(e) { messageDiv.innerHTML = '❌ ' + e.message; saveButton.disabled = false; });
+            });
+        });
+    </script>
+
+</body>
+</html>
+

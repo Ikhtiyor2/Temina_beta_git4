@@ -1,0 +1,858 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Отжимания • Тренировка{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* СБРОС И БАЗОВЫЕ СТИЛИ */
+    .header, .footer { display: none !important; }
+    .main { padding: 0 !important; margin: 0 !important; }
+    body { 
+        background: #000; 
+        overflow: hidden; 
+        height: 100vh; 
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    }
+
+    /* КОНТЕЙНЕР ТРЕНИРОВКИ */
+    .workout {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #0a0618 0%, #000000 100%);
+        position: relative;
+    }
+
+    /* УВЕЛИЧЕННАЯ КАМЕРА (75% экрана) */
+    .camera-section {
+        flex: 3; /* Больше места для камеры */
+        min-height: 0;
+        padding: 0.8rem 0.8rem 0.1rem; /* Минимальные отступы */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .camera-wrapper {
+        flex: 1;
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #000;
+        box-shadow: 
+            0 0 0 1px rgba(139, 92, 246, 0.3),
+            0 0 40px rgba(139, 92, 246, 0.4),
+            inset 0 0 30px rgba(157, 78, 221, 0.2);
+        z-index: 1;
+    }
+
+    .camera-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        background: linear-gradient(45deg, 
+            #9d4edd 0%, 
+            #e04ef3 25%, 
+            #5ce1e6 50%, 
+            #9d4edd 75%, 
+            #e04ef3 100%);
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderFlow 4s linear infinite;
+        opacity: 0.7;
+    }
+
+    .camera-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 2;
+        background: radial-gradient(
+            circle at 50% 50%,
+            transparent 40%,
+            rgba(10, 6, 24, 0.4) 70%,
+            rgba(0, 0, 0, 0.6) 100%
+        );
+    }
+
+    .camera-label {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 6, 24, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(157, 78, 221, 0.4);
+        z-index: 3;
+    }
+
+    .camera-label span {
+        background: linear-gradient(90deg, #9d4edd, #e04ef3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    #camera {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Заполнение камерой всего пространства */
+        display: block;
+        background: #000;
+    }
+
+    /* КОМПАКТНЫЙ HUD (25% экрана) */
+    .hud-section {
+        flex: 1;
+        background: rgba(10, 6, 24, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(139, 92, 246, 0.3);
+        padding: 0.6rem 1rem 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* ГЛАВНЫЙ СЧЕТЧИК - КОМПАКТНЫЙ */
+    .counter-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .reps-counter {
+        font-size: 2rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #9d4edd 0%, #e04ef3 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .counter-label {
+        font-size: 0.7rem;
+        color: #a78bfa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.2rem;
+    }
+
+    /* ТАЙМЕР */
+    .timer-display {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #c8a2ff;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+
+    /* КОМПАКТНЫЕ СТАТИСТИКИ */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .stat-card {
+        background: rgba(139, 92, 246, 0.08);
+        border-radius: 10px;
+        padding: 0.5rem;
+        text-align: center;
+        border: 1px solid rgba(139, 92, 246, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+        background: rgba(139, 92, 246, 0.12);
+        border-color: rgba(139, 92, 246, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .stat-value {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 0.1rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+        color: #a78bfa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* XP СТИЛЬ */
+    .stat-card:nth-child(1) .stat-value {
+        background: linear-gradient(90deg, #00ffaa, #00ccff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* КАЧЕСТВО СТИЛЬ */
+    .stat-card:nth-child(2) .stat-value {
+        background: linear-gradient(90deg, #ffaa00, #ff5500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* ОШИБКИ СТИЛЬ */
+    .stat-card:nth-child(3) .stat-value {
+        background: linear-gradient(90deg, #ff3366, #ff0066);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* AI ФИДБЭК - КОМПАКТНЫЙ */
+    .ai-feedback {
+        background: rgba(157, 78, 221, 0.1);
+        border-radius: 10px;
+        padding: 0.5rem 0.8rem;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #e0c3fc;
+        border: 1px solid rgba(157, 78, 221, 0.2);
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    /* КНОПКИ - КОМПАКТНЫЕ */
+    .button-row {
+        display: flex;
+        gap: 0.6rem;
+        margin-top: auto;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.6rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #9d4edd 0%, #e04ef3 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #e0c3fc;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* АНИМАЦИИ */
+    @keyframes borderFlow {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+
+    @keyframes counterPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes statHighlight {
+        0% { background: rgba(139, 92, 246, 0.08); }
+        50% { background: rgba(139, 92, 246, 0.2); }
+        100% { background: rgba(139, 92, 246, 0.08); }
+    }
+
+    @keyframes aiGlow {
+        0% { box-shadow: 0 0 5px rgba(157, 78, 221, 0.2); }
+        50% { box-shadow: 0 0 15px rgba(157, 78, 221, 0.4); }
+        100% { box-shadow: 0 0 5px rgba(157, 78, 221, 0.2); }
+    }
+
+    .counter-pulse {
+        animation: counterPulse 0.3s ease-out;
+    }
+
+    .stat-highlight {
+        animation: statHighlight 0.6s ease-out;
+    }
+
+    .ai-glow {
+        animation: aiGlow 2s infinite;
+    }
+
+    /* АДАПТИВНОСТЬ */
+    @media (max-width: 768px) {
+        .camera-section {
+            padding: 0.6rem 0.6rem 0.1rem;
+            flex: 3.2; /* Еще больше камера на мобильных */
+        }
+        
+        .hud-section {
+            padding: 0.5rem 0.8rem 0.7rem;
+            gap: 0.3rem;
+        }
+        
+        .reps-counter {
+            font-size: 1.8rem;
+        }
+        
+        .stats-grid {
+            gap: 0.6rem;
+        }
+        
+        .stat-card {
+            padding: 0.4rem;
+        }
+        
+        .stat-value {
+            font-size: 0.9rem;
+        }
+        
+        .ai-feedback {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+            min-height: 34px;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .camera-section {
+            padding: 0.4rem 0.4rem 0.1rem;
+            flex: 3.5;
+        }
+        
+        .hud-section {
+            padding: 0.4rem 0.6rem 0.6rem;
+        }
+        
+        .reps-counter {
+            font-size: 1.6rem;
+        }
+        
+        .timer-display {
+            font-size: 0.75rem;
+        }
+        
+        .stats-grid {
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-value {
+            font-size: 0.85rem;
+        }
+        
+        .stat-label {
+            font-size: 0.55rem;
+        }
+        
+        .ai-feedback {
+            font-size: 0.7rem;
+            min-height: 32px;
+            margin-bottom: 0.4rem;
+        }
+        
+        .button-row {
+            gap: 0.5rem;
+        }
+    }
+
+    /* ПРОГРЕСС БАР ДЛЯ КАЧЕСТВА */
+    .quality-bar {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 0.2rem;
+        overflow: hidden;
+    }
+
+    .quality-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffaa00, #00ffaa);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+
+    /* КЛАССЫ ДЛЯ СТАТУСОВ */
+    .status-excellent {
+        color: #00ffaa !important;
+    }
+    
+    .status-good {
+        color: #ffaa00 !important;
+    }
+    
+    .status-poor {
+        color: #ff3366 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workout">
+    <!-- УВЕЛИЧЕННАЯ СЕКЦИЯ КАМЕРЫ -->
+    <div class="camera-section">
+        <div class="camera-wrapper">
+            <img id="camera" src="{% url 'video_feed_pushups' %}" alt="Камера для отслеживания позы">
+            <div class="camera-overlay"></div>
+            <div class="camera-label">
+                <span>Отслеживание позы ИИ</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОМПАКТНАЯ СЕКЦИЯ HUD -->
+    <div class="hud-section">
+        <!-- СЧЕТЧИК ПОВТОРЕНИЙ И ТАЙМЕР -->
+        <div class="counter-row">
+            <div class="reps-counter" id="repsCounter">0</div>
+            <div class="counter-label">повторений</div>
+        </div>
+        
+        <div class="timer-display" id="timer">00:00</div>
+
+        <!-- СТАТИСТИКИ В ГРИДЕ -->
+        <div class="stats-grid">
+            <div class="stat-card" id="xpCard">
+                <div class="stat-value" id="xpValue">0.0</div>
+                <div class="stat-label">Опыт</div>
+            </div>
+            
+            <div class="stat-card" id="qualityCard">
+                <div class="stat-value" id="qualityValue">—</div>
+                <div class="stat-label">Качество</div>
+                <div class="quality-bar">
+                    <div class="quality-fill" id="qualityFill"></div>
+                </div>
+            </div>
+            
+            <div class="stat-card" id="errorsCard">
+                <div class="stat-value" id="errorsCount">0</div>
+                <div class="stat-label">Ошибки</div>
+            </div>
+        </div>
+
+        <!-- AI ФИДБЭК -->
+        <div class="ai-feedback" id="aiFeedback">
+            AI: Готовимся к тренировке...
+        </div>
+
+        <!-- КНОПКИ ДЕЙСТВИЙ -->
+        <div class="button-row">
+            <button id="saveSetButton" class="action-btn btn-primary">
+                💾 Сохранить подход
+            </button>
+            <a href="/" class="action-btn btn-secondary">
+                🏠 Выйти
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const elements = {
+        reps: document.getElementById('repsCounter'),
+        xp: document.getElementById('xpValue'),
+        xpCard: document.getElementById('xpCard'),
+        quality: document.getElementById('qualityValue'),
+        qualityCard: document.getElementById('qualityCard'),
+        qualityFill: document.getElementById('qualityFill'),
+        errors: document.getElementById('errorsCount'),
+        errorsCard: document.getElementById('errorsCard'),
+        ai: document.getElementById('aiFeedback'),
+        timer: document.getElementById('timer'),
+        saveBtn: document.getElementById('saveSetButton')
+    };
+
+    let workoutStartTime = Date.now();
+    let isSaving = false;
+    let currentExercise = 'PUSHUP';
+    let updateInterval = null;
+    let lastReps = 0;
+
+    // ОПТИМИЗИРОВАННЫЙ HUD МЕНЕДЖЕР
+    class OptimizedHUDManager {
+        constructor() {
+            this.cache = {};
+            this.updateQueue = [];
+            this.isUpdating = false;
+            this.lastUpdateTime = 0;
+            this.minUpdateInterval = 300; // 300мс между обновлениями
+        }
+
+        async update() {
+            // Защита от слишком частых обновлений
+            const now = Date.now();
+            if (now - this.lastUpdateTime < this.minUpdateInterval && this.isUpdating) {
+                return;
+            }
+
+            this.isUpdating = true;
+            this.lastUpdateTime = now;
+
+            try {
+                // Приоритет: новый API -> универсальный -> старый
+                const endpoints = [
+                    `/api/hud/real-time/?exercise=${currentExercise}&_=${now}`,
+                    `/api/hud/unified/?exercise=${currentExercise}`,
+                    '/api/pushups/stats/'
+                ];
+
+                let data = null;
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint, {
+                            headers: { 'X-CSRFToken': csrfToken },
+                            signal: AbortSignal.timeout(2000)
+                        });
+                        
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.success || result.status === 'success') {
+                                data = result.data || result;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.debug(`Endpoint ${endpoint} failed:`, e.message);
+                        continue;
+                    }
+                }
+
+                if (data) {
+                    this.processData(data);
+                }
+
+            } catch (error) {
+                console.warn('HUD update failed:', error);
+                this.showFallbackData();
+            } finally {
+                this.isUpdating = false;
+            }
+        }
+
+        processData(data) {
+            // ОБРАБОТКА ПОВТОРЕНИЙ
+            const newReps = data.count || data.reps || 0;
+            if (elements.reps && newReps !== lastReps) {
+                elements.reps.textContent = newReps;
+                
+                if (newReps > lastReps) {
+                    elements.reps.classList.add('counter-pulse');
+                    setTimeout(() => elements.reps.classList.remove('counter-pulse'), 300);
+                }
+                lastReps = newReps;
+            }
+
+            // ОБРАБОТКА XP
+            const xp = data.xp_gained || 0;
+            if (elements.xp && xp !== parseFloat(elements.xp.textContent)) {
+                elements.xp.textContent = xp.toFixed(1);
+                if (xp > 0) {
+                    elements.xpCard.classList.add('stat-highlight');
+                    setTimeout(() => elements.xpCard.classList.remove('stat-highlight'), 600);
+                }
+            }
+
+            // ОБРАБОТКА КАЧЕСТВА
+            const quality = data.quality || (data.perfect_form ? 100 : 92);
+            if (elements.quality) {
+                const qualityPercent = Math.min(100, Math.max(0, quality));
+                elements.quality.textContent = `${Math.round(qualityPercent)}%`;
+                
+                // Прогресс бар
+                if (elements.qualityFill) {
+                    elements.qualityFill.style.width = `${qualityPercent}%`;
+                }
+                
+                // Цвет статуса
+                elements.qualityCard.classList.remove('status-excellent', 'status-good', 'status-poor');
+                if (qualityPercent >= 90) {
+                    elements.qualityCard.classList.add('status-excellent');
+                } else if (qualityPercent >= 75) {
+                    elements.qualityCard.classList.add('status-good');
+                } else {
+                    elements.qualityCard.classList.add('status-poor');
+                }
+            }
+
+            // ОБРАБОТКА ОШИБОК
+            const errors = data.errors || data.feedback?.error_count || 0;
+            if (elements.errors && errors !== parseInt(elements.errors.textContent)) {
+                elements.errors.textContent = errors;
+                
+                if (errors > 0) {
+                    elements.errorsCard.classList.add('stat-highlight');
+                    setTimeout(() => elements.errorsCard.classList.remove('stat-highlight'), 600);
+                }
+            }
+
+            // AI ФИДБЭК
+            if (elements.ai) {
+                let message = data.feedback?.message || 'AI: Готовим систему...';
+                if (!message.startsWith('AI:')) message = `AI: ${message}`;
+                
+                // Обрезаем длинные сообщения
+                if (message.length > 60) {
+                    message = message.substring(0, 57) + '...';
+                }
+                
+                elements.ai.textContent = message;
+                
+                // Цветовая индикация
+                elements.ai.classList.remove('ai-glow');
+                if (message.includes('Отличн') || message.includes('Perfect')) {
+                    elements.ai.style.background = 'rgba(0, 255, 170, 0.1)';
+                    elements.ai.style.color = '#00ffaa';
+                    elements.ai.classList.add('ai-glow');
+                } else if (message.includes('Ошибк') || message.includes('Error')) {
+                    elements.ai.style.background = 'rgba(255, 51, 102, 0.1)';
+                    elements.ai.style.color = '#ff3366';
+                } else {
+                    elements.ai.style.background = 'rgba(157, 78, 221, 0.1)';
+                    elements.ai.style.color = '#e0c3fc';
+                }
+            }
+
+            // ТАЙМЕР
+            if (elements.timer) {
+                const duration = data.workout_duration || Math.floor((Date.now() - workoutStartTime) / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                elements.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        showFallbackData() {
+            // Просто показываем текущее время для таймера
+            if (elements.timer) {
+                const duration = Math.floor((Date.now() - workoutStartTime) / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                elements.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            if (elements.ai && elements.ai.textContent.includes('Готовим')) {
+                elements.ai.textContent = 'AI: Соединение...';
+            }
+        }
+
+        startPolling(interval = 500) {
+            this.stopPolling();
+            updateInterval = setInterval(() => this.update(), interval);
+            this.update(); // Первый запрос сразу
+        }
+
+        stopPolling() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+        }
+    }
+
+    // ИНИЦИАЛИЗАЦИЯ ТРЕНИРОВКИ
+    async function initializeWorkout() {
+        try {
+            workoutStartTime = Date.now();
+            
+            // Пытаемся начать тренировку через API
+            try {
+                await fetch('/api/exercise/start/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ exercise_type: currentExercise })
+                });
+            } catch (apiError) {
+                console.log('API start failed, continuing offline:', apiError);
+            }
+            
+            // Запускаем обновление HUD
+            window.hudManager.startPolling(500);
+            
+        } catch (error) {
+            console.error('Workout initialization error:', error);
+            window.hudManager.startPolling(1000); // Более медленный опрос при ошибке
+        }
+    }
+
+    // СОХРАНЕНИЕ ПОДХОДА
+    async function saveWorkoutSet() {
+        if (isSaving) return;
+        
+        isSaving = true;
+        const originalText = elements.saveBtn.textContent;
+        elements.saveBtn.disabled = true;
+        elements.saveBtn.textContent = '💾 Сохраняем...';
+        
+        elements.ai.textContent = 'AI: Сохраняем ваш подход...';
+        elements.ai.style.background = 'rgba(255, 170, 0, 0.1)';
+        elements.ai.style.color = '#ffaa00';
+        
+        try {
+            const reps = parseInt(elements.reps.textContent) || 0;
+            
+            // Синхронизация счетчика
+            try {
+                await fetch('/api/hud/sync/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        exercise_type: currentExercise,
+                        count: reps
+                    })
+                });
+            } catch (syncError) {
+                console.log('Sync failed, continuing:', syncError);
+            }
+            
+            // Сохранение подхода
+            const response = await fetch(`/api/save-set/${currentExercise}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({})
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                let successMsg = `✅ Сохранено! +${result.xp_gained?.toFixed(1) || '0'} XP`;
+                
+                if (result.leveled_up) {
+                    successMsg += ` 🎉 Уровень ${result.new_level}!`;
+                }
+                
+                if (result.completed_quests?.length > 0) {
+                    successMsg += ` 📜 Квесты: ${result.completed_quests.join(', ')}`;
+                }
+                
+                elements.ai.textContent = successMsg;
+                elements.ai.style.background = 'rgba(0, 255, 170, 0.1)';
+                elements.ai.style.color = '#00ffaa';
+                
+                // Перенаправление через 2 секунды
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+                
+            } else {
+                throw new Error(result.message || 'Ошибка сохранения');
+            }
+            
+        } catch (error) {
+            console.error('Save error:', error);
+            elements.ai.textContent = `❌ Ошибка: ${error.message}`;
+            elements.ai.style.background = 'rgba(255, 51, 102, 0.1)';
+            elements.ai.style.color = '#ff3366';
+            
+            // Восстановление кнопки через 3 секунды
+            setTimeout(() => {
+                elements.saveBtn.disabled = false;
+                elements.saveBtn.textContent = originalText;
+                isSaving = false;
+            }, 3000);
+        }
+    }
+
+    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    document.addEventListener('DOMContentLoaded', () => {
+        // Создаем менеджер HUD
+        window.hudManager = new OptimizedHUDManager();
+        
+        // Инициализируем тренировку
+        initializeWorkout();
+        
+        // Назначаем обработчик сохранения
+        elements.saveBtn.addEventListener('click', saveWorkoutSet);
+        
+        // Управление обновлениями при смене вкладки
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                window.hudManager.stopPolling();
+            } else {
+                window.hudManager.startPolling();
+            }
+        });
+        
+        // Предотвращаем скроллинг на странице
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.target.tagName !== 'IMG') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    });
+
+    // ОЧИСТКА ПРИ ЗАКРЫТИИ
+    window.addEventListener('beforeunload', () => {
+        if (window.hudManager) {
+            window.hudManager.stopPolling();
+        }
+    });
+
+    // ОБРАБОТЧИК ОШИБОК ИЗОБРАЖЕНИЯ КАМЕРЫ
+    document.getElementById('camera').addEventListener('error', (e) => {
+        console.error('Camera stream error:', e);
+        elements.ai.textContent = 'AI: Проблема с камерой. Проверьте подключение.';
+        elements.ai.style.background = 'rgba(255, 51, 102, 0.1)';
+        elements.ai.style.color = '#ff3366';
+    });
+</script>
+{% endblock %}

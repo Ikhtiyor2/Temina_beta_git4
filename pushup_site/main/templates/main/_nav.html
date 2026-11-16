@@ -1,0 +1,614 @@
+<!-- templates/main/_nav.html -->
+<nav class="navbar">
+    <div class="nav-container">
+        <!-- Логотип -->
+        <div class="nav-brand">
+            <a href="{% url 'home' %}" class="logo-link">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">TEMINAFIT</span>
+            </a>
+        </div>
+
+        <!-- Основное меню -->
+        <div class="nav-menu">
+            <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Тренировки</span>
+                <span class="nav-pulse"></span>
+            </a>
+            
+            <a href="{% url 'quests' %}" class="nav-item {% if request.resolver_match.url_name == 'quests' %}active{% endif %}">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-label">Квесты</span>
+                <span class="nav-pulse"></span>
+            </a>
+            
+            <a href="{% url 'stats' %}" class="nav-item {% if request.resolver_match.url_name == 'stats' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Аналитика</span>
+                <span class="nav-pulse"></span>
+            </a>
+            
+            <a href="{% url 'leaderboard' %}" class="nav-item {% if request.resolver_match.url_name == 'leaderboard' or request.resolver_match.url_name == 'rating' %}active{% endif %}">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Лидерборд</span>
+                <span class="nav-pulse"></span>
+            </a>
+            
+            <a href="{% url 'profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+                <span class="nav-pulse"></span>
+            </a>
+        </div>
+
+        <!-- Действия пользователя -->
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <div class="user-info">
+                    <div class="level-display">
+                        <div class="level-circle">
+                            <span class="level-number">{{ player.level|default:1 }}</span>
+                        </div>
+                        <div class="level-text">
+                            <span class="level-label">Уровень</span>
+                            <span class="xp-progress">{{ player.xp|default:0 }}/{{ player.exp_to_level|default:100 }} опыта</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout" style="background:none;cursor:pointer;">
+                            <span class="btn-icon">🚪</span>
+                            <span class="btn-text">Выйти</span>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="action-buttons">
+                    <a href="{% url 'login_page' %}" class="btn btn-secondary">
+                        <span class="btn-icon">🔑</span>
+                        <span class="btn-text">Войти</span>
+                    </a>
+                    <a href="{% url 'registration' %}" class="btn btn-primary">
+                        <span class="btn-icon">🎮</span>
+                        <span class="btn-text">Начать</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Мобильное меню -->
+        <div class="mobile-menu-toggle">
+            <button class="menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="{% url 'home' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Тренировки</span>
+            </a>
+            
+            <a href="{% url 'quests' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'quests' %}active{% endif %}">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-label">Квесты</span>
+            </a>
+            
+            <a href="{% url 'stats' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'stats' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Аналитика</span>
+            </a>
+            
+            <a href="{% url 'leaderboard' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'leaderboard' or request.resolver_match.url_name == 'rating' %}active{% endif %}">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Лидерборд</span>
+            </a>
+            
+            <a href="{% url 'profile' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </a>
+
+            {% if not user.is_authenticated %}
+                <div class="mobile-auth-buttons">
+                    <a href="{% url 'login_page' %}" class="btn btn-secondary btn-full">
+                        <span class="btn-icon">🔑</span>
+                        <span class="btn-text">Войти</span>
+                    </a>
+                    <a href="{% url 'registration' %}" class="btn btn-primary btn-full">
+                        <span class="btn-icon">🎮</span>
+                        <span class="btn-text">Начать</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<style>
+/* ======================= NAVIGATION VARIABLES ======================= */
+:root {
+    --nav-height: 70px;
+    --nav-background: rgba(17, 24, 39, 0.95);
+    --nav-border: rgba(45, 55, 72, 0.8);
+    --nav-blur: blur(20px);
+}
+
+/* ======================= NAVBAR CONTAINER ======================= */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--nav-background);
+    backdrop-filter: var(--nav-blur);
+    border-bottom: 1px solid var(--nav-border);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+/* ======================= BRAND/LOGO ======================= */
+.nav-brand {
+    flex-shrink: 0;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.logo-icon {
+    font-size: 1.75rem;
+    animation: pulse 2s infinite;
+}
+
+.logo-text {
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ======================= MAIN NAV MENU ======================= */
+.nav-menu {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--nav-border);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-item:hover::before {
+    left: 100%;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: var(--neon-blue);
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+}
+
+.nav-icon {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover .nav-icon {
+    transform: scale(1.2);
+}
+
+.nav-pulse {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    background: var(--neon-green);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item.active .nav-pulse {
+    opacity: 1;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.7; }
+}
+
+/* ======================= USER ACTIONS ======================= */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.level-display {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid var(--neon-blue);
+    border-radius: 2rem;
+}
+
+.level-circle {
+    width: 36px;
+    height: 36px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--bg-primary);
+    font-size: 0.875rem;
+}
+
+.level-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.level-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.xp-progress {
+    font-size: 0.7rem;
+    color: var(--neon-green);
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* ======================= BUTTONS ======================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: rgba(0, 217, 255, 0.15);
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.btn-primary:hover {
+    background: rgba(0, 217, 255, 0.25);
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid var(--neon-red);
+    color: var(--neon-red);
+}
+
+.btn-logout:hover {
+    background: rgba(255, 68, 68, 0.2);
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* ======================= MOBILE MENU ======================= */
+.mobile-menu-toggle {
+    display: none;
+}
+
+.menu-toggle {
+    width: 30px;
+    height: 24px;
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: var(--neon-blue);
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: all 0.3s ease;
+}
+
+.menu-toggle span:nth-child(1) { top: 0px; }
+.menu-toggle span:nth-child(2) { top: 10px; }
+.menu-toggle span:nth-child(3) { top: 20px; }
+
+.menu-toggle.active span:nth-child(1) {
+    top: 10px;
+    transform: rotate(135deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+    left: -60px;
+}
+
+.menu-toggle.active span:nth-child(3) {
+    top: 10px;
+    transform: rotate(-135deg);
+}
+
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.mobile-menu.active {
+    transform: translateX(0);
+}
+
+.mobile-menu-content {
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+    color: var(--neon-blue);
+    background: rgba(0, 217, 255, 0.1);
+    border-color: rgba(0, 217, 255, 0.3);
+}
+
+.mobile-auth-buttons {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem;
+}
+
+/* ======================= RESPONSIVE DESIGN ======================= */
+@media (max-width: 1024px) {
+    .nav-menu {
+        gap: 0.25rem;
+    }
+    
+    .nav-item {
+        padding: 0.6rem 1rem;
+    }
+    
+    .nav-label {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+    
+    .nav-actions .action-buttons {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .user-info {
+        display: none;
+    }
+    
+    .nav-container {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-brand .logo-text {
+        font-size: 1.25rem;
+    }
+    
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+    
+    .mobile-menu-content {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* ======================= SCROLL EFFECTS ======================= */
+.navbar.scrolled {
+    background: rgba(17, 24, 39, 0.98);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const navbar = document.querySelector('.navbar');
+    
+    // Mobile menu toggle
+    if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        });
+    }
+    
+    // Close mobile menu when clicking on links
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    mobileNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+            mobileMenuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+    
+    // Add active state to current page
+    const currentPath = window.location.pathname;
+    const navItems = document.querySelectorAll('.nav-item, .mobile-nav-item');
+    navItems.forEach(item => {
+        if (item.getAttribute('href') === currentPath) {
+            item.classList.add('active');
+        }
+    });
+});
+</script>

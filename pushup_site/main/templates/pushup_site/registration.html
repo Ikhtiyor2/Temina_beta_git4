@@ -1,0 +1,275 @@
+{% load static %}
+{% block title %}
+Регистрация — TeminaFit v3.0
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* 🛑 ИЗМЕНЕНИЕ: Устанавливаем самый темный фон для всего тела страницы */
+    body { 
+        background-color: #0b0013; /* Глубокий темно-фиолетовый/черный */
+        color: #ffffff; /* Белый текст по умолчанию */
+        font-family: 'Montserrat', sans-serif; /* Используем единый шрифт */
+    }
+    
+    /* Стиль для контейнера формы */
+    .register-container {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #1a0030; /* Темно-фиолетовый фон контейнера (чуть светлее фона body) */
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(138, 43, 226, 0.4); /* Фиолетовая тень */
+        border: 1px solid #4a0080;
+        color: #d4b3ff; /* Светло-фиолетовый текст */
+    }
+
+    /* Заголовок */
+    .register-container h2 {
+        color: #00e5ff; /* Яркий акцент для заголовка */
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    /* Стиль для всех полей ввода (input) */
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        background-color: #2a0040; /* Темный фон поля */
+        border: 1px solid #5e00cc; /* Фиолетовая рамка */
+        color: #ffffff;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .register-container input:focus {
+        border-color: #00e5ff; /* Яркий акцент при фокусе */
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        outline: none;
+    }
+    
+    /* Лейблы (чтобы были видны на темном фоне) */
+    .register-container label {
+        display: block;
+        font-weight: 500;
+        color: #bfaaff;
+    }
+
+    /* Кнопка "Sign up" */
+    .btn-primary {
+        background-color: #8a2be2; /* Базовый фиолетовый */
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+        background-color: #9a4cff; /* Светлее при наведении */
+        transform: translateY(-1px);
+    }
+    
+    /* Сообщения об ошибках */
+    .errorlist {
+        color: #ff4d4d; /* Красный для ошибок */
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+    .non-field-errors {
+        color: #ff0000;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
+
+<div class="register-container">
+    <h2 class="mb-4">Регистрация в TeminaFit</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+
+        {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            <div class="errorlist">{{ field.errors }}</div>
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-100 mt-3">Создать аккаунт</button>
+    </form>
+</div>
+{% endblock %}
+{% comment %} {% load static %}
+{% block title %}
+Регистрация — TeminaFit v3.0
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Стиль для контейнера формы */
+    .register-container {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #1a0030; /* Темно-фиолетовый фон контейнера */
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(138, 43, 226, 0.4); /* Фиолетовая тень */
+        border: 1px solid #4a0080;
+        color: #d4b3ff; /* Светло-фиолетовый текст */
+    }
+
+    /* Заголовок */
+    .register-container h2 {
+        color: #00e5ff; /* Яркий акцент для заголовка */
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    /* Стиль для всех полей ввода (input) */
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        background-color: #2a0040; /* Темный фон поля */
+        border: 1px solid #5e00cc; /* Фиолетовая рамка */
+        color: #3287f5ff;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .register-container input:focus {
+        border-color: #00e5ff; /* Яркий акцент при фокусе */
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        outline: none;
+    }
+
+    /* Кнопка "Sign up" */
+    .btn-primary {
+        background-color: #8a2be2; /* Базовый фиолетовый */
+        border: none;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+        background-color: #9a4cff; /* Светлее при наведении */
+        transform: translateY(-1px);
+    }
+    
+    /* Сообщения об ошибках */
+    .errorlist {
+        color: #ff4d4d; /* Красный для ошибок */
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+    .non-field-errors {
+        color: #ff0000;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
+
+<div class="register-container">
+    <h2 class="mb-4">Регистрация в TeminaFit</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="non-field-errors">
+            {{ form.non_field_errors }}
+        </div>
+
+        {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            <div class="errorlist">{{ field.errors }}</div>
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-100 mt-3">Создать аккаунт</button>
+    </form>
+</div>
+{% endblock %}
+
+ {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% load static %}
+{% block title %}
+Register
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+  <h2 class="mb-4">Registration</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="mb-3">
+      {{ form.username.label_tag }}
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.first_name.label_tag }}
+      {{ form.first_name }}
+      {{ form.first_name.errors }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      {{ form.password1.errors }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      {{ form.password2.errors }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+  </form>
+</div>
+{% endblock %} {% endcomment %}

@@ -1,0 +1,1136 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ current_lang|default:'ru' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0b1e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TeminaFit">
+  <title>{% block title %}TeminaFit{% endblock %}</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon.svg' %}">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Remix Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    (function () {
+      var preview = false;
+      try {
+        var params = new URLSearchParams(location.search);
+        if (params.get("tma") === "1") {
+          sessionStorage.setItem("tmaPreview", "1");
+          preview = true;
+        } else if (sessionStorage.getItem("tmaPreview") === "1") {
+          preview = true;
+        }
+      } catch (e) {}
+      var tg = window.Telegram && window.Telegram.WebApp;
+      if ((!tg || !tg.initData) && !preview) return;
+      document.documentElement.classList.add("is-tma");
+      if (preview && (!tg || !tg.initData)) document.documentElement.classList.add("is-tma-preview");
+      if (location.pathname.indexOf("/train/") === 0) {
+        document.documentElement.classList.add("is-tma-focus");
+      }
+      try { if (tg && tg.initData) { tg.ready(); tg.expand(); } } catch (e) {}
+    })();
+  </script>
+  {% block extra_head %}{% endblock %}
+
+  <style>
+    :root{
+      --bg: #0D0D10;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-surface: #1a1a1e;
+      --border: rgba(255,255,255,0.08);
+      --txt: #ffffff;
+      --muted: rgba(255,255,255,0.65);
+      --muted2: rgba(255,255,255,0.45);
+      --accent-start: #A855F7;
+      --accent-end: #D946EF;
+      --accent-magenta: #ec4899;
+      --accent-cyan: #06b6d4;
+      --accent-teal: #14b8a6;
+      --glow: rgba(168,85,247,0.4);
+      --glow-strong: rgba(168,85,247,0.55);
+      --glow-text: 0 0 32px rgba(189,107,255,0.45);
+      --green: #22c55e;
+      --purple: #a855f7;
+      --purple2: #bd6bff;
+      --blue: #3b82f6;
+      --orange: #f97316;
+      --red: #ef4444;
+      --r: 16px;
+      --r2: 12px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.4);
+      --shadow-glow: 0 8px 32px rgba(168,85,247,0.2);
+      --container: 1200px;
+      --headerH: 64px;
+      --font: 'Outfit', system-ui, sans-serif;
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html{ font-size: 16px; scroll-behavior:smooth; -webkit-tap-highlight-color: transparent; }
+
+    body{
+      font-family: var(--font);
+      color: var(--txt);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
+    }
+
+    body::before{
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 90% 60% at 50% -15%, rgba(168,85,247,0.18), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 100% 40%, rgba(217,70,239,0.1), transparent 50%),
+        radial-gradient(ellipse 60% 45% at 0% 70%, rgba(168,85,247,0.08), transparent 50%),
+        radial-gradient(ellipse 50% 30% at 80% 100%, rgba(6,182,212,0.06), transparent 50%);
+      pointer-events: none;
+    }
+    /* Лёгкое «дыхание» фона (опционально) */
+    @keyframes bgShift {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.92; }
+    }
+    body::before { animation: bgShift 12s ease-in-out infinite; }
+
+    a{ color: inherit; text-decoration:none; }
+    img{ max-width:100%; display:block; }
+
+    .app{ min-height: 100vh; display: flex; flex-direction: column; }
+
+    main{
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 60px;
+      flex: 1;
+    }
+
+    /* Header — glass */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: var(--headerH);
+      display: flex;
+      align-items: center;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hWrap{
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logoMark{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      border: 1px solid rgba(168,85,247,0.4);
+      box-shadow: 0 0 20px var(--glow);
+    }
+
+    .logoMark i{ font-size: 18px; color: #fff; }
+
+    .logoText{ display: flex; flex-direction: column; line-height: 1.1; }
+
+    .logoText .a{
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logoText .b{ font-size: 11px; color: var(--muted2); font-weight: 600; margin-top: 1px; }
+
+    nav{ display: flex; align-items: center; gap: 6px; }
+
+    .navLink{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color .2s, background .2s;
+    }
+
+    .navLink i{ font-size: 1.1rem; }
+
+    .navLink:hover{ color: var(--txt); background: var(--bg-card); }
+
+    .navLink.active{
+      color: var(--purple2);
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.25);
+    }
+
+    .rightActions{ display: flex; align-items: center; gap: 10px; }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .pill .dot{
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(34,197,94,0.5);
+    }
+
+    .btnLogout{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--txt);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform .2s, background .2s, border-color .2s;
+    }
+
+    .btnLogout:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .btnPrimary{
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: #fff;
+      box-shadow: 0 4px 20px var(--glow);
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .btnPrimary:hover{ transform: translateY(-2px); box-shadow: 0 8px 28px var(--glow); }
+
+    /* Кнопки для страниц (stats, quests и т.д.) — яркие и с подсветкой */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 20px; border-radius: 14px; font-weight: 700; font-size: 0.95rem;
+      transition: transform .2s, box-shadow .2s, filter .2s; text-decoration: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .btn i { font-size: 1.1rem; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: #fff;
+      box-shadow: 0 4px 20px var(--glow), 0 0 0 1px rgba(255,255,255,0.1) inset;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 36px var(--glow-strong), 0 0 0 1px rgba(255,255,255,0.15) inset;
+      filter: brightness(1.05);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--txt);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(168,85,247,0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transform: translateY(-1px);
+    }
+
+    .burger{
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--txt);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    .burger i{ font-size: 22px; }
+
+    @media (max-width: 980px){ nav{ display: none; } .burger{ display: flex; } .pill{ display: none; } }
+
+    @media (max-width: 600px) {
+      /* Сжимаем шапку */
+      .hWrap { width: calc(100% - 24px); gap: 8px; }
+      .logoText .a { font-size: 1rem; }
+      .logoText .b { display: none; }
+      .btnLogout { display: none; } /* logout есть в мобильном меню */
+      /* Основной контент в sidebar-layout */
+      .app.layout-sidebar main { padding: 16px 12px 36px; }
+      main { width: calc(100% - 24px); }
+      /* Нижняя безопасная зона для iPhone */
+      footer { padding: 20px 0 calc(20px + env(safe-area-inset-bottom)); }
+    }
+
+    @media (max-width: 480px) {
+      .logoMark { width: 34px; height: 34px; }
+      .logoMark i { font-size: 15px; }
+      .burger { width: 38px; height: 38px; min-width: 44px; min-height: 44px; }
+      .mobileNavPanel { width: calc(100% - 20px); max-height: 80vh; border-radius: 16px; }
+      .mLink { padding: 16px 18px; min-height: 52px; }
+    }
+
+    /* Оверлей мобильного меню — тап вне меню закрывает */
+    .mobileNavOverlay{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1998;
+    }
+    .mobileNavOverlay.active{ display: block; }
+
+    .mobileNav{
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: calc(var(--headerH) + 12px) 12px 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobileNav.active{ display: flex; flex-direction: column; }
+
+    .mobileNavPanel{
+      width: min(480px, calc(100% - 24px));
+      background: rgba(10,10,15,0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      padding: 12px;
+      margin: 0 auto;
+    }
+
+    .mGrid{ display: grid; gap: 10px; }
+
+    .mLink{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      min-height: 48px;
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--txt);
+      transition: transform .15s, background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mLink:hover,.mLink:active{ background: rgba(255,255,255,0.06); }
+    .mLink .left{ display: flex; align-items: center; gap: 14px; }
+    .mLink i{ font-size: 1.35rem; opacity: .9; flex-shrink: 0; }
+    .mLink small{ color: var(--muted2); font-weight: 500; }
+
+    /* Нижняя панель навигации на мобильных (только для авторизованных) */
+    .bottomNav{
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+    }
+    .bottomNav-inner{
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      gap: 4px;
+    }
+    .bottomNav a{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 2px;
+      min-height: 50px;
+      min-width: 48px;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color .2s, background .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bottomNav a span{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .bottomNav a:hover{ color: var(--txt); background: rgba(255,255,255,0.05); }
+    .bottomNav a.active{
+      color: var(--purple2);
+      background: rgba(168,85,247,0.12);
+    }
+    .bottomNav a i{ font-size: 1.25rem; }
+
+    @media (max-width: 900px) {
+      .bottomNav { display: block; }
+      .app.layout-sidebar main { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+    }
+    @media (min-width: 901px) {
+      .bottomNav { display: none !important; }
+    }
+
+    /* Telegram Mini App: телефонный каркас поверх тех же страниц */
+    html.is-tma,
+    html.is-tma body {
+      min-height: var(--tg-viewport-stable-height, 100dvh);
+      background: var(--bg);
+    }
+    html.is-tma .app,
+    html.is-tma .app.layout-sidebar {
+      min-height: var(--tg-viewport-stable-height, 100dvh);
+      flex-direction: column;
+    }
+    html.is-tma .sidebar,
+    html.is-tma .top-header,
+    html.is-tma footer,
+    html.is-tma .mobileNav,
+    html.is-tma .mobileNavOverlay,
+    html.is-tma .burger { display: none !important; }
+    html.is-tma .bottomNav { display: block !important; }
+    html.is-tma .bottomNav a[href="/stats/"] { display: none; }
+    html.is-tma .bottomNav a.active {
+      color: var(--purple2);
+      background: transparent;
+    }
+    html.is-tma body:not([data-authenticated="1"]) #tmaGate { display: flex !important; }
+    html.is-tma main,
+    html.is-tma .app.layout-sidebar main {
+      width: calc(100% - 16px);
+      max-width: 720px;
+      padding: 12px 0 calc(92px + env(safe-area-inset-bottom));
+    }
+    html.is-tma.is-tma-focus .bottomNav { display: none !important; }
+    html.is-tma.is-tma-focus main,
+    html.is-tma.is-tma-focus .app.layout-sidebar main {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    html.is-tma body:not([data-authenticated="1"]) main,
+    html.is-tma body:not([data-authenticated="1"]) footer { visibility: hidden; }
+    .tma-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 4000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(168,85,247,0.22), transparent 55%),
+        var(--bg);
+    }
+    .tma-gate[hidden] { display: none !important; }
+    .tma-gate-card {
+      width: min(360px, 100%);
+      text-align: center;
+      padding: 28px 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+    }
+    .tma-gate-mark {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      box-shadow: 0 8px 28px var(--glow);
+      color: #fff;
+      font-size: 28px;
+    }
+    .tma-gate-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .tma-gate-text { color: var(--muted); font-size: 0.95rem; line-height: 1.45; }
+    .tma-gate-retry {
+      margin-top: 18px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tma-gate-retry[hidden] { display: none !important; }
+
+    footer{
+      border-top: 1px solid var(--border);
+      background: rgba(10,10,15,0.6);
+      backdrop-filter: blur(14px);
+      padding: 28px 0;
+    }
+
+    .fWrap{
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .fLeft{ max-width: 400px; }
+
+    .fTitle{
+      font-weight: 800;
+      font-size: 1rem;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .fDesc{ margin-top: 8px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    .copy{
+      width: 100%;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .fCol { display: flex; flex-direction: column; gap: 8px; min-width: 140px; }
+    .fColTitle { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px; }
+    .fCol a { color: var(--muted); font-size: 14px; transition: color .2s; }
+    .fCol a:hover { color: var(--txt); }
+    .langSwitch { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+    .langSwitch a { color: var(--muted); font-size: 13px; font-weight: 600; padding: 4px 8px; border-radius: 8px; }
+    .langSwitch a:hover { color: var(--txt); background: var(--bg-card); }
+    .langSwitch a.active { color: var(--purple2); background: rgba(168,85,247,0.15); }
+
+    .toast{
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      background: rgba(10,10,15,0.95);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      padding: 14px 18px;
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3000;
+      max-width: 360px;
+      animation: toastIn .25s ease;
+    }
+    @keyframes toastIn{ from{ transform: translateY(-8px); opacity: 0; } to{ transform: translateY(0); opacity: 1; } }
+    .toast .ico{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(6,182,212,0.15));
+      border: 1px solid rgba(168,85,247,0.25);
+    }
+    .toast .msg{ font-weight: 600; color: var(--txt); font-size: 14px; line-height: 1.4; }
+
+    /* Card utility for inner pages — с лёгким свечением при наведении */
+    .page-card{
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+    }
+    .page-card:hover{
+      border-color: rgba(168,85,247,0.28);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25), var(--shadow-glow);
+      transform: translateY(-2px);
+    }
+
+    /* ========== DESIGN SYSTEM (ds-) — для всех внутренних страниц ========== */
+    .ds-container { width: min(var(--container), calc(100% - 32px)); margin: 0 auto; }
+    .ds-page-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 24px; color: var(--txt); }
+    .ds-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      transition: border-color .25s, box-shadow .25s, transform .2s;
+    }
+    .ds-card:hover {
+      border-color: rgba(168,85,247,0.22);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.22), 0 0 40px rgba(168,85,247,0.06);
+      transform: translateY(-2px);
+    }
+    .ds-card-title { font-size: 0.9rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px; }
+    .ds-card-value { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; color: var(--txt); }
+    .ds-card-value.accent { background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .ds-grid { display: grid; gap: 20px; }
+    .ds-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .ds-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .ds-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 900px) { .ds-grid-4 { grid-template-columns: repeat(2, 1fr); } .ds-grid-3 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .ds-grid-4, .ds-grid-3, .ds-grid-2 { grid-template-columns: 1fr; } }
+    .ds-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 0.95rem;
+      transition: transform .2s, box-shadow .2s; text-decoration: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .ds-btn-primary { background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; box-shadow: 0 4px 16px var(--glow); }
+    .ds-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+    .ds-btn-ghost { background: var(--bg-card); color: var(--txt); border: 1px solid var(--border); }
+    .ds-btn-ghost:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+    .ds-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--muted);
+    }
+    .ds-badge i { opacity: .9; }
+    .ds-progress-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .ds-progress-bar div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-start), var(--accent-end)); transition: width .5s ease; }
+    .ds-list-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    }
+    .ds-list-item + .ds-list-item { margin-top: 8px; }
+    .ds-hero {
+      padding: 28px; border-radius: 20px; margin-bottom: 24px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .ds-hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-start), var(--accent-end), transparent); opacity: .8;
+    }
+    /* Заголовки с градиентом и лёгким свечением */
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: var(--glow-text);
+    }
+    .text-gradient-glow {
+      filter: drop-shadow(0 0 20px rgba(168,85,247,0.35));
+    }
+
+    /* ========== SIDEBAR LAYOUT (Lovable-style) ========== */
+    .app.layout-sidebar { flex-direction: row; }
+    .app.layout-sidebar .top-header { display: none; }
+    .app.layout-sidebar .main-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .app.layout-sidebar main { flex: 1; width: 100%; max-width: none; padding: 24px 28px 48px; }
+
+    .sidebar {
+      width: 80px;
+      min-height: 100vh;
+      background: rgba(13,13,16,0.98);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0 16px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .sidebar-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px var(--glow);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .sidebar-logo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 28px var(--glow);
+    }
+    .sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+    .sidebar-link {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: color .2s, background .2s;
+      text-decoration: none;
+    }
+    .sidebar-link:hover { color: var(--txt); background: rgba(255,255,255,0.06); }
+    .sidebar-link.active {
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: #fff;
+      box-shadow: 0 4px 24px var(--glow), 0 0 20px rgba(168,85,247,0.25);
+    }
+    .sidebar-link i { font-size: 1.35rem; }
+    .sidebar-bottom { margin-top: auto; }
+    .sidebar-link.logout { color: var(--muted2); }
+    .sidebar-link.logout:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+    .sidebar-lang { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px; font-size: 12px; }
+    .sidebar-lang a { color: var(--muted); font-weight: 600; padding: 4px 6px; border-radius: 6px; text-decoration: none; }
+    .sidebar-lang a:hover { color: var(--txt); background: rgba(255,255,255,0.06); }
+    .sidebar-lang a.active { color: var(--purple2); background: rgba(168,85,247,0.15); }
+    .sidebar-lang-sep { color: var(--muted2); font-size: 10px; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .app.layout-sidebar .top-header { display: flex; }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/telegram-miniapp.css' %}?v=temina">
+</head>
+
+<body data-authenticated="{% if user.is_authenticated %}1{% else %}0{% endif %}" data-lang="{{ current_lang|default:'ru' }}">
+  <div id="tmaGate" class="tma-gate" hidden>
+    <div class="tma-gate-card">
+      <div class="tma-gate-mark" aria-hidden="true"><i class="ri-pulse-line"></i></div>
+      <div class="tma-gate-title">TeminaFit</div>
+      <p class="tma-gate-text" id="tmaGateText">{% if current_lang == 'en' %}Signing in…{% else %}Входим…{% endif %}</p>
+      <button type="button" class="tma-gate-retry" id="tmaGateRetry" hidden>{% if current_lang == 'en' %}Try again{% else %}Повторить{% endif %}</button>
+    </div>
+  </div>
+  <div hidden>{% csrf_token %}</div>
+  <div class="app {% if user.is_authenticated %}layout-sidebar{% endif %}">
+
+    {% if user.is_authenticated %}
+    <!-- SIDEBAR (Lovable-style) -->
+    <aside class="sidebar">
+      <a href="/dashboard/" class="sidebar-logo" title="TEMINAFIT"><i class="ri-pulse-line"></i></a>
+      <nav class="sidebar-nav">
+        <a href="/dashboard/" class="sidebar-link {% if request.path == '/' or 'dashboard' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Home{% else %}Главная{% endif %}"><i class="ri-home-5-line"></i></a>
+        <a href="/workouts/" class="sidebar-link {% if 'workouts' in request.path or 'train' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}"><i class="ri-run-line"></i></a>
+        <a href="/quests/" class="sidebar-link {% if 'quests' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}"><i class="ri-trophy-line"></i></a>
+        <a href="/leaderboard/" class="sidebar-link {% if 'leaderboard' in request.path or 'rating' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Leaderboard{% else %}Лидерборд{% endif %}"><i class="ri-medal-line"></i></a>
+        <a href="/stats/" class="sidebar-link {% if 'stats' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Stats{% else %}Статистика{% endif %}"><i class="ri-bar-chart-2-line"></i></a>
+        <a href="/profile/" class="sidebar-link {% if 'profile' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}"><i class="ri-user-3-line"></i></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-lang">
+          <a href="{% url 'set_language' %}?lang=en&next={{ request.get_full_path|urlencode }}" class="{% if current_lang == 'en' %}active{% endif %}" title="English">EN</a>
+          <span class="sidebar-lang-sep">|</span>
+          <a href="{% url 'set_language' %}?lang=ru&next={{ request.get_full_path|urlencode }}" class="{% if current_lang == 'ru' %}active{% endif %}" title="Русский">RU</a>
+        </div>
+        <a href="{% url 'logout' %}" class="sidebar-link logout" onclick="event.preventDefault();document.getElementById('logoutForm').submit();" title="{% if current_lang == 'en' %}Log out{% else %}Выйти{% endif %}"><i class="ri-logout-box-r-line"></i></a>
+      </div>
+    </aside>
+    {% endif %}
+
+    <div class="main-wrap">
+    <!-- HEADER (hidden when sidebar) -->
+    <header class="top-header">
+      <div class="hWrap">
+
+        <a href="/" class="logo">
+          <div class="logoMark">
+            <i class="ri-pulse-line"></i>
+          </div>
+          <div class="logoText">
+            <div class="a">TeminaFit</div>
+            <div class="b">{% if current_lang == 'en' %}AI Fitness{% else %}Фитнес с ИИ{% endif %}</div>
+          </div>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav>
+          <a href="/" class="navLink {% if request.path == '/' %}active{% endif %}">
+            <i class="ri-home-5-line"></i> {% if current_lang == 'en' %}Home{% else %}Главная{% endif %}
+          </a>
+
+          {% if user.is_authenticated %}
+            <a href="/workouts/" class="navLink {% if 'workouts' in request.path or 'train' in request.path %}active{% endif %}">
+              <i class="ri-play-circle-line"></i> {% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}
+            </a>
+            <a href="/dashboard/" class="navLink {% if 'dashboard' in request.path %}active{% endif %}">
+              <i class="ri-dashboard-2-line"></i> {% if current_lang == 'en' %}Dashboard{% else %}Панель{% endif %}
+            </a>
+            <a href="/stats/" class="navLink {% if 'stats' in request.path %}active{% endif %}">
+              <i class="ri-line-chart-line"></i> {% if current_lang == 'en' %}Stats{% else %}Статистика{% endif %}
+            </a>
+            <a href="/leaderboard/" class="navLink {% if 'leaderboard' in request.path or 'rating' in request.path %}active{% endif %}">
+              <i class="ri-trophy-line"></i> {% if current_lang == 'en' %}Leaderboard{% else %}Лидерборд{% endif %}
+            </a>
+            <a href="/quests/" class="navLink {% if 'quests' in request.path %}active{% endif %}">
+              <i class="ri-award-line"></i> {% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}
+            </a>
+            <a href="/profile/" class="navLink {% if 'profile' in request.path %}active{% endif %}">
+              <i class="ri-user-3-line"></i> {% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}
+            </a>
+          {% endif %}
+        </nav>
+
+        <div class="rightActions">
+          <div class="langSwitch">
+            <a href="{% url 'set_language' %}?lang=en&next={{ request.get_full_path|urlencode }}" class="{% if current_lang == 'en' %}active{% endif %}">EN</a>
+            <span style="color: var(--muted2);">|</span>
+            <a href="{% url 'set_language' %}?lang=ru&next={{ request.get_full_path|urlencode }}" class="{% if current_lang == 'ru' %}active{% endif %}">RU</a>
+          </div>
+          {% if user.is_authenticated %}
+            <div class="pill">
+              <span class="dot"></span>
+              {% if current_lang == 'en' %}Online{% else %}Онлайн{% endif %}
+            </div>
+
+            <a href="{% url 'logout' %}" class="btnLogout" onclick="event.preventDefault();document.getElementById('logoutForm').submit();">
+              <i class="ri-logout-box-r-line"></i> {% if current_lang == 'en' %}Log out{% else %}Выйти{% endif %}
+            </a>
+          {% else %}
+            <a href="{% url 'login_page' %}" class="btnLogout">
+              <i class="ri-login-box-line"></i> {% if current_lang == 'en' %}Log in{% else %}Войти{% endif %}
+            </a>
+          {% endif %}
+
+          <button class="burger" id="burgerBtn" aria-label="{% if current_lang == 'en' %}Menu{% else %}Меню{% endif %}">
+            <i class="ri-menu-3-line" id="burgerIcon"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Overlay для закрытия мобильного меню по тапу -->
+    <div class="mobileNavOverlay" id="mobileNavOverlay" aria-hidden="true"></div>
+
+    <!-- Mobile nav (бургер) -->
+    <div class="mobileNav" id="mobileNav" aria-hidden="true">
+      <div class="mobileNavPanel">
+      <div class="mGrid">
+
+        <a href="/" class="mLink">
+          <div class="left">
+            <i class="ri-home-5-line"></i>
+            <div>
+              {% if current_lang == 'en' %}Home{% else %}Главная{% endif %}<br>
+              <small>{% if current_lang == 'en' %}Start{% else %}Старт{% endif %}</small>
+            </div>
+          </div>
+          <i class="ri-arrow-right-s-line"></i>
+        </a>
+
+        {% if user.is_authenticated %}
+          <a href="/workouts/" class="mLink">
+            <div class="left">
+              <i class="ri-play-circle-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Start{% else %}Старт{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+          <a href="/dashboard/" class="mLink">
+            <div class="left">
+              <i class="ri-dashboard-2-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Dashboard{% else %}Панель{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Progress{% else %}Прогресс{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="/stats/" class="mLink">
+            <div class="left">
+              <i class="ri-line-chart-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Stats{% else %}Статистика{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Week / month{% else %}Неделя / месяц{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="/leaderboard/" class="mLink">
+            <div class="left">
+              <i class="ri-trophy-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Leaderboard{% else %}Лидерборд{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Rating{% else %}Рейтинг{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="/quests/" class="mLink">
+            <div class="left">
+              <i class="ri-award-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Goals{% else %}Цели{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="/profile/" class="mLink">
+            <div class="left">
+              <i class="ri-user-3-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Settings{% else %}Настройки{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="{% url 'logout' %}" class="mLink" onclick="event.preventDefault();document.getElementById('logoutForm').submit();">
+            <div class="left">
+              <i class="ri-logout-box-r-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Log out{% else %}Выйти{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Exit{% else %}Завершить{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+        {% else %}
+          <a href="{% url 'login_page' %}" class="mLink">
+            <div class="left">
+              <i class="ri-login-box-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Log in{% else %}Войти{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Account{% else %}Аккаунт{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+
+          <a href="{% url 'register_page' %}" class="mLink">
+            <div class="left">
+              <i class="ri-user-add-line"></i>
+              <div>
+                {% if current_lang == 'en' %}Sign up{% else %}Регистрация{% endif %}<br>
+                <small>{% if current_lang == 'en' %}Create account{% else %}Создать аккаунт{% endif %}</small>
+              </div>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+          </a>
+        {% endif %}
+
+      </div>
+      </div>
+    </div>
+
+    <!-- Нижняя панель навигации (только мобильные + авторизован) -->
+    {% if user.is_authenticated %}
+    <nav class="bottomNav" id="bottomNav" aria-label="{% if current_lang == 'en' %}Main navigation{% else %}Основная навигация{% endif %}">
+      <div class="bottomNav-inner">
+        <a href="/dashboard/" class="{% if request.path == '/' or 'dashboard' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Home{% else %}Главная{% endif %}"><i class="ri-home-5-line"></i><span>{% if current_lang == 'en' %}Home{% else %}Главная{% endif %}</span></a>
+        <a href="/workouts/" class="{% if 'workouts' in request.path or 'train' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}"><i class="ri-run-line"></i><span>{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}</span></a>
+        <a href="/quests/" class="{% if 'quests' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}"><i class="ri-trophy-line"></i><span>{% if current_lang == 'en' %}Quests{% else %}Квесты{% endif %}</span></a>
+        <a href="/leaderboard/" class="{% if 'leaderboard' in request.path or 'rating' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Leaderboard{% else %}Лидерборд{% endif %}"><i class="ri-medal-line"></i><span>{% if current_lang == 'en' %}Rating{% else %}Рейтинг{% endif %}</span></a>
+        <a href="/stats/" class="{% if 'stats' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Stats{% else %}Статистика{% endif %}"><i class="ri-bar-chart-2-line"></i><span>{% if current_lang == 'en' %}Stats{% else %}Статистика{% endif %}</span></a>
+        <a href="/profile/" class="{% if 'profile' in request.path %}active{% endif %}" title="{% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}"><i class="ri-user-3-line"></i><span>{% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}</span></a>
+      </div>
+    </nav>
+    {% endif %}
+
+    <!-- MAIN -->
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="fWrap">
+        <div class="fLeft">
+          <div class="fTitle">TeminaFit</div>
+          <div class="fDesc">
+            {% if current_lang == 'en' %}AI fitness app with gamification. Records, streaks and real stats in one place.{% else %}AI-приложение для тренировок, которое геймифицирует прогресс. Рекорды, серия тренировок и реальная статистика — в одном месте.{% endif %}
+          </div>
+        </div>
+        <div class="fCol">
+          <div class="fColTitle">{% if current_lang == 'en' %}Exercises{% else %}Упражнения{% endif %}</div>
+          <a href="/workouts/">{% if current_lang == 'en' %}All workouts{% else %}Все тренировки{% endif %}</a>
+          <a href="/train/pushups/">{% if current_lang == 'en' %}Push-ups{% else %}Отжимания{% endif %}</a>
+          <a href="/train/squats/">{% if current_lang == 'en' %}Squats{% else %}Приседания{% endif %}</a>
+          <a href="/train/crunches/">{% if current_lang == 'en' %}Crunches{% else %}Скручивания{% endif %}</a>
+          <a href="/train/planks/">{% if current_lang == 'en' %}Plank{% else %}Планка{% endif %}</a>
+          <a href="/train/pullups/">{% if current_lang == 'en' %}Pull-ups{% else %}Подтягивания{% endif %}</a>
+        </div>
+        <div class="fCol">
+          <div class="fColTitle">{% if current_lang == 'en' %}Account{% else %}Аккаунт{% endif %}</div>
+          <a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Sign up{% else %}Регистрация{% endif %}</a>
+          <a href="{% url 'login_page' %}">{% if current_lang == 'en' %}Log in{% else %}Войти{% endif %}</a>
+          <a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Create account{% else %}Создать аккаунт{% endif %}</a>
+          <a href="{% url 'privacy_policy' %}">{% if current_lang == 'en' %}Privacy policy{% else %}Политика конфиденциальности{% endif %}</a>
+        </div>
+        <div class="copy">
+          © 2025 TeminaFit. {% if current_lang == 'en' %}Fitness with AI and gamification.{% else %}Фитнес с ИИ и геймификацией.{% endif %}
+        </div>
+      </div>
+    </footer>
+
+    </div><!-- .main-wrap -->
+  </div>
+
+  <script>
+    // Mobile menu toggle (оверлей + закрытие по тапу вне меню)
+    const burgerBtn = document.getElementById('burgerBtn');
+    const burgerIcon = document.getElementById('burgerIcon');
+    const mobileNav = document.getElementById('mobileNav');
+    const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+
+    function closeMobileMenu(){
+      if (mobileNav) mobileNav.classList.remove('active');
+      if (mobileNavOverlay) mobileNavOverlay.classList.remove('active');
+      if (burgerIcon) burgerIcon.className = 'ri-menu-3-line';
+      document.body.style.overflow = '';
+    }
+
+    function openMobileMenu(){
+      if (mobileNav) mobileNav.classList.add('active');
+      if (mobileNavOverlay) mobileNavOverlay.classList.add('active');
+      if (burgerIcon) burgerIcon.className = 'ri-close-line';
+      document.body.style.overflow = 'hidden';
+    }
+
+    if (burgerBtn && mobileNav){
+      burgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mobileNav.classList.toggle('active');
+        if (mobileNavOverlay) mobileNavOverlay.classList.toggle('active', isOpen);
+        if (burgerIcon) burgerIcon.className = isOpen ? 'ri-close-line' : 'ri-menu-3-line';
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+      });
+
+      if (mobileNavOverlay) mobileNavOverlay.addEventListener('click', closeMobileMenu);
+
+      document.addEventListener('click', (e) => {
+        if (mobileNav && mobileNav.classList.contains('active') && !mobileNav.contains(e.target) && !burgerBtn.contains(e.target)) {
+          closeMobileMenu();
+        }
+      });
+
+      mobileNav.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => closeMobileMenu());
+      });
+    }
+
+    // toast уведомления
+    window.showNotification = function(message, type='info', duration=2600){
+      const old = document.querySelector('.toast');
+      if (old) old.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+
+      let icon = 'ri-information-line';
+      if (type === 'success') icon = 'ri-checkbox-circle-line';
+      if (type === 'error') icon = 'ri-close-circle-line';
+
+      toast.innerHTML = `
+        <div class="ico"><i class="${icon}"></i></div>
+        <div class="msg">${message}</div>
+      `;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all .2s ease';
+        setTimeout(() => toast.remove(), 220);
+      }, duration);
+    };
+
+    // PWA: в Mini App не регистрируем, чтобы вебвью не держало старый кэш оболочки
+    if ('serviceWorker' in navigator && !document.documentElement.classList.contains('is-tma')) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(function (reg) { /* console.log('SW registered', reg.scope); */ })
+          .catch(function () {});
+      });
+    }
+  </script>
+
+  {% if user.is_authenticated %}
+  <form id="logoutForm" method="post" action="{% url 'logout' %}" style="display:none;">{% csrf_token %}</form>
+  {% endif %}
+
+  <script src="{% static 'js/telegram-miniapp.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

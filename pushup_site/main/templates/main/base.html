@@ -1,0 +1,1104 @@
+[file name]: base.html
+[file content begin]
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>{% block title %}TeminaFit • AI Fitness{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            /* ========== НОВАЯ ЦВЕТОВАЯ ПАЛИТРА ========== */
+            --color-bg-primary: #0a0a0a;
+            --color-bg-secondary: #111111;
+            --color-bg-tertiary: #1a1a1a;
+            --color-bg-surface: #222222;
+            
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #a0a0a0;
+            --color-text-tertiary: #666666;
+            
+            /* Основной акцентный цвет - неоновый синий */
+            --color-accent-primary: #00d9ff;
+            --color-accent-primary-rgb: 0, 217, 255;
+            --color-accent-secondary: #8b5cf6;
+            --color-accent-success: #00ff9d;
+            --color-accent-warning: #ffcc00;
+            --color-accent-danger: #ff4757;
+            
+            /* Градиенты */
+            --gradient-primary: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+            --gradient-card: linear-gradient(145deg, #1a1a1a, #111111);
+            --gradient-glow: radial-gradient(circle at center, rgba(0, 217, 255, 0.1), transparent 70%);
+            
+            /* Тени и свечения */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 20px rgba(0, 217, 255, 0.3);
+            --shadow-glow-intense: 0 0 40px rgba(0, 217, 255, 0.5);
+            
+            /* Скругления */
+            --radius-xs: 4px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Анимации */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Размеры */
+            --header-height: 70px;
+            --sidebar-width: 260px;
+            --container-max-width: 1400px;
+        }
+        
+        /* ========== БАЗОВЫЕ СТИЛИ ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* ========== ТИПОГРАФИЯ ========== */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        h1 { font-size: 3.5rem; font-weight: 900; }
+        h2 { font-size: 2.5rem; }
+        h3 { font-size: 2rem; }
+        h4 { font-size: 1.5rem; }
+        h5 { font-size: 1.25rem; }
+        h6 { font-size: 1rem; }
+        
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .text-accent { color: var(--color-accent-primary); }
+        .text-success { color: var(--color-accent-success); }
+        .text-warning { color: var(--color-accent-warning); }
+        .text-danger { color: var(--color-accent-danger); }
+        .text-muted { color: var(--color-text-secondary); }
+        
+        p { margin-bottom: 1rem; }
+        .lead { font-size: 1.25rem; font-weight: 300; }
+        
+        /* ========== ЛЕЙАУТ ========== */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+        }
+        
+        /* ========== ХЕДЕР ========== */
+        .header {
+            height: var(--header-height);
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: var(--transition-base);
+        }
+        
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            font-size: 1.5rem;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        /* ========== НАВИГАЦИЯ ========== */
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-link:hover::before {
+            left: 100%;
+        }
+        
+        .nav-link.active {
+            color: var(--color-accent-primary);
+            background: rgba(0, 217, 255, 0.1);
+        }
+        
+        .nav-link i {
+            font-size: 1.25rem;
+        }
+        
+        /* ========== КАРТОЧКИ ========== */
+        .card {
+            background: var(--gradient-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 217, 255, 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-glow {
+            position: relative;
+        }
+        
+        .card-glow::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: var(--gradient-primary);
+            border-radius: calc(var(--radius-lg) + 1px);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            z-index: -1;
+        }
+        
+        .card-glow:hover::after {
+            opacity: 0.3;
+        }
+        
+        /* ========== КНОПКИ ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-intense);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--color-text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--color-accent-primary);
+            border: 2px solid var(--color-accent-primary);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-md);
+        }
+        
+        /* ========== ФОРМЫ ========== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all var(--transition-base);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+        
+        .form-control::placeholder {
+            color: var(--color-text-tertiary);
+        }
+        
+        /* ========== БАДЖИ И ТЭГИ ========== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text-secondary);
+        }
+        
+        .badge-primary {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--color-accent-primary);
+        }
+        
+        .badge-success {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--color-accent-success);
+        }
+        
+        .badge-warning {
+            background: rgba(255, 204, 0, 0.2);
+            color: var(--color-accent-warning);
+        }
+        
+        .badge-danger {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--color-accent-danger);
+        }
+        
+        /* ========== ПРОГРЕСС БАРЫ ========== */
+        .progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            position: relative;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* ========== АНИМАЦИИ ========== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes neonGlow {
+            0%, 100% { box-shadow: var(--shadow-glow); }
+            50% { box-shadow: var(--shadow-glow-intense); }
+        }
+        
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+        .animate-slideIn { animation: slideIn 0.6s ease-out; }
+        .animate-scaleIn { animation: scaleIn 0.6s ease-out; }
+        .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+        .animate-neon { animation: neonGlow 3s ease-in-out infinite; }
+        
+        /* ========== УТИЛИТЫ ========== */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        
+        .hidden { display: none; }
+        
+        /* ========== УВЕДОМЛЕНИЯ ========== */
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--color-bg-surface);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .notification-success {
+            border-color: rgba(0, 255, 157, 0.3);
+        }
+        
+        .notification-error {
+            border-color: rgba(255, 71, 87, 0.3);
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* ========== FOOTER ========== */
+        .footer {
+            background: var(--color-bg-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 3rem 2rem;
+            margin-top: auto;
+        }
+        
+        .footer-container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        .footer-section h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--color-text-tertiary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        
+        .footer-links a:hover {
+            color: var(--color-accent-primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--color-text-tertiary);
+            font-size: 0.9rem;
+        }
+        
+        /* ========== LOADING STATES ========== */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--color-accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ========== МОБИЛЬНАЯ НАВИГАЦИЯ ========== */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--color-text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            transition: background var(--transition-fast);
+        }
+        
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav {
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                right: 0;
+                background: var(--color-bg-secondary);
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all var(--transition-base);
+                z-index: 99;
+            }
+            
+            .nav.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .nav-link {
+                width: 100%;
+                justify-content: center;
+            }
+            .nav-link.nav-link-home {
+                display: none;
+            }
+            .header-container {
+                padding: 0 1rem;
+            }
+        }
+        
+        /* ========== ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ========== */
+        .glow-effect {
+            position: relative;
+        }
+        
+        .glow-effect::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient-primary);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .glow-effect:hover::before {
+            opacity: 0.3;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--color-accent-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+        
+        /* ========== СКРОЛЛБАР ========== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        ::-webkit-scrollbar-thumb:active {
+            background: rgba(0, 217, 255, 0.5);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Частицы фона -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="app-container">
+        <!-- Хедер -->
+        <header class="header">
+            <div class="header-container">
+                <a href="/" class="logo">
+                    <div class="logo-icon">
+                        <i class="ri-pulse-line"></i>
+                    </div>
+                    <span class="logo-text">TeminaFit</span>
+                </a>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="ri-menu-line"></i>
+                </button>
+                
+                <nav class="nav" id="mainNav">
+                    <a href="/" class="nav-link nav-link-home {% if request.path == '/' %}active{% endif %}">
+                        <i class="ri-home-line"></i>
+                        Главная
+                    </a>
+                    
+                    {% if user.is_authenticated %}
+                    <!-- Убрана вкладка тренировок -->
+                    
+                    <!-- Статистика теперь с иконкой графика -->
+                    <a href="/stats/" class="nav-link {% if 'stats' in request.path %}active{% endif %}">
+                        <i class="ri-bar-chart-line"></i>
+                        Статистика
+                    </a>
+                    
+                    <a href="/quests/" class="nav-link {% if 'quests' in request.path %}active{% endif %}">
+                        <i class="ri-trophy-line"></i>
+                        Квесты
+                    </a>
+                    
+                    <a href="/profile/" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                        <i class="ri-user-line"></i>
+                        Профиль
+                    </a>
+                    
+                    <a href="{% url 'logout' %}" class="nav-link" onclick="event.preventDefault();document.getElementById('logoutForm').submit();">
+                        <i class="ri-logout-box-r-line"></i>
+                        Выйти
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login_page' %}" class="nav-link">
+                        <i class="ri-login-box-line"></i>
+                        Войти
+                    </a>
+                    
+                    <a href="{% url 'register_page' %}" class="nav-link">
+                        <i class="ri-user-add-line"></i>
+                        Регистрация
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <!-- Футер -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <a href="/" class="logo">
+                        <div class="logo-icon">
+                            <i class="ri-pulse-line"></i>
+                        </div>
+                        <span class="logo-text">TeminaFit</span>
+                    </a>
+                    <p class="text-muted mt-4">AI-помощник для ваших тренировок. Достигайте большего вместе с технологиями.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Тренировки</h3>
+                    <ul class="footer-links">
+                        <li><a href="/workouts/pushups/">Отжимания</a></li>
+                        <li><a href="/workouts/squats/">Приседания</a></li>
+                        <li><a href="/workouts/crunches/">Скручивания</a></li>
+                        <!-- Убраны подтягивания -->
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Аккаунт</h3>
+                    <ul class="footer-links">
+                        <li><a href="/profile/">Профиль</a></li>
+                        <li><a href="/stats/">Статистика</a></li>
+                        <li><a href="/quests/">Квесты</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Поддержка</a></li>
+                        <!-- Убрана документация -->
+                        <!-- Убран GitHub -->
+                        <li><a href="#">Telegram</a></li>
+                        <li><a href="#">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                © 2024 TeminaFit. Все права защищены.
+            </div>
+        </footer>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Мобильное меню
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mainNav = document.getElementById('mainNav');
+        
+        if (mobileMenuBtn && mainNav) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mainNav.classList.toggle('active');
+                mobileMenuBtn.innerHTML = mainNav.classList.contains('active') 
+                    ? '<i class="ri-close-line"></i>' 
+                    : '<i class="ri-menu-line"></i>';
+            });
+            
+            // Закрытие меню при клике вне его
+            document.addEventListener('click', (e) => {
+                if (!mainNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    mainNav.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="ri-menu-line"></i>';
+                }
+            });
+        }
+        
+        // Партиклы
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animation = `float ${6 + Math.random() * 6}s ease-in-out infinite`;
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Активная навигация
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // Уведомления
+        window.showNotification = function(message, type = 'info', duration = 3000) {
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">${icon}</div>
+                <div>${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        };
+
+        // Функция для получения данных статистики из AI счетчика
+        async function fetchExerciseStats() {
+            try {
+                const response = await fetch('/api/exercise-stats/');
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки статистики');
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Ошибка при загрузке статистики:', error);
+                return null;
+            }
+        }
+
+        // Обновление статистики на страницах упражнений
+        function updateExerciseStats(statsData) {
+            // Находим все элементы с классом stats-card
+            const statsCards = document.querySelectorAll('.stats-card');
+            
+            statsCards.forEach(card => {
+                const exerciseName = card.dataset.exercise;
+                if (statsData && statsData[exerciseName]) {
+                    const stats = statsData[exerciseName];
+                    
+                    // Обновляем данные в карточке
+                    const totalElement = card.querySelector('.stat-total');
+                    const todayElement = card.querySelector('.stat-today');
+                    const streakElement = card.querySelector('.stat-streak');
+                    const bestElement = card.querySelector('.stat-best');
+                    
+                    if (totalElement) totalElement.textContent = stats.total || 0;
+                    if (todayElement) todayElement.textContent = stats.today || 0;
+                    if (streakElement) streakElement.textContent = stats.streak || 0;
+                    if (bestElement) bestElement.textContent = stats.best || 0;
+                }
+            });
+        }
+
+        // Инициализация статистики
+        async function initExerciseStats() {
+            const statsData = await fetchExerciseStats();
+            updateExerciseStats(statsData);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setActiveNav();
+            
+            // Анимация появления элементов
+            const animateElements = document.querySelectorAll('.card, .btn, .form-control');
+            animateElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+                el.classList.add('animate-fadeIn');
+            });
+
+            // Инициализация статистики упражнений
+            if (document.querySelector('.stats-card')) {
+                initExerciseStats();
+            }
+        });
+    </script>
+    
+    {% if user.is_authenticated %}
+    <form id="logoutForm" method="post" action="{% url 'logout' %}" style="display:none;">{% csrf_token %}</form>
+    {% endif %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+[file content end]

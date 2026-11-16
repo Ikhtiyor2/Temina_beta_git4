@@ -1,0 +1,1365 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}AI Workout{% else %}AI Тренировка{% endif %} • {{ exercise_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Скрываем шапку/футер только на этой странице */
+.app.layout-sidebar .sidebar,
+header.top-header,
+footer {
+    display: none !important;
+}
+.app:not(.layout-sidebar) header,
+.app.layout-sidebar .main-wrap > header {
+    display: none !important;
+}
+body .main-wrap main,
+main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+}
+
+/* Тема страницы тренировки — в стиле TeminaFit (фиолетовый/бирюзовый) */
+.train-shell {
+    --tg-bg: #0a0a0f;
+    --tg-panel: rgba(255,255,255,0.04);
+    --tg-border: rgba(255,255,255,0.08);
+    --tg-txt: #f1f5f9;
+    --tg-muted: rgba(241,245,249,0.6);
+    --tg-accent-s: #a855f7;
+    --tg-accent-e: #06b6d4;
+    --tg-green: #22c55e;
+    --tg-orange: #f97316;
+    --tg-red: #ef4444;
+    --tg-glow: rgba(168,85,247,0.25);
+    --tg-r: 16px;
+    --tg-r-sm: 12px;
+}
+
+.train-shell {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--tg-bg);
+    color: var(--tg-txt);
+    overflow: hidden;
+    font-family: var(--font, 'Outfit', system-ui, sans-serif);
+}
+.train-shell::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 80% 40% at 20% 0%, rgba(168,85,247,0.12), transparent 50%),
+        radial-gradient(ellipse 60% 30% at 80% 10%, rgba(6,182,212,0.08), transparent 50%);
+}
+
+/* Верхняя панель */
+.train-topbar {
+    position: relative;
+    z-index: 1;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: rgba(10,10,15,0.85);
+    border-bottom: 1px solid var(--tg-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+.train-topbar-left { min-width: 0; }
+.train-topbar-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--tg-accent-s), var(--tg-accent-e));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.train-topbar-sub { font-size: 0.8rem; color: var(--tg-muted); margin-top: 2px; }
+.train-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--tg-r-sm);
+    background: var(--tg-panel);
+    border: 1px solid var(--tg-border);
+    color: var(--tg-txt);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s, border-color .2s, background .2s;
+}
+.train-exit:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168,85,247,0.3);
+    background: rgba(255,255,255,0.06);
+}
+
+/* Блок статистики */
+.train-stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 16px 20px;
+}
+.train-stat {
+    border-radius: var(--tg-r);
+    background: var(--tg-panel);
+    border: 1px solid var(--tg-border);
+    padding: 16px;
+    text-align: center;
+    transition: border-color .2s;
+}
+.train-stat:hover { border-color: rgba(168,85,247,0.2); }
+.train-stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--tg-accent-s), var(--tg-accent-e));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.train-stat-label { font-size: 0.75rem; color: var(--tg-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Основная сетка: видео + панель ИИ */
+.train-main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    padding: 0 20px 20px;
+}
+
+/* Карточка с камерой */
+.train-video-card {
+    position: relative;
+    border-radius: var(--tg-r);
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--tg-border);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    min-height: 0;
+}
+.train-video-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+.train-video-card video { display: none; }
+.train-video-card canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+.train-video-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    pointer-events: none;
+    z-index: 2;
+}
+.train-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+}
+.train-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--tg-green);
+    box-shadow: 0 0 10px rgba(34,197,94,0.6);
+    animation: train-pulse 1.6s ease-in-out infinite;
+}
+@keyframes train-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* Панель ИИ */
+.train-ai {
+    border-radius: var(--tg-r);
+    background: var(--tg-panel);
+    border: 1px solid var(--tg-border);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+.train-ai-coach { border: 1px solid rgba(168,85,247,0.2); background: linear-gradient(180deg, rgba(168,85,247,0.06) 0%, transparent 100%); border-radius: var(--tg-r); }
+.train-ai-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.train-coach-avatar { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(217,70,239,0.15)); border: 1px solid rgba(168,85,247,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+.train-ai-head-text { flex: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.train-ai-head-text h3 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
+.train-ai-sub { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px 0; line-height: 1.4; }
+.train-coach-says { margin-top: 8px; }
+.train-coach-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; display: block; margin-bottom: 6px; }
+.train-coach-bubble { border-left: 3px solid var(--purple2); }
+.train-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.25);
+    color: var(--tg-green);
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+.train-feedback {
+    flex: 1;
+    min-height: 0;
+    white-space: pre-line;
+    border-radius: var(--tg-r-sm);
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--tg-border);
+    padding: 16px;
+    overflow-y: auto;
+    white-space: pre-line;
+    line-height: 1.55;
+    font-size: 0.9rem;
+    color: var(--tg-txt);
+    transition: border-color .2s, box-shadow .2s;
+}
+.train-feedback.success {
+    border-color: rgba(34,197,94,0.3);
+    box-shadow: 0 0 0 2px rgba(34,197,94,0.06);
+}
+.train-feedback.warning {
+    border-color: rgba(249,115,22,0.3);
+    box-shadow: 0 0 0 2px rgba(249,115,22,0.06);
+}
+.train-feedback.danger {
+    border-color: rgba(239,68,68,0.3);
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.06);
+}
+.train-btn-row { display: flex; gap: 12px; margin-top: 14px; }
+.train-btn {
+    flex: 1;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: var(--tg-r-sm);
+    padding: 14px 16px;
+    transition: transform .2s, box-shadow .2s, opacity .2s;
+    font-family: inherit;
+}
+.train-btn:active { transform: scale(0.98); }
+.train-btn.secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--tg-txt);
+    border: 1px solid var(--tg-border);
+}
+.train-btn.secondary:hover { border-color: rgba(168,85,247,0.25); }
+.train-btn.active { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.4); color: var(--purple2); }
+.voice-options { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); font-size: 0.88rem; }
+.voice-opt { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; color: var(--muted); }
+.voice-opt:last-child { margin-bottom: 0; }
+.voice-opt input[type="range"] { width: 80px; accent-color: var(--purple2); }
+.train-btn.primary {
+    background: linear-gradient(135deg, var(--tg-accent-s), var(--tg-accent-e));
+    color: #fff;
+    box-shadow: 0 4px 20px var(--tg-glow);
+}
+.train-btn.primary:hover { box-shadow: 0 6px 28px var(--tg-glow); opacity: 0.95; }
+.train-btn.paused {
+    background: var(--tg-orange);
+    color: #000;
+    border: none;
+    }
+
+/* Индикатор загрузки камеры/AI */
+.train-pill-status .train-pill-dot {
+    animation: trainPulse 1.2s ease-in-out infinite;
+    }
+@keyframes trainPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+    }
+
+/* ── Планшеты (≤980px) ── */
+@media (max-width: 980px) {
+    .train-stats { grid-template-columns: repeat(2, 1fr); }
+    .train-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1.5fr 1fr;
+        padding: 0 14px 14px;
+    }
+}
+
+/* ── Мобильные телефоны (≤768px) ── */
+@media (max-width: 768px) {
+    .train-topbar {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+    .train-topbar-title { font-size: 1rem; }
+    .train-topbar-sub { font-size: 0.7rem; margin-top: 1px; }
+    .train-exit {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .train-stats {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 8px 14px;
+        gap: 8px;
+    }
+    .train-stat { padding: 10px 6px; }
+    .train-stat-value { font-size: 1.35rem; }
+    .train-stat-label { font-size: 0.6rem; margin-top: 4px; }
+    .train-main {
+        gap: 10px;
+        padding: 0 12px 12px;
+        grid-template-rows: 1.65fr 1fr;
+    }
+    .train-ai { padding: 12px; }
+    .train-ai-head { margin-bottom: 8px; }
+    .train-ai-head h3 { font-size: 0.88rem; }
+    .train-live { font-size: 0.68rem; padding: 4px 10px; }
+    .train-feedback { font-size: 0.82rem; padding: 10px 12px; line-height: 1.5; }
+    .train-btn-row { gap: 8px; margin-top: 10px; }
+    .train-btn {
+        padding: 14px 10px;
+        font-size: 0.85rem;
+        min-height: 48px;   /* удобный touch-target */
+    }
+    .train-pill { font-size: 0.78rem; padding: 6px 10px; }
+}
+
+/* ── Маленькие телефоны (≤480px) ── */
+@media (max-width: 480px) {
+    .train-topbar { padding: 9px 12px; }
+    .train-topbar-title { font-size: 0.92rem; }
+    .train-topbar-sub { display: none; }   /* убираем подзаголовок чтобы не толпился */
+    .train-exit-text { display: none; }    /* оставляем только иконку */
+    .train-exit { padding: 9px 12px; }
+    .train-stats {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+    .train-stat { padding: 8px 4px; border-radius: 10px; }
+    .train-stat-value { font-size: 1.2rem; }
+    .train-stat-label { font-size: 0.55rem; letter-spacing: 0.02em; }
+    .train-main { padding: 0 10px 10px; gap: 8px; grid-template-rows: 1.7fr 1fr; }
+    .train-ai { padding: 10px; }
+    .train-feedback { font-size: 0.78rem; padding: 8px 10px; }
+    .train-btn { padding: 13px 8px; font-size: 0.8rem; border-radius: 10px; }
+    .train-btn-row { gap: 6px; margin-top: 8px; }
+    .train-video-overlay { padding: 10px 12px; }
+    .train-pill { font-size: 0.72rem; padding: 5px 8px; gap: 6px; }
+}
+
+/* ── Очень маленькие (≤360px) ── */
+@media (max-width: 360px) {
+    .train-stat-value { font-size: 1.05rem; }
+    .train-stat-label { font-size: 0.5rem; }
+    .train-feedback { font-size: 0.74rem; }
+    .train-btn { min-height: 44px; font-size: 0.78rem; }
+}
+
+/* ── Ландшафтная ориентация на телефоне (≤ 600px высота) ── */
+@media (max-height: 600px) and (orientation: landscape) {
+    .train-topbar { padding: 7px 14px; }
+    .train-topbar-sub { display: none; }
+    .train-stats {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 6px 14px;
+        gap: 8px;
+    }
+    .train-stat { padding: 6px 4px; }
+    .train-stat-value { font-size: 1.1rem; }
+    .train-stat-label { font-size: 0.55rem; margin-top: 2px; }
+    /* В landscape возвращаем горизонтальный лейаут: видео + ИИ рядом */
+    .train-main {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr;
+        padding: 0 12px 10px;
+        gap: 10px;
+    }
+    .train-ai { padding: 10px; }
+    .train-ai-head { margin-bottom: 6px; }
+    .train-ai-head h3 { font-size: 0.82rem; }
+    .train-live { font-size: 0.65rem; padding: 4px 8px; }
+    .train-feedback { font-size: 0.76rem; padding: 8px 10px; }
+    .train-btn { padding: 10px 8px; font-size: 0.78rem; min-height: 40px; }
+    .train-btn-row { gap: 6px; margin-top: 8px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="train-shell">
+    <div style="display:none">{% csrf_token %}</div>
+
+    <div class="train-topbar">
+        <div class="train-topbar-left">
+            <div class="train-topbar-title">{{ exercise_name }}</div>
+            <div class="train-topbar-sub">TeminaFit AI · {% if current_lang == 'en' %}real-time tracking{% else %}отслеживание в реальном времени{% endif %}</div>
+        </div>
+        <a href="/workouts/" class="train-exit"><i class="ri-arrow-left-line"></i><span class="train-exit-text"> {% if current_lang == 'en' %}Exit{% else %}Выйти{% endif %}</span></a>
+    </div>
+
+    <section class="train-stats">
+        <div class="train-stat">
+            <div class="train-stat-value" id="reps">0</div>
+            <div class="train-stat-label" id="reps-label">{% if exercise == "PLANK" %}{% if current_lang == 'en' %}Sec{% else %}Сек{% endif %}{% else %}{% if current_lang == 'en' %}Reps{% else %}Повторы{% endif %}{% endif %}</div>
+        </div>
+        <div class="train-stat">
+            <div class="train-stat-value" id="sets">1</div>
+            <div class="train-stat-label">{% if current_lang == 'en' %}Set{% else %}Подход{% endif %}</div>
+        </div>
+        <div class="train-stat">
+            <div class="train-stat-value" id="time">00:00</div>
+            <div class="train-stat-label">{% if current_lang == 'en' %}Time{% else %}Время{% endif %}</div>
+        </div>
+        <div class="train-stat">
+            <div class="train-stat-value" id="fps">0</div>
+            <div class="train-stat-label">{% if current_lang == 'en' %}FPS{% else %}К/с{% endif %}</div>
+        </div>
+    </section>
+
+    <section class="train-main">
+        <div class="train-video-card">
+            <video id="video" playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="train-video-overlay">
+                <div class="train-pill train-pill-status" id="trainStatusPill">
+                    <span class="train-pill-dot"></span>
+                    <span id="poseStatus">{% if current_lang == 'en' %}Loading AI model…{% else %}Загрузка модели AI…{% endif %}</span>
+                </div>
+                <div class="train-pill"><span id="videoSize">–</span></div>
+            </div>
+        </div>
+
+        <div class="train-ai train-ai-coach">
+            <div class="train-ai-head">
+                <span class="train-coach-avatar" aria-hidden="true">🤖</span>
+                <div class="train-ai-head-text">
+                    <h3>{% if current_lang == 'en' %}AI Coach{% else %}ИИ‑тренер{% endif %}</h3>
+                    <span class="train-live">● {% if current_lang == 'en' %}LIVE{% else %}В ЭФИРЕ{% endif %}</span>
+                </div>
+            </div>
+            <p class="train-ai-sub">{% if current_lang == 'en' %}I watch your form and count only correct reps. Red = fix this.{% else %}Слежу за техникой, считаю только правильные повторения. Красное на скелете — исправь.{% endif %}</p>
+            <div class="train-coach-says">
+                <span class="train-coach-label">{% if current_lang == 'en' %}Coach says{% else %}Тренер{% endif %}</span>
+                <div class="train-feedback warning train-coach-bubble" id="feedback">{% if current_lang == 'en' %}Preparing camera and AI…{% else %}Подготовка камеры и AI…{% endif %}</div>
+            </div>
+            <div class="train-btn-row">
+                <button id="voiceCoachBtn" class="train-btn secondary" type="button" title="{% if current_lang == 'en' %}Voice coach{% else %}Голосовой помощник{% endif %}">🔊 {% if current_lang == 'en' %}Voice{% else %}Голос{% endif %}</button>
+                <button id="pauseBtn" class="train-btn secondary">⏸ {% if current_lang == 'en' %}Pause{% else %}Пауза{% endif %}</button>
+                <button id="saveBtn" class="train-btn primary">💾 {% if current_lang == 'en' %}Save{% else %}Сохранить{% endif %}</button>
+            </div>
+            <div id="voiceOptions" class="voice-options" style="display:none;">
+                <label class="voice-opt"><input type="checkbox" id="voiceSuccessCb" /> {% if current_lang == 'en' %}Speak successes{% else %}Озвучивать успехи{% endif %}</label>
+                <label class="voice-opt">{% if current_lang == 'en' %}Volume{% else %}Громкость{% endif %} <input type="range" id="voiceVolume" min="0.3" max="1" step="0.1" value="0.9" /></label>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ================= MediaPipe (загружаем первыми) ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="{% static 'js/mediapipe-client.js' %}"></script>
+
+<!-- ================= Логика подсчёта на устройстве (без сервера) ================= -->
+<script>
+(function() {
+  var TRAIN_EN = ('{{ current_lang|default:"ru" }}' === 'en');
+  function err(message, hint) { return { message: message, hint: hint }; }
+  function e(mRu, hRu, mEn, hEn) { return err(TRAIN_EN ? mEn : mRu, TRAIN_EN ? hEn : hRu); }
+  function fb(ru, en) { return TRAIN_EN ? en : ru; }
+
+  function angle(a, b, c) {
+    var ba = [a.x - b.x, a.y - b.y];
+    var bc = [c.x - b.x, c.y - b.y];
+    var dot = ba[0]*bc[0] + ba[1]*bc[1];
+    var magBa = Math.sqrt(ba[0]*ba[0] + ba[1]*ba[1]);
+    var magBc = Math.sqrt(bc[0]*bc[0] + bc[1]*bc[1]);
+    if (magBa === 0 || magBc === 0) return 0;
+    var cos = Math.max(-1, Math.min(1, dot / (magBa * magBc)));
+    return Math.acos(cos) * 180 / Math.PI;
+  }
+
+  var EX = "{{ exercise }}";
+  var state = {
+    count: 0, stage: "up", ready: false,
+    readyBuffer: [], downHoldFrames: 0, handsOnGround: true, topPositionPose: false,
+    minKneeAngleInRep: 180, goodHoldFrames: 0, lastCenter: null,
+    stableRef: [], holdStartTime: null, startHipY: null,
+    handsOffFrames: 0,
+    crunchDownFrames: 0
+  };
+  var READY_BUF_LEN = 15;
+  var SQUAT_MIN_DOWN_FRAMES = 5;
+  var HANDS_FLOOR_Y = 0.70;
+  var HANDS_OFF_GRACE = 5;
+
+  function pushup(lm) {
+    var ls = lm[11], le = lm[13], lw = lm[15], rs = lm[12], re = lm[14], rw = lm[16];
+    var lh = lm[23], rh = lm[24], lk = lm[25], rk = lm[26];
+    var elbowAngle = (angle(ls, le, lw) + angle(rs, re, rw)) / 2;
+    var backAngle = (angle(ls, lh, lk) + angle(rs, rh, rk)) / 2;
+    var hipAngle = (angle(lk, lh, ls) + angle(rk, rh, rs)) / 2;
+    var shoulderWidth = Math.abs(ls.x - rs.x);
+    var torsoLen = Math.hypot(ls.x - lh.x, ls.y - lh.y);
+    var shoulderHipY = Math.abs(ls.y - lh.y);
+    var wristsAvgY = (lw.y + rw.y) / 2;
+    var wristsMinY = Math.min(lw.y, rw.y);
+    var handsYStrict = (lw.y > HANDS_FLOOR_Y && rw.y > HANDS_FLOOR_Y) || wristsAvgY > 0.72;
+    var handsYRelaxed = elbowAngle > 120 && wristsMinY > 0.58 && wristsAvgY > 0.62;
+    var handsNearFloor = handsYStrict || handsYRelaxed;
+    if (!handsNearFloor) {
+      state.handsOffFrames++;
+      if (state.handsOffFrames >= HANDS_OFF_GRACE) {
+        state.handsOnGround = false;
+        return { feedback: fb("Поставьте руки на пол!", "Put your hands on the floor!"), errors: [e("Руки не на полу.", "Опустите ладони на пол на ширине плеч, кисти строго под плечами. Убедитесь, что руки целиком в кадре.", "Hands not on the floor.", "Place palms on the floor shoulder-width apart, wrists under shoulders. Keep your whole arms in frame.")] };
+      }
+    } else {
+      state.handsOffFrames = 0;
+      state.handsOnGround = true;
+    }
+    var startPose = elbowAngle > 150 && hipAngle > 135 && backAngle > 140 && shoulderWidth > 0.15 && torsoLen > 0.1 && shoulderHipY < 0.3;
+    state.readyBuffer.push(startPose);
+    if (state.readyBuffer.length > READY_BUF_LEN) state.readyBuffer.shift();
+    if (elbowAngle > 150) state.topPositionPose = hipAngle > 135 && backAngle > 140 && shoulderWidth > 0.15 && torsoLen > 0.1 && shoulderHipY < 0.3;
+    if (!state.ready) {
+      if (state.readyBuffer.filter(Boolean).length >= 12) { state.ready = true; return { feedback: fb("Готово. Начинайте отжимания!", "Ready. Start push-ups!"), errors: [] }; }
+      return { feedback: fb("Примите упор лёжа...", "Get into plank position..."), errors: [] };
+    }
+    if (!state.handsOnGround) {
+      return { feedback: fb("Руки подняты! Стоп.", "Hands up! Stop."), errors: [e("Руки оторваны от пола.", "Держите ладони плотно на полу на протяжении всего движения. Отрывание рук не засчитывается.", "Hands off the floor.", "Keep palms firmly on the floor throughout the movement. Lifting hands does not count.")] };
+    }
+    if (elbowAngle < 90 && state.stage === "up") { state.stage = "down"; state.downHoldFrames = 0; return { feedback: fb("Движение вниз...", "Going down..."), errors: [] }; }
+    if (state.stage === "down") {
+      if (elbowAngle < 90) {
+        state.downHoldFrames++;
+        var center = { x: (ls.x + rs.x) / 2, y: (ls.y + rs.y) / 2 };
+        var elbowFlareAngle = angle(le, center, re);
+        if (elbowFlareAngle > 100) {
+          return { feedback: fb("Локти ближе к корпусу!", "Elbows closer to your body!"), errors: [e("Локти разведены в стороны.", "Сгибайте руки вдоль корпуса: локти направлены назад, угол между локтями не больше 90–100°. Так нагрузка идёт в грудь и трицепс — и повтор засчитается.", "Elbows flared out.", "Tuck elbows along your body, pointing back. Angle between elbows under 90–100°. That loads chest and triceps and counts the rep.")] };
+        }
+      }
+      if (elbowAngle > 150) {
+        var wasHoldEnough = state.downHoldFrames >= 2;
+        var counted = wasHoldEnough && state.topPositionPose;
+        var errs = [];
+        if (!counted && !wasHoldEnough)
+          errs.push(e("Повтор не засчитан: слишком быстро внизу.", "В нижней точке (локти примерно 90°) задержитесь на 1–2 секунды, затем плавно выжмите вверх. Контролируемое движение = засчитанный повтор.", "Rep not counted: too fast at the bottom.", "Hold at the bottom (elbows ~90°) for 1–2 seconds, then press up smoothly. Controlled movement = counted rep."));
+        if (!counted && wasHoldEnough && !state.topPositionPose)
+          errs.push(e("Неправильная форма в верхней точке.", "Держите корпус одной прямой линией: голова — плечи — таз — ноги. Не прогибайте поясницу и не поднимайте таз. Напрягите пресс.", "Wrong form at the top.", "Keep body in one straight line: head — shoulders — hips — legs. Don't arch your lower back or lift your hips. Engage your core."));
+        state.stage = "up";
+        if (counted) state.count++;
+        state.downHoldFrames = 0;
+        var feedbackMsg = counted ? fb("Отжимание засчитано!", "Push-up counted!") : (wasHoldEnough ? fb("Исправьте форму корпуса!", "Fix your body form!") : fb("Задержитесь внизу!", "Hold at the bottom!"));
+        return { feedback: feedbackMsg, errors: errs };
+      }
+    }
+    return { feedback: fb("Продолжайте...", "Keep going..."), errors: [] };
+  }
+
+  function squat(lm) {
+    var lhip = lm[23], lknee = lm[25], lankle = lm[27], rhip = lm[24], rknee = lm[26], rankle = lm[28];
+    var lsh = lm[11], rsh = lm[12];
+    var kneeAngle = (angle(lhip, lknee, lankle) + angle(rhip, rknee, rankle)) / 2;
+    var hipAngle = (angle(lknee, lhip, lsh) + angle(rknee, rhip, rsh)) / 2;
+    var bodyVisible = lankle.y > lknee.y && lknee.y > lhip.y && rankle.y > rknee.y && rknee.y > rhip.y;
+    var kneesOverToes = (lknee.x > lankle.x && lhip.x < lknee.x) || (rknee.x > rankle.x && rhip.x < rknee.x);
+    var errs = [];
+    if (kneesOverToes) errs.push(e("Колени уходят вперёд за носки.", "Следите, чтобы колени не выходили далеко вперёд за стопы. Отводите таз назад, как при посадке на стул.", "Knees going past toes.", "Keep knees from going far past your feet. Sit back as if into a chair."));
+    var upright = kneeAngle > 170 && hipAngle > 170 && bodyVisible;
+    state.readyBuffer.push(upright);
+    if (state.readyBuffer.length > READY_BUF_LEN) state.readyBuffer.shift();
+    if (!state.ready) {
+      if (state.readyBuffer.filter(Boolean).length >= 10) { state.ready = true; return { feedback: fb("Готово. Начинайте приседания!", "Ready. Start squats!"), errors: [] }; }
+      return { feedback: fb("Встаньте прямо для начала", "Stand straight to begin"), errors: errs };
+    }
+    if (!bodyVisible) {
+      errs.push(e("Не видно полное тело.", "Отойдите от камеры так, чтобы в кадре были голова, корпус и обе ноги целиком.", "Full body not visible.", "Step back so the camera sees your head, torso and both legs fully."));
+      return { feedback: fb("Покажите всё тело, обе ноги должны быть видны", "Show your full body, both legs must be visible"), errors: errs };
+    }
+    if (kneeAngle < 90 && state.stage === "up") { state.stage = "down"; state.minKneeAngleInRep = kneeAngle; state.downHoldFrames = 0; return { feedback: fb("Приседайте ниже...", "Squat lower..."), errors: errs }; }
+    if (state.stage === "down") {
+      if (kneeAngle < 165) state.downHoldFrames++;
+      if (kneeAngle < state.minKneeAngleInRep) state.minKneeAngleInRep = kneeAngle;
+      if (kneeAngle > 170) {
+        var deepEnough = state.minKneeAngleInRep < 100;
+        var heldDownEnough = state.downHoldFrames >= SQUAT_MIN_DOWN_FRAMES;
+        if (!deepEnough) errs.push(e("Недостаточная глубина приседа.", "Опускайтесь до угла в колене меньше 90° (бедро хотя бы параллельно полу), затем выпрямляйтесь.", "Squat not deep enough.", "Lower until knee angle is under 90° (thigh at least parallel to the floor), then stand up."));
+        if (!heldDownEnough && deepEnough) errs.push(e("Слишком быстро встали.", "Задержитесь в нижней точке приседа на мгновение.", "Stood up too fast.", "Hold briefly at the bottom of the squat."));
+        if (deepEnough && heldDownEnough) state.count++;
+        state.stage = "up";
+        state.minKneeAngleInRep = 180;
+        state.downHoldFrames = 0;
+        return { feedback: (deepEnough && heldDownEnough) ? fb("Приседание засчитано!", "Squat counted!") : (deepEnough ? fb("Задержитесь внизу!", "Hold at the bottom!") : fb("Приседайте глубже!", "Squat deeper!")), errors: errs };
+      }
+    }
+    return { feedback: fb("Продолжайте...", "Keep going..."), errors: errs };
+  }
+
+  function crunch(lm) {
+    var nose = { x: lm[0].x, y: lm[0].y };
+    var shoulder = { x: (lm[11].x + lm[12].x)/2, y: (lm[11].y + lm[12].y)/2 };
+    var hip = { x: (lm[23].x + lm[24].x)/2, y: (lm[23].y + lm[24].y)/2 };
+    var knee = { x: (lm[25].x + lm[26].x)/2, y: (lm[25].y + lm[26].y)/2 };
+    var torsoAngle = angle(knee, hip, shoulder);
+    var errs = [];
+    if (!state.ready) {
+      var minX = Math.min(nose.x, shoulder.x, hip.x, knee.x), maxX = Math.max(nose.x, shoulder.x, hip.x, knee.x);
+      var minY = Math.min(nose.y, shoulder.y, hip.y, knee.y), maxY = Math.max(nose.y, shoulder.y, hip.y, knee.y);
+      var inFrame = minX >= 0.06 && maxX <= 0.94 && minY >= 0.06 && maxY <= 0.94;
+      var bodySpan = Math.hypot(shoulder.x - knee.x, shoulder.y - knee.y);
+      var fullBodyVisible = inFrame && bodySpan > 0.22;
+      var flatLying = torsoAngle > 168;
+      var shoulderSpreadX = Math.abs(lm[11].x - lm[12].x);
+      var sideView = shoulderSpreadX < 0.2;
+      var startPoseOk = fullBodyVisible && flatLying && sideView;
+      if (startPoseOk) state.readyBuffer.push(true); else {
+        state.readyBuffer.push(false);
+        if (!fullBodyVisible) errs.push(e("Тело не полностью в кадре.", "Встаньте боком к камере: лягте на спину так, чтобы в кадре были видны голова, корпус и ноги целиком (вид сбоку).", "Body not fully in frame.", "Lie on your back sideways to the camera so head, torso and legs are fully visible (side view)."));
+        else if (!sideView) errs.push(e("Камера видит вас не сбоку.", "Полностью повернитесь боком к камере: лёжа на спине, боком к объективу, чтобы считались скручивания.", "Camera not seeing you from the side.", "Turn fully sideways to the camera: on your back, side facing the lens, for crunches to count."));
+        else if (!flatLying) errs.push(e("Стартовая поза не выпрямлена.", "Лягте на спину, ноги согнуты, выпрямите корпус (угол плечи–таз–колени почти 180°), затем начните.", "Start pose not straight.", "Lie on your back, knees bent, straighten your torso (shoulders–hips–knees angle nearly 180°), then start."));
+      }
+      if (state.readyBuffer.length > READY_BUF_LEN) state.readyBuffer.shift();
+      if (state.readyBuffer.filter(Boolean).length >= 12) { state.ready = true; state.startHipY = hip.y; state.crunchDownFrames = 0; return { feedback: fb("Готово. Начинайте скручивания!", "Ready. Start crunches!"), errors: [] }; }
+      return { feedback: fb("Примите стартовую позицию: лёжа боком к камере, всё тело в кадре.", "Get in start position: on your back, sideways to the camera, full body in frame."), errors: errs };
+    }
+    if (state.startHipY != null && Math.abs(hip.y - state.startHipY) > 0.06) {
+      errs.push(e("Таз отрывается или смещается.", "Работайте только верхней частью корпуса. Таз и поясница должны оставаться на полу.", "Hips lifting or shifting.", "Work only the upper body. Hips and lower back should stay on the floor."));
+    }
+    if (torsoAngle <= 118 && state.stage === "up") { state.stage = "down"; state.crunchDownFrames = 0; return { feedback: fb("Скручивание...", "Crunching..."), errors: errs }; }
+    if (state.stage === "down") {
+      if (torsoAngle < 165) state.crunchDownFrames++;
+      if (torsoAngle >= 165) {
+        var counted = state.crunchDownFrames >= 2;
+        if (counted) state.count++;
+        state.stage = "up";
+        state.crunchDownFrames = 0;
+        return { feedback: counted ? (errs.length ? fb("Исправьте форму!", "Fix your form!") : fb("Повтор засчитан!", "Rep counted!")) : fb("Держите скручивание чуть дольше", "Hold the crunch a bit longer"), errors: errs };
+      }
+    }
+    return { feedback: fb("Продолжайте...", "Keep going..."), errors: errs };
+  }
+
+  function plank(lm) {
+    var ls = lm[11], rs = lm[12], lh = lm[23], rh = lm[24], la = lm[27], ra = lm[28], le = lm[13], re = lm[14], lw = lm[15], rw = lm[16];
+    var cx = (ls.x+rs.x+lh.x+rh.x)/4, cy = (ls.y+rs.y+lh.y+rh.y)/4;
+    var errs = [];
+    if (state.lastCenter) {
+      var dx = Math.abs(cx - state.lastCenter.x), dy = Math.abs(cy - state.lastCenter.y);
+      if (Math.sqrt(dx*dx+dy*dy) > 0.08) {
+        state.holdStartTime = null;
+        state.lastCenter = { x: cx, y: cy };
+        errs.push(e("Резкое движение.", "Держите планку статично. Не сдвигайтесь и не подстраивайте камеру во время удержания.", "Sudden movement.", "Hold the plank still. Don't shift or adjust the camera during the hold."));
+        return { feedback: fb("Держите позу стабильно!", "Keep the pose stable!"), errors: errs };
+      }
+    }
+    state.lastCenter = { x: cx, y: cy };
+    var shoulder = { x: (ls.x+rs.x)/2, y: (ls.y+rs.y)/2 }, hip = { x: (lh.x+rh.x)/2, y: (lh.y+rh.y)/2 }, ankle = { x: (la.x+ra.x)/2, y: (la.y+ra.y)/2 };
+    var torsoAngle = angle(shoulder, hip, ankle);
+    var bodyStraight = torsoAngle >= 155 && torsoAngle <= 205;
+    var elbowOk = (Math.abs(le.x-ls.x) < 0.15 && Math.abs(re.x-rs.x) < 0.15) || (Math.abs(lw.x-ls.x) < 0.15 && Math.abs(rw.x-rs.x) < 0.15);
+    if (!elbowOk) errs.push(e("Локти/кисти не под плечами.", "Поставьте предплечья или ладони строго под плечами.", "Elbows/wrists not under shoulders.", "Place forearms or palms directly under your shoulders."));
+    if (!bodyStraight) {
+      if (torsoAngle < 155) errs.push(e("Таз провисает вниз.", "Поддерживайте прямую линию: голова–плечи–таз–ноги. Напрягите пресс и ягодицы.", "Hips sagging.", "Keep a straight line: head–shoulders–hips–legs. Engage core and glutes."));
+      else errs.push(e("Таз поднят слишком высоко.", "Опустите таз в одну линию с плечами и ногами, не поднимайте ягодицы вверх.", "Hips too high.", "Lower your hips in line with shoulders and legs; don't lift your glutes up."));
+    }
+    var goodPose = bodyStraight && elbowOk;
+    state.readyBuffer.push(goodPose);
+    if (state.readyBuffer.length > READY_BUF_LEN) state.readyBuffer.shift();
+    if (!state.ready) {
+      if (state.readyBuffer.filter(Boolean).length >= 10) { state.ready = true; state.holdStartTime = null; return { feedback: fb("Готово. Держите планку!", "Ready. Hold the plank!"), errors: [] }; }
+      return { feedback: fb("Примите упор на предплечьях/ладонах, тело в одну линию.", "Get into forearm or palm plank, body in one line."), errors: errs };
+    }
+    if (!goodPose) { state.holdStartTime = null; return { feedback: errs.length ? fb("Исправьте позу.", "Fix your pose.") : fb("Держите прямую линию корпуса.", "Keep a straight body line."), errors: errs }; }
+    state.holdStartTime = state.holdStartTime || Date.now();
+    state.count = Math.floor((Date.now() - state.holdStartTime) / 1000);
+    return { feedback: state.count ? (TRAIN_EN ? "Great! " + state.count + " sec." : "Отлично! " + state.count + " сек.") : (TRAIN_EN ? "Hold! " + state.count + " sec." : "Держите! " + state.count + " сек."), errors: [] };
+  }
+
+  function processLandmarksClient(landmarks) {
+    if (!landmarks || landmarks.length < 28) return { count: state.count, feedback: fb("Ожидание...", "Waiting..."), errors: [] };
+    var out;
+    if (EX === "PUSHUP") out = pushup(landmarks);
+    else if (EX === "SQUAT") out = squat(landmarks);
+    else if (EX === "CRUNCH") out = crunch(landmarks);
+    else if (EX === "PLANK") out = plank(landmarks);
+    else out = { feedback: fb("Продолжайте...", "Keep going..."), errors: [] };
+    return { count: state.count, feedback: out.feedback || fb("Продолжайте...", "Keep going..."), errors: out.errors || [] };
+  }
+
+  function getClientCount() { return state.count; }
+  function resetClientState() {
+    state.count = 0; state.stage = "up"; state.ready = false;
+    state.readyBuffer = []; state.downHoldFrames = 0; state.minKneeAngleInRep = 180;
+    state.goodHoldFrames = 0; state.lastCenter = null; state.holdStartTime = null; state.startHipY = null; state.stableRef = [];
+    state.crunchDownFrames = 0;
+  }
+
+  window.clientDetector = { process: processLandmarksClient, getCount: getClientCount, reset: resetClientState };
+})();
+</script>
+
+<script>
+/* ======================================================
+   GLOBAL STATE
+====================================================== */
+const EXERCISE_TYPE = "{{ exercise }}";
+const T_LANG = '{{ current_lang|default:"ru" }}';
+const T_EN = (T_LANG === 'en');
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const repsEl = document.getElementById("reps");
+const fpsEl = document.getElementById("fps");
+const feedbackEl = document.getElementById("feedback");
+const poseStatusEl = document.getElementById("poseStatus");
+const videoSizeEl = document.getElementById("videoSize");
+const pauseBtn = document.getElementById("pauseBtn");
+const setsEl = document.getElementById("sets");
+
+let isPaused = false;
+let lastSend = 0;
+
+/* ======================================================
+   COACH MESSAGES (RIGHT PANEL)
+====================================================== */
+let lastCoachText = "";
+let lastCoachType = "";
+let lastCoachTime = 0;
+
+function showCoach(text, type = "warning", cooldown = 1500) {
+    const now = Date.now();
+    if (text === lastCoachText && type === lastCoachType && now - lastCoachTime < cooldown) return;
+
+    lastCoachText = text;
+    lastCoachType = type;
+    lastCoachTime = now;
+
+    feedbackEl.textContent = text;
+    feedbackEl.classList.remove("success", "warning", "danger");
+    feedbackEl.classList.add(type);
+}
+
+/* ======================================================
+   VOICE COACH (Speech Synthesis) — расширенный
+   Ошибки: короткие фразы. Опционально: успехи, громкость.
+====================================================== */
+const VOICE_COACH_KEY = "temina_voice_coach";
+const VOICE_SUCCESS_KEY = "temina_voice_success";
+const VOICE_VOLUME_KEY = "temina_voice_volume";
+let voiceCoachEnabled = (typeof localStorage !== "undefined" && localStorage.getItem(VOICE_COACH_KEY) !== "false");
+let voiceSpeakSuccess = (typeof localStorage !== "undefined" && localStorage.getItem(VOICE_SUCCESS_KEY) === "true");
+let voiceVolume = 0.9;
+try { var v = parseFloat(localStorage.getItem(VOICE_VOLUME_KEY)); if (v >= 0.3 && v <= 1) voiceVolume = v; } catch (e) {}
+let lastSpokenText = "";
+let lastSpokenTime = 0;
+let lastSuccessTime = 0;
+const VOICE_COOLDOWN_MS = 5000;
+const VOICE_SUCCESS_COOLDOWN_MS = 8000;
+
+/* Короткие фразы для озвучки ошибок: [триггер в тексте, RU фраза, EN фраза] */
+var VOICE_SHORT = [
+    ["Локти разведены", "Локти к корпусу", "Elbows in"],
+    ["локти ближе", "Локти к корпусу", "Elbows in"],
+    ["Elbows flared", "Локти к корпусу", "Elbows in"],
+    ["Elbows closer", "Локти к корпусу", "Elbows in"],
+    ["Руки не на полу", "Руки на пол", "Hands on the floor"],
+    ["Hands not on", "Руки на пол", "Hands on the floor"],
+    ["Hands off the floor", "Руки на пол", "Hands down"],
+    ["Руки оторваны", "Руки на пол", "Hands down"],
+    ["Задержитесь внизу", "Задержка внизу", "Hold at the bottom"],
+    ["Hold at the bottom", "Задержка внизу", "Hold at the bottom"],
+    ["Приседайте глубже", "Приседай глубже", "Squat deeper"],
+    ["Squat deeper", "Приседай глубже", "Squat deeper"],
+    ["глубже", "Глубже", "Deeper"],
+    ["Держите скручивание", "Держи скручивание", "Hold the crunch"],
+    ["Hold the crunch", "Держи скручивание", "Hold the crunch"],
+    ["Исправьте форму", "Исправь форму", "Fix your form"],
+    ["Fix your form", "Исправь форму", "Fix your form"],
+    ["Fix your pose", "Исправь позу", "Fix your pose"],
+    ["Fix your body", "Исправь форму", "Fix your form"],
+    ["позу", "Держи линию", "Keep the line"],
+    ["прямую линию", "Держи линию", "Keep the line"],
+    ["straight line", "Держи линию", "Keep the line"],
+    ["straight body", "Держи линию", "Keep the line"],
+    ["тело в кадре", "Покажи тело в кадре", "Show your body in frame"],
+    ["full body", "Покажи тело в кадре", "Show full body"],
+    ["both legs", "Покажи тело в кадре", "Show full body"],
+    ["body in frame", "Покажи тело в кадре", "Show full body"]
+];
+
+function getShortVoicePhrase(text) {
+    if (!text || !text.trim()) return "";
+    var t = text.trim().slice(0, 200);
+    for (var i = 0; i < VOICE_SHORT.length; i++) {
+        if (t.indexOf(VOICE_SHORT[i][0]) !== -1)
+            return T_EN ? VOICE_SHORT[i][2] : VOICE_SHORT[i][1];
+    }
+    return t.length > 60 ? t.slice(0, 60) : t;
+}
+
+function doSpeak(phrase, cooldownKey) {
+    if (!phrase || typeof speechSynthesis === "undefined") return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(phrase);
+    u.volume = voiceVolume;
+    u.rate = 0.92;
+    u.pitch = 1;
+    var lang = T_LANG === "en" ? "en-US" : "ru-RU";
+    u.lang = lang;
+    var voices = speechSynthesis.getVoices();
+    var preferred = voices.find(function(v) { return v.lang.startsWith(lang.slice(0, 2)); });
+    if (preferred) u.voice = preferred;
+    speechSynthesis.speak(u);
+}
+
+function speakCoach(shortPhrase, isError) {
+    if (!shortPhrase || !voiceCoachEnabled || !isError) return;
+    var now = Date.now();
+    var phrase = getShortVoicePhrase(shortPhrase);
+    if (!phrase) return;
+    if (phrase === lastSpokenText && now - lastSpokenTime < VOICE_COOLDOWN_MS) return;
+    lastSpokenText = phrase;
+    lastSpokenTime = now;
+    doSpeak(phrase);
+}
+
+function speakSuccess() {
+    if (!voiceCoachEnabled || !voiceSpeakSuccess || typeof speechSynthesis === "undefined") return;
+    var now = Date.now();
+    if (now - lastSuccessTime < VOICE_SUCCESS_COOLDOWN_MS) return;
+    lastSuccessTime = now;
+    var phrase = T_EN ? "Good. Rep counted." : "Отлично. Повтор засчитан.";
+    doSpeak(phrase);
+}
+
+function setVoiceCoachUI() {
+    var btn = document.getElementById("voiceCoachBtn");
+    var opts = document.getElementById("voiceOptions");
+    if (btn) {
+        btn.classList.toggle("active", voiceCoachEnabled);
+        btn.title = voiceCoachEnabled
+            ? (T_EN ? "Voice coach on" : "Голосовой помощник включён")
+            : (T_EN ? "Voice coach off" : "Голос выключен");
+    }
+    if (opts) opts.style.display = voiceCoachEnabled ? "block" : "none";
+    var cb = document.getElementById("voiceSuccessCb");
+    if (cb) cb.checked = voiceSpeakSuccess;
+    var vol = document.getElementById("voiceVolume");
+    if (vol) { vol.value = String(voiceVolume); }
+}
+
+/* Маппинг ошибок детектора → ключевые точки скелета для красной подсветки (MediaPipe Pose 33 pts) */
+window.getCoachHighlightLandmarks = function(errors) {
+    var set = new Set();
+    if (!errors || errors.length === 0) return set;
+    var msg = errors.map(function(e) { return (e.message || "").toLowerCase(); }).join(" ");
+    if (/elbow|локт/.test(msg)) { [11,12,13,14].forEach(function(i) { set.add(i); }); }
+    if (/hand|руки|wrist/.test(msg)) { [15,16].forEach(function(i) { set.add(i); }); }
+    if (/back|спин|корпус|form|body line|линию/.test(msg)) { [11,12,23,24].forEach(function(i) { set.add(i); }); }
+    if (/knee|колен|squat|присед|глубже|deeper/.test(msg)) { [23,24,25,26].forEach(function(i) { set.add(i); }); }
+    if (/pose|позу|frame|кадре|body|тело/.test(msg)) { [11,12,23,24,27,28].forEach(function(i) { set.add(i); }); }
+    return set;
+};
+
+/* ======================================================
+   SIMPLE POSE DETECTORS
+====================================================== */
+function isPlank(landmarks) {
+    const shoulder = landmarks[11];
+    const hip = landmarks[23];
+    const ankle = landmarks[27];
+
+    if (!shoulder || !hip || !ankle) return false;
+
+    return (
+        Math.abs(shoulder.y - hip.y) < 0.08 &&
+        Math.abs(hip.y - ankle.y) < 0.08
+    );
+}
+
+/* ======================================================
+   COACH FSM
+====================================================== */
+let coachState = "init";
+
+function updateCoach(landmarks) {
+    if (isPaused) {
+        showCoach(T_EN ? "⏸ Workout paused" : "⏸ Тренировка на паузе", "warning", 2000);
+        return;
+    }
+
+    if (!landmarks) {
+        coachState = "init";
+        showCoach(T_EN ? "Step into frame" : "Подойдите в кадр", "warning", 1500);
+        return;
+    }
+
+    if (EXERCISE_TYPE === "PUSHUP") {
+        if (coachState === "init") {
+            showCoach(T_EN ? "Get into plank position" : "Примите упор лёжа", "warning", 1500);
+            coachState = "waiting";
+            return;
+        }
+
+        if (coachState === "waiting") {
+            if (!isPlank(landmarks)) {
+                showCoach(T_EN ? "Get into plank position" : "Примите упор лёжа", "warning", 1500);
+            } else {
+                showCoach(T_EN ? "Good. Start push-ups" : "Отлично. Начинаем отжимания", "success", 2000);
+                coachState = "ready";
+            }
+            return;
+        }
+
+        if (coachState === "ready") {
+            if (!isPlank(landmarks)) {
+                coachState = "waiting";
+                showCoach(T_EN ? "Return to plank" : "Вернитесь в упор лёжа", "warning", 1500);
+            } else {
+                showCoach(T_EN ? "▶ Workout in progress" : "▶ Тренировка продолжается", "success", 2500);
+            }
+            return;
+        }
+    }
+
+    if (EXERCISE_TYPE === "SQUAT") {
+        if (coachState === "init") {
+            showCoach(T_EN ? "Stand straight. Feet shoulder-width apart" : "Встаньте прямо. Ноги на ширине плеч", "warning", 1800);
+            coachState = "ready";
+            return;
+        }
+        showCoach(T_EN ? "▶ Do squats" : "▶ Делайте приседания", "success", 2000);
+        return;
+    }
+
+    if (EXERCISE_TYPE === "CRUNCH") {
+        if (coachState === "init") {
+            showCoach(T_EN ? "Lie on your back. Knees bent" : "Лягте на спину. Колени согнуты", "warning", 1800);
+            coachState = "ready";
+            return;
+        }
+        showCoach(T_EN ? "▶ Do crunches" : "▶ Делайте скручивания", "success", 2000);
+        return;
+    }
+
+    showCoach(T_EN ? "▶ Workout in progress" : "▶ Тренировка продолжается", "success", 2000);
+}
+
+
+/* ======================================================
+   TIMER
+====================================================== */
+let seconds = 0;
+setInterval(() => {
+    if (isPaused) return;
+    seconds++;
+    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
+    document.getElementById("time").textContent = `${m}:${s}`;
+}, 1000);
+
+/* ======================================================
+   CAMERA + POSE: параллельный запуск (камера и модель ИИ одновременно)
+   — лёгкие ограничения камеры для быстрого старта на мобильных
+   — прогрев Pose одним кадром, чтобы WASM загрузился параллельно с камерой
+====================================================== */
+let mpCamera = null;
+let poseReady = false;
+
+function setStatus(text) {
+  if (poseStatusEl) poseStatusEl.textContent = text;
+}
+function setFeedback(text) {
+  if (feedbackEl) { feedbackEl.textContent = text; feedbackEl.className = "train-feedback warning"; }
+}
+
+var poseOptions = { modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 };
+
+function createPosePromise() {
+  if (window.TeminaPoseClient && typeof window.TeminaPoseClient.getOrCreatePose === "function") {
+    return window.TeminaPoseClient.getOrCreatePose(poseOptions).then(function(pose) {
+      var warmup = document.createElement("canvas");
+      warmup.width = 64;
+      warmup.height = 64;
+      warmup.getContext("2d").fillRect(0, 0, 64, 64);
+      return pose.send({ image: warmup }).then(function() { return pose; }, function() { return pose; });
+    });
+  }
+  if (typeof Pose === "undefined") {
+    return Promise.reject(new Error(T_EN ? "MediaPipe Pose not loaded" : "MediaPipe Pose не загружен"));
+  }
+  var p = new Pose({ locateFile: function(f) { return "https://cdn.jsdelivr.net/npm/@mediapipe/pose/" + f; } });
+  p.setOptions(poseOptions);
+  var warmup = document.createElement("canvas");
+  warmup.width = 64;
+  warmup.height = 64;
+  warmup.getContext("2d").fillRect(0, 0, 64, 64);
+  return p.send({ image: warmup }).then(function() { return p; }, function() { return p; });
+}
+
+setStatus(T_EN ? "Starting camera & AI…" : "Запуск камеры и ИИ…");
+setFeedback(T_EN ? "Allow camera if asked. AI loads in parallel." : "Разрешите камеру при запросе. ИИ загружается параллельно.");
+
+var aiLoadStartMs = performance.now();
+
+function drawVideoOnly() {
+  if (poseReady) return;
+  if (canvas.width && canvas.height) {
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+  requestAnimationFrame(drawVideoOnly);
+}
+
+var streamPromise = navigator.mediaDevices.getUserMedia({
+  video: {
+    facingMode: "user",
+    width: { max: 640 },
+    height: { max: 480 }
+  }
+}).then(function(stream) {
+  video.srcObject = stream;
+  setStatus(T_EN ? "Camera ready" : "Камера готова");
+  return video.play();
+}).then(function() {
+  return new Promise(function(resolve) {
+    if (video.videoWidth > 0) resolve();
+    else video.addEventListener("loadedmetadata", function() { resolve(); }, { once: true });
+  });
+}).then(function() {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  if (videoSizeEl) videoSizeEl.textContent = canvas.width + "×" + canvas.height;
+  drawVideoOnly();
+});
+
+var posePromise = createPosePromise();
+
+Promise.all([streamPromise, posePromise]).then(function(results) {
+  var pose = results[1];
+  poseReady = true;
+  var aiLoadMs = Math.round(performance.now() - aiLoadStartMs);
+  if (typeof console !== "undefined" && console.log) {
+    console.log("[TeminaFit] AI (Pose) loaded in " + (aiLoadMs / 1000).toFixed(2) + " s");
+  }
+
+  pose.onResults(onPose);
+  mpCamera = new Camera(video, {
+    onFrame: async function() { await pose.send({ image: video }); },
+    width: canvas.width,
+    height: canvas.height
+  });
+  mpCamera.start();
+
+  setStatus(T_EN ? "Ready" : "Готово");
+  setFeedback((T_EN ? "Ready! Step into frame and start. " : "Готово! Встаньте в кадр и начните. ") + (aiLoadMs >= 1000 ? (T_EN ? "(AI loaded in " : "(ИИ загружен за ") + (aiLoadMs / 1000).toFixed(1) + " s)" : ""));
+  document.getElementById("trainStatusPill")?.classList.remove("train-pill-status");
+
+  fetch("/api/workouts/start/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify({ exercise_type: EXERCISE_TYPE })
+  }).catch(function() {});
+  if (window.clientDetector && typeof window.clientDetector.reset === "function") {
+    window.clientDetector.reset();
+  }
+}).catch(function(err) {
+  console.error(err);
+  if (poseStatusEl) poseStatusEl.textContent = T_EN ? "Camera / AI error" : "Ошибка камеры или ИИ";
+  setFeedback(T_EN ? "Failed to start camera or AI. Check permissions and try again." : "Не удалось запустить камеру или ИИ. Проверьте разрешения и попробуйте снова.");
+});
+
+/* ======================================================
+   FPS COUNTER
+====================================================== */
+let frames = 0;
+let lastFpsTime = performance.now();
+
+/* ======================================================
+   POSE HANDLER
+====================================================== */
+function onPose(results) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // video mirror (НЕ ТРОГАЕМ)
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    if (!results.poseLandmarks) {
+        poseStatusEl.textContent = T_EN ? "Pose not detected" : "Поза не обнаружена";
+        poseStatusEl.style.color = "#f97316";
+        updateCoach(null);
+        return;
+    }
+
+    poseStatusEl.textContent = T_EN ? "Pose detected ✓" : "Поза обнаружена ✓";
+    poseStatusEl.style.color = "#22c55e";
+
+    // Детектор → результат и подсветка ошибок на скелете (по конфигу)
+    var out = window.clientDetector ? window.clientDetector.process(results.poseLandmarks) : null;
+    var highlightLm = window.getCoachHighlightLandmarks ? window.getCoachHighlightLandmarks(out ? out.errors : null) : new Set();
+
+    // СКЕЛЕТ: обычные линии и точки, красным — зоны с ошибкой
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.translate(-canvas.width, 0);
+
+    var lm = results.poseLandmarks;
+    if (typeof POSE_CONNECTIONS !== "undefined") {
+        for (var c = 0; c < POSE_CONNECTIONS.length; c++) {
+            var pair = POSE_CONNECTIONS[c];
+            var a = pair[0], b = pair[1];
+            var isError = highlightLm.has(a) || highlightLm.has(b);
+            ctx.strokeStyle = isError ? "#ef4444" : "#a855f7";
+            ctx.lineWidth = isError ? 5 : 4;
+            if (lm[a] && lm[b]) {
+                ctx.beginPath();
+                ctx.moveTo(lm[a].x * canvas.width, lm[a].y * canvas.height);
+                ctx.lineTo(lm[b].x * canvas.width, lm[b].y * canvas.height);
+                ctx.stroke();
+            }
+        }
+    }
+    for (var i = 0; i < lm.length; i++) {
+        ctx.fillStyle = highlightLm.has(i) ? "#ef4444" : "#f1f5f9";
+        ctx.beginPath();
+        ctx.arc(lm[i].x * canvas.width, lm[i].y * canvas.height, highlightLm.has(i) ? 5 : 4, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+    ctx.restore();
+
+    // FPS
+    frames++;
+    const now = performance.now();
+    if (now - lastFpsTime > 1000) {
+        fpsEl.textContent = frames;
+        frames = 0;
+        lastFpsTime = now;
+    }
+
+    if (out) {
+        repsEl.textContent = (EXERCISE_TYPE === "PLANK") ? (out.count + " сек") : out.count;
+        if (out.feedback) {
+            var coachText = out.feedback;
+            var hasErrors = out.errors && out.errors.length > 0;
+            if (hasErrors) {
+                var errList = out.errors.slice(0, 2);
+                coachText += "\n\n⚠ " + (T_EN ? "What's wrong:" : "Что не так:") + "\n• " + errList.map(function(er) {
+                    return (er.message || '').trim();
+                }).join("\n• ");
+                coachText += "\n\n💡 " + (T_EN ? "How to fix:" : "Как исправить:") + "\n• " + errList.map(function(er) {
+                    return (er.hint || '').trim();
+                }).join("\n• ");
+                var firstMsg = (errList[0] && (errList[0].message || '').trim()) || out.feedback;
+                if (typeof speakCoach === "function") speakCoach(firstMsg, true);
+            } else {
+                var fb = (out.feedback || "").toLowerCase();
+                if ((fb.indexOf("засчитан") !== -1 || fb.indexOf("counted") !== -1 || fb.indexOf("отлично") !== -1) && typeof speakSuccess === "function")
+                    speakSuccess();
+            }
+            var cooldown = hasErrors ? 2800 : 1500;
+            showCoach(coachText, hasErrors ? "warning" : "success", cooldown);
+        }
+    } else if (!window.clientDetector) {
+        updateCoach(results.poseLandmarks);
+    }
+}
+
+/* ======================================================
+   SERVER COMMUNICATION
+====================================================== */
+function sendLandmarks(landmarks) {
+    if (isPaused) return;
+
+    const now = Date.now();
+    if (now - lastSend < 150) return;
+    lastSend = now;
+
+    fetch("/api/ai/process-landmarks/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+            exercise_type: EXERCISE_TYPE,
+            landmarks: landmarks
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data?.success) return;
+
+        const count = data.count ?? 0;
+        repsEl.textContent = (EXERCISE_TYPE === 'PLANK') ? (count + ' сек') : count;
+
+        if (data.sets !== undefined) {
+            setsEl.textContent = data.sets;
+        }
+
+        let coachText = data.feedback || '';
+        let coachType = 'success';
+        var hasErrors = data.errors && data.errors.length > 0;
+        if (hasErrors) {
+            coachType = 'warning';
+            var errList = data.errors.slice(0, 2);
+            coachText += '\n\n⚠ ' + (T_EN ? "What's wrong:" : "Что не так:") + '\n• ' + errList.map(function(er) {
+                var msg = (typeof er === 'object' && er.message != null) ? er.message : String(er);
+                return msg.trim();
+            }).join('\n• ');
+            coachText += '\n\n💡 ' + (T_EN ? "How to fix:" : "Как исправить:") + '\n• ' + errList.map(function(er) {
+                var hint = (typeof er === 'object' && er.hint != null) ? er.hint : '';
+                return hint.trim();
+            }).join('\n• ');
+            var firstMsg = (errList[0] && (typeof errList[0] === 'object' && errList[0].message != null ? errList[0].message : String(errList[0])).trim()) || (data.feedback || '');
+            if (typeof speakCoach === "function") speakCoach(firstMsg, true);
+        } else {
+            var fbStr = (coachText || "").toLowerCase();
+            if ((fbStr.indexOf("засчитан") !== -1 || fbStr.indexOf("counted") !== -1) && typeof speakSuccess === "function")
+                speakSuccess();
+        }
+        if (coachText) {
+            feedbackEl.style.whiteSpace = 'pre-line';
+            showCoach(coachText, coachType, hasErrors ? 2800 : 1200);
+        }
+    });
+}
+
+/* ======================================================
+   PAUSE
+====================================================== */
+pauseBtn.addEventListener("click", () => {
+    isPaused = !isPaused;
+
+    if (isPaused) {
+        pauseBtn.textContent = T_EN ? "▶ Resume" : "▶ Продолжить";
+        pauseBtn.classList.add("paused");
+        showCoach(T_EN ? "⏸ Workout paused" : "⏸ Тренировка приостановлена", "warning", 2000);
+    } else {
+        pauseBtn.textContent = T_EN ? "⏸ Pause" : "⏸ Пауза";
+        pauseBtn.classList.remove("paused");
+        showCoach(T_EN ? "▶ Workout in progress" : "▶ Тренировка продолжается", "success", 2000);
+    }
+});
+
+/* Voice coach toggle and options */
+if (typeof setVoiceCoachUI === "function") setVoiceCoachUI();
+document.getElementById("voiceCoachBtn")?.addEventListener("click", function() {
+    voiceCoachEnabled = !voiceCoachEnabled;
+    try { localStorage.setItem(VOICE_COACH_KEY, voiceCoachEnabled ? "true" : "false"); } catch (e) {}
+    setVoiceCoachUI();
+    showCoach(voiceCoachEnabled ? (T_EN ? "🔊 Voice coach on" : "🔊 Голосовой помощник включён") : (T_EN ? "Voice coach off" : "Голос выключен"), "success", 1500);
+});
+document.getElementById("voiceSuccessCb")?.addEventListener("change", function() {
+    voiceSpeakSuccess = this.checked;
+    try { localStorage.setItem(VOICE_SUCCESS_KEY, voiceSpeakSuccess ? "true" : "false"); } catch (e) {}
+});
+document.getElementById("voiceVolume")?.addEventListener("input", function() {
+    voiceVolume = parseFloat(this.value) || 0.9;
+    try { localStorage.setItem(VOICE_VOLUME_KEY, String(voiceVolume)); } catch (e) {}
+});
+if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = function() { if (typeof setVoiceCoachUI === "function") setVoiceCoachUI(); };
+}
+
+/* ======================================================
+   SAVE
+====================================================== */
+function getCsrfToken() {
+    var el = document.querySelector("[name=csrfmiddlewaretoken]");
+    if (el) return el.value;
+    var m = document.cookie.match(/\bcsrftoken=([^;]+)/);
+    return m ? m[1] : "";
+}
+document.getElementById("saveBtn").addEventListener("click", async () => {
+    showCoach(T_EN ? "💾 Saving…" : "💾 Сохранение…", "warning", 1500);
+
+    var payload = { exercise_type: EXERCISE_TYPE };
+    if (window.clientDetector && typeof window.clientDetector.getCount === "function") {
+        payload.reps = window.clientDetector.getCount();
+    }
+
+    var headers = { "Content-Type": "application/json" };
+    var csrf = getCsrfToken();
+    if (csrf) headers["X-CSRFToken"] = csrf;
+
+    try {
+        const res = await fetch("/api/workouts/complete/", {
+            method: "POST",
+            headers: headers,
+            credentials: "same-origin",
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if (data.success) {
+            var farewellsEn = ["Good session! Rest well.", "Nice work! See you next time.", "Saved. Keep it up!"];
+            var farewellsRu = ["Отличная тренировка! Отдыхай.", "Молодец! До следующего раза.", "Сохранено. Так держать!"];
+            var idx = Math.floor(Math.random() * 3);
+            var msg = (T_EN ? farewellsEn[idx] : farewellsRu[idx]) + " ✅";
+            showCoach(msg, "success", 2500);
+            setTimeout(function() { window.location.href = "/workouts/"; }, 2200);
+        } else {
+            throw new Error(data.error || "save_failed");
+        }
+    } catch (e) {
+        showCoach(T_EN ? "❌ Save failed" : "❌ Ошибка сохранения", "danger", 2500);
+    }
+});
+</script>
+{% endblock %}

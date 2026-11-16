@@ -1,0 +1,1247 @@
+<!-- main/templates/main/home.html -->
+<!DOCTYPE html>
+<html lang="{% if current_lang == 'en' %}en{% else %}ru{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeminaFit — {% if current_lang == 'en' %}AI fitness workouts{% else %}Игровые тренировки с ИИ{% endif %}</title>
+    <meta name="description" content="{% if current_lang == 'en' %}Fitness platform with AI coach: proper form, gamification, quests and stats. Push-ups, squats, crunches, plank.{% else %}Фитнес-платформа с ИИ-тренером: правильная техника упражнений, геймификация, квесты и статистика. Отжимания, приседания, скручивания, планка.{% endif %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f1f5f9;
+            --muted: rgba(241, 245, 249, 0.6);
+            --accent-start: #a855f7;
+            --accent-end: #06b6d4;
+            --glow: rgba(168, 85, 247, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.2), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 50%, rgba(6, 182, 212, 0.12), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 80%, rgba(168, 85, 247, 0.1), transparent);
+        }
+
+        .bg-gradient::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 64px 64px;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header — glass */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 0;
+            background: rgba(10, 10, 15, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .header.scrolled {
+            background: rgba(10, 10, 15, 0.9);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: var(--accent-start);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            background: var(--bg-card);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            color: #fff;
+            box-shadow: 0 4px 20px var(--glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--glow);
+        }
+
+        .btn-ghost {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 28px;
+            animation: fadeUp 0.7s ease both;
+        }
+
+        .hero-badge i {
+            color: var(--accent-end);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            animation: fadeUp 0.7s ease 0.1s both;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--muted);
+            margin-bottom: 40px;
+            line-height: 1.7;
+            animation: fadeUp 0.7s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeUp 0.7s ease 0.3s both;
+        }
+
+        .hero-visual {
+            margin-top: 64px;
+            animation: fadeUp 0.8s ease 0.4s both;
+        }
+
+        .hero-card {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
+            opacity: 0.6;
+        }
+
+        .hero-card-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 24px 0;
+        }
+
+        .hero-card-inner i {
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-card-inner div {
+            text-align: left;
+        }
+
+        .hero-card-inner h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .hero-card-inner p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* Problem → Solution block */
+        .problem-section {
+            padding: 80px 0 100px;
+        }
+
+        .problem-section .section-title {
+            font-size: clamp(1.5rem, 3.5vw, 2rem);
+            margin-bottom: 8px;
+        }
+
+        .problem-stats {
+            text-align: center;
+            color: var(--muted);
+            font-size: 1rem;
+            margin-bottom: 32px;
+        }
+
+        .problem-stats strong {
+            color: var(--text);
+        }
+
+        .problem-cards {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .problem-card {
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            max-width: 200px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .problem-card i {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .problem-transition {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .problem-transition p {
+            color: var(--muted);
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .problem-transition .solution-line {
+            font-size: clamp(1.4rem, 3vw, 1.75rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scenario-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .scenario-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .scenario-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .scenario-card .scenario-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2));
+            color: var(--accent-end);
+            flex-shrink: 0;
+        }
+
+        .scenario-card .scenario-arrow {
+            color: var(--muted);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .scenario-card .scenario-text strong {
+            display: block;
+            color: var(--text);
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .scenario-card .scenario-text span {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .problem-section {
+                padding: 56px 0 72px;
+            }
+            .problem-cards {
+                margin-bottom: 36px;
+            }
+            .scenario-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Section */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-compact {
+            padding: 56px 0 64px;
+        }
+
+        .section-compact .section-subtitle {
+            display: none;
+        }
+
+        .features-grid-compact {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .features-grid-exercises {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .feature-card-compact {
+            padding: 24px 20px;
+        }
+
+        .feature-card-compact .feature-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card-compact h3 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+
+        .feature-card-compact p {
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid-compact {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+            }
+            .features-grid-exercises {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 4vw, 2.25rem);
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 520px;
+            margin: 0 auto 56px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            color: var(--accent-end);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(6, 182, 212, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover .feature-icon::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .feature-visual {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s;
+        }
+
+        .feature-card:hover .feature-visual {
+            transform: translateY(-4px);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
+        .feature-visual::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.2), transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.2), transparent 50%);
+            opacity: 0.5;
+        }
+
+        .feature-visual i {
+            font-size: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-visual i:not([style*="color"]) {
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Detailed sections */
+        .detail-section {
+            padding: 80px 0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            margin-bottom: 64px;
+        }
+
+        .detail-grid.reverse {
+            direction: rtl;
+        }
+
+        .detail-grid.reverse > * {
+            direction: ltr;
+        }
+
+        .detail-content h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .detail-content p {
+            color: var(--muted);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .detail-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .detail-list li {
+            padding: 12px 0;
+            padding-left: 32px;
+            position: relative;
+            color: var(--muted);
+        }
+
+        .detail-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-end);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .detail-visual {
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .detail-visual i {
+            font-size: 5rem;
+            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(1.75rem, 4vw, 2.25rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 480px;
+            margin: 0 auto 32px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 64px 0 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .footer-section h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .reveal.visible {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        /* Mobile */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                padding: 16px;
+                background: rgba(10, 10, 15, 0.98);
+                border-bottom: 1px solid var(--border);
+                z-index: 999;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-card {
+                padding: 24px 16px;
+            }
+
+            .hero-card-inner {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .hero-card-inner div {
+                text-align: center;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .detail-grid.reverse {
+                direction: ltr;
+            }
+
+            .section {
+                padding: 64px 0;
+            }
+
+            .detail-section {
+                padding: 48px 0;
+            }
+
+            .cta-section {
+                padding: 64px 0;
+            }
+
+            .footer {
+                padding: 40px 0 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-badge {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            .detail-visual {
+                padding: 24px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .problem-card {
+                max-width: 100%;
+            }
+
+            .problem-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="/" class="logo">
+                    <i class="fas fa-fire-flame-curved"></i>
+                    <span>TeminaFit</span>
+                </a>
+                <div class="nav-links">
+                    <a href="/set-language/?lang=en&next={{ request.path|urlencode }}" style="font-size:0.85rem;opacity:{% if current_lang == 'en' %}1{% else %}0.6{% endif %}">EN</a>
+                    <a href="/set-language/?lang=ru&next={{ request.path|urlencode }}" style="font-size:0.85rem;opacity:{% if current_lang == 'ru' %}1{% else %}0.6{% endif %}">RU</a>
+                    <a href="#problem-solution">{% if current_lang == 'en' %}Why us{% else %}Зачем мы{% endif %}</a>
+                    <a href="#features">{% if current_lang == 'en' %}Features{% else %}Возможности{% endif %}</a>
+                    <a href="#how-it-works">{% if current_lang == 'en' %}How it works{% else %}Как это работает{% endif %}</a>
+                    {% if user.is_authenticated %}
+                        <a href="/dashboard/" class="btn btn-primary">{% if current_lang == 'en' %}Dashboard{% else %}Дашборд{% endif %}</a>
+                    {% else %}
+                        <a href="{% url 'login_page' %}" class="btn btn-ghost">{% if current_lang == 'en' %}Log in{% else %}Войти{% endif %}</a>
+                        <a href="{% url 'register_page' %}" class="btn btn-primary">{% if current_lang == 'en' %}Get started{% else %}Начать{% endif %}</a>
+                    {% endif %}
+                </div>
+                <button class="mobile-menu-btn" aria-label="{% if current_lang == 'en' %}Menu{% else %}Меню{% endif %}">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    {% if current_lang == 'en' %}AI counts reps in real time{% else %}ИИ считает повторения в реальном времени{% endif %}
+                </div>
+                <h1>{% if current_lang == 'en' %}Train like in a <span class="gradient">game</span>{% else %}Тренируйся как в <span class="gradient">игре</span>{% endif %}</h1>
+                <p>{% if current_lang == 'en' %}TeminaFit is a fitness platform with an AI coach: proper form, gamification, quests and stats. Less fuss, more results.{% else %}ТеминаФит — это фитнес-платформа с ИИ-тренером: правильная техника упражнений, геймификация, квесты и статистика. Минимум суеты, максимум результата.{% endif %}</p>
+                <div class="hero-buttons">
+                    {% if user.is_authenticated %}
+                        <a href="/workouts/" class="btn btn-primary">
+                            <i class="fas fa-play"></i> {% if current_lang == 'en' %}Workout{% else %}Тренировка{% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register_page' %}" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> {% if current_lang == 'en' %}Start free{% else %}Начать бесплатно{% endif %}
+                        </a>
+                        <a href="{% url 'login_page' %}" class="btn btn-ghost">
+                            <i class="fas fa-right-to-bracket"></i> {% if current_lang == 'en' %}Log in{% else %}Войти{% endif %}
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-card">
+                        <div class="hero-card-inner">
+                            <i class="fas fa-camera"></i>
+                            <div>
+                                <h3>{% if current_lang == 'en' %}AI tracks your pose{% else %}ИИ отслеживает позу{% endif %}</h3>
+                                <p>{% if current_lang == 'en' %}Push-ups, squats, crunches, plank — counts only correct reps{% else %}Отжимания, приседы, скручивания, планка — считает только правильные повторения{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="problem-section" id="problem-solution">
+        <div class="container">
+            <p class="problem-stats reveal"><strong>{% if current_lang == 'en' %}Most{% else %}Большинство{% endif %}</strong> {% if current_lang == 'en' %}train alone.{% else %}тренируются в одиночку.{% endif %}</p>
+            <h2 class="section-title reveal">{% if current_lang == 'en' %}Here's what "alone" looks like{% else %}Вот как выглядит «один»{% endif %}</h2>
+            <div class="problem-cards reveal">
+                <div class="problem-card">
+                    <i class="fas fa-circle-question"></i>
+                    <p>{% if current_lang == 'en' %}Am I doing it right? No idea.{% else %}Правильно ли делаю? Непонятно.{% endif %}</p>
+                </div>
+                <div class="problem-card">
+                    <i class="fas fa-hashtag"></i>
+                    <p>{% if current_lang == 'en' %}Counting reps myself — lose track.{% else %}Считаю повторения сам — сбиваюсь.{% endif %}</p>
+                </div>
+                <div class="problem-card">
+                    <i class="fas fa-face-frown"></i>
+                    <p>{% if current_lang == 'en' %}Motivation drops, quit after a week.{% else %}Мотивация падает, бросаю через неделю.{% endif %}</p>
+                </div>
+            </div>
+            <div class="problem-transition reveal">
+                <p>{% if current_lang == 'en' %}It shouldn't be like that.{% else %}Так не должно быть.{% endif %}</p>
+                <p class="solution-line">{% if current_lang == 'en' %}So we built TeminaFit.{% else %}Поэтому мы сделали TeminaFit.{% endif %}</p>
+            </div>
+            <div class="scenario-cards">
+                <div class="scenario-card reveal">
+                    <div class="scenario-icon"><i class="fas fa-camera"></i></div>
+                    <span class="scenario-arrow">→</span>
+                    <div class="scenario-text">
+                        <strong>{% if current_lang == 'en' %}Turn on camera{% else %}Включил камеру{% endif %}</strong>
+                        <span>{% if current_lang == 'en' %}AI counts reps in real time{% else %}ИИ считает повторения в реальном времени{% endif %}</span>
+                    </div>
+                </div>
+                <div class="scenario-card reveal">
+                    <div class="scenario-icon"><i class="fas fa-circle-exclamation"></i></div>
+                    <span class="scenario-arrow">→</span>
+                    <div class="scenario-text">
+                        <strong>{% if current_lang == 'en' %}Form mistake{% else %}Ошибка в технике{% endif %}</strong>
+                        <span>{% if current_lang == 'en' %}On-screen hint: what's wrong and how to fix it{% else %}Подсказка на экране: что не так и как исправить{% endif %}</span>
+                    </div>
+                </div>
+                <div class="scenario-card reveal">
+                    <div class="scenario-icon"><i class="fas fa-medal"></i></div>
+                    <span class="scenario-arrow">→</span>
+                    <div class="scenario-text">
+                        <strong>{% if current_lang == 'en' %}Workout done{% else %}Потренировался{% endif %}</strong>
+                        <span>{% if current_lang == 'en' %}Level, quests, stats — like in a game{% else %}Уровень, квесты, статистика — как в игре{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-compact" id="features">
+        <div class="container">
+            <h2 class="section-title reveal">{% if current_lang == 'en' %}Why TeminaFit{% else %}Почему TeminaFit{% endif %}</h2>
+            <div class="features-grid features-grid-compact">
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon"><i class="fas fa-microchip"></i></div>
+                    <h3>{% if current_lang == 'en' %}AI coach{% else %}ИИ-тренер{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Real-time form, hints, counting on device.{% else %}Техника в реальном времени, подсказки, счёт на устройстве.{% endif %}</p>
+                </div>
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon"><i class="fas fa-star"></i></div>
+                    <h3>{% if current_lang == 'en' %}Gamification{% else %}Геймификация{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Levels, XP, quests — like in a game.{% else %}Уровни, XP, квесты — как в игре.{% endif %}</p>
+                </div>
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon"><i class="fas fa-chart-column"></i></div>
+                    <h3>{% if current_lang == 'en' %}Statistics{% else %}Статистика{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Progress, streaks, history.{% else %}Прогресс, серии, история.{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-compact">
+        <div class="container">
+            <h2 class="section-title reveal">{% if current_lang == 'en' %}Exercises{% else %}Упражнения{% endif %}</h2>
+            <div class="features-grid features-grid-exercises">
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.2)); border-color: rgba(245,158,11,0.3); color: #f59e0b;"><i class="fas fa-hand-fist"></i></div>
+                    <h3>{% if current_lang == 'en' %}Push-ups{% else %}Отжимания{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Depth, back, elbows.{% else %}Глубина, спина, локти.{% endif %}</p>
+                </div>
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2)); border-color: rgba(16,185,129,0.3); color: #10b981;"><i class="fas fa-person-walking"></i></div>
+                    <h3>{% if current_lang == 'en' %}Squats{% else %}Приседания{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Depth, knees.{% else %}Глубина, колени.{% endif %}</p>
+                </div>
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(124,58,237,0.2)); border-color: rgba(168,85,247,0.3); color: #a855f7;"><i class="fas fa-dumbbell"></i></div>
+                    <h3>{% if current_lang == 'en' %}Crunches{% else %}Скручивания{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Range, hips on floor.{% else %}Амплитуда, таз на полу.{% endif %}</p>
+                </div>
+                <div class="feature-card feature-card-compact reveal">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.2)); border-color: rgba(239,68,68,0.3); color: #ef4444;"><i class="fas fa-stopwatch"></i></div>
+                    <h3>{% if current_lang == 'en' %}Plank{% else %}Планка{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Straight body line, time hold.{% else %}Прямая линия корпуса, удержание по времени.{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="detail-section" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title reveal">{% if current_lang == 'en' %}How it works{% else %}Как это работает{% endif %}</h2>
+            <p class="section-subtitle reveal">{% if current_lang == 'en' %}Tech that makes workouts effective{% else %}Технологии, которые делают тренировки эффективными{% endif %}</p>
+
+            <div class="detail-grid reveal">
+                <div class="detail-content">
+                    <h3>{% if current_lang == 'en' %}AI pose analysis{% else %}ИИ-анализ позы{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Google's MediaPipe Pose tracks 33 body landmarks in real time. AI analyzes joint angles, body position and exercise quality.{% else %}Используется технология MediaPipe Pose от Google для распознавания 33 ключевых точек тела в реальном времени. ИИ анализирует углы суставов, положение тела и качество выполнения упражнения.{% endif %}</p>
+                    <ul class="detail-list">
+                        <li>{% if current_lang == 'en' %}Runs on your device — private and fast{% else %}Обработка происходит на вашем устройстве — приватно и быстро{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Works in the browser, no app install{% else %}Работает в браузере без установки приложений{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Pose recognition accuracy — 98%{% else %}Точность распознавания позы — 98%{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Any camera: phone, laptop, webcam{% else %}Поддержка любых камер: телефон, ноутбук, веб-камера{% endif %}</li>
+                    </ul>
+                </div>
+                <div class="detail-visual">
+                    <i class="fas fa-microchip"></i>
+                    <h4>MediaPipe Pose</h4>
+                    <p style="color: var(--muted); margin-top: 12px;">{% if current_lang == 'en' %}33 body points in real time{% else %}33 точки тела в реальном времени{% endif %}</p>
+                </div>
+            </div>
+
+            <div class="detail-grid reverse reveal">
+                <div class="detail-content">
+                    <h3>{% if current_lang == 'en' %}Gamification system{% else %}Система геймификации{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}Every workout gives XP and levels you up. Upgrade skills (Strength, Stamina, Agility, Technique) for bonus XP and calories.{% else %}Каждая тренировка приносит опыт (XP), который повышает ваш уровень. Прокачивайте навыки (Сила, Выносливость, Ловкость, Техника) и получайте бонусы: больше XP и калорий за тренировки.{% endif %}</p>
+                    <ul class="detail-list">
+                        <li>{% if current_lang == 'en' %}Levels: from beginner to master{% else %}Уровни: от новичка до мастера{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Skills: 4 stats that affect rewards{% else %}Навыки: 4 характеристики, влияющие на награды{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Quests: daily and weekly tasks{% else %}Квесты: ежедневные и еженедельные задания{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Achievements: for streaks and records{% else %}Достижения: за серии тренировок и рекорды{% endif %}</li>
+                    </ul>
+                </div>
+                <div class="detail-visual">
+                    <i class="fas fa-star"></i>
+                    <h4>{% if current_lang == 'en' %}Game mechanics{% else %}Игровая механика{% endif %}</h4>
+                    <p style="color: var(--muted); margin-top: 12px;">{% if current_lang == 'en' %}Motivation through progress{% else %}Мотивация через прогресс{% endif %}</p>
+                </div>
+            </div>
+
+            <div class="detail-grid reveal">
+                <div class="detail-content">
+                    <h3>{% if current_lang == 'en' %}Hints and safety{% else %}Подсказки и безопасность{% endif %}</h3>
+                    <p>{% if current_lang == 'en' %}AI counts reps and checks form. When it spots errors that could cause injury or lower effectiveness, you get clear hints on how to fix them.{% else %}ИИ не только считает повторения, но и анализирует технику. При обнаружении ошибок, которые могут привести к травмам или снижению эффективности, вы получаете конкретные подсказки по исправлению.{% endif %}</p>
+                    <ul class="detail-list">
+                        <li>{% if current_lang == 'en' %}Warnings for wrong form{% else %}Предупреждения о неправильной технике{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Clear advice on how to fix the error{% else %}Конкретные советы, как исправить ошибку{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Exercise depth check{% else %}Проверка глубины упражнений{% endif %}</li>
+                        <li>{% if current_lang == 'en' %}Body and joint position control{% else %}Контроль положения тела и суставов{% endif %}</li>
+                    </ul>
+                </div>
+                <div class="detail-visual">
+                    <i class="fas fa-shield-halved"></i>
+                    <h4>{% if current_lang == 'en' %}Safety{% else %}Безопасность{% endif %}</h4>
+                    <p style="color: var(--muted); margin-top: 12px;">{% if current_lang == 'en' %}Train without injury{% else %}Тренируйся без травм{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="reveal">{% if current_lang == 'en' %}Start today{% else %}Начни сегодня{% endif %}</h2>
+            <p class="reveal">{% if current_lang == 'en' %}Join those who already train with an AI coach{% else %}Присоединяйся к тем, кто уже качает тело с ИИ-тренером{% endif %}</p>
+            {% if user.is_authenticated %}
+                <a href="/train/pushups/" class="btn btn-primary reveal" style="padding: 16px 36px; font-size: 1.05rem;">
+                    <i class="fas fa-play"></i> {% if current_lang == 'en' %}Start workout{% else %}Старт тренировки{% endif %}
+                </a>
+            {% else %}
+                <a href="{% url 'register_page' %}" class="btn btn-primary reveal" style="padding: 16px 36px; font-size: 1.05rem;">
+                    <i class="fas fa-user-plus"></i> {% if current_lang == 'en' %}Create account{% else %}Создать аккаунт{% endif %}
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TeminaFit</h3>
+                    <ul class="footer-links">
+                        <li><a href="/">{% if current_lang == 'en' %}Home{% else %}Главная{% endif %}</a></li>
+                        <li><a href="#problem-solution">{% if current_lang == 'en' %}Why us{% else %}Зачем мы{% endif %}</a></li>
+                        <li><a href="#features">{% if current_lang == 'en' %}Features{% else %}Возможности{% endif %}</a></li>
+                        <li><a href="#how-it-works">{% if current_lang == 'en' %}How it works{% else %}Как это работает{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Workouts{% else %}Тренировки{% endif %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>{% if current_lang == 'en' %}Exercises{% else %}Упражнения{% endif %}</h3>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Push-ups{% else %}Отжимания{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Squats{% else %}Приседания{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Crunches{% else %}Скручивания{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Plank{% else %}Планка{% endif %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>{% if current_lang == 'en' %}Account{% else %}Аккаунт{% endif %}</h3>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Log in{% else %}Вход{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Sign up{% else %}Регистрация{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %}</a></li>
+                        <li><a href="{% url 'register_page' %}">{% if current_lang == 'en' %}Statistics{% else %}Статистика{% endif %}</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 TeminaFit. {% if current_lang == 'en' %}Fitness with AI and gamification. All processing runs on your device.{% else %}Фитнес с ИИ и геймификацией. Вся обработка происходит на вашем устройстве.{% endif %}</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            // Header scroll
+            var header = document.getElementById('header');
+            if (header) {
+                window.addEventListener('scroll', function() {
+                    header.classList.toggle('scrolled', window.scrollY > 40);
+                });
+            }
+
+            // Scroll reveal
+            var reveals = document.querySelectorAll('.reveal');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+            reveals.forEach(function(el) { observer.observe(el); });
+
+            // Mobile menu
+            var btn = document.querySelector('.mobile-menu-btn');
+            var links = document.querySelector('.nav-links');
+            if (btn && links) {
+                btn.addEventListener('click', function() {
+                    links.classList.toggle('open');
+                });
+                links.querySelectorAll('a').forEach(function(a) {
+                    a.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) links.classList.remove('open');
+                    });
+                });
+            }
+
+            // Smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+                a.addEventListener('click', function(e) {
+                    var id = this.getAttribute('href');
+                    if (id === '#') return;
+                    var el = document.querySelector(id);
+                    if (el) {
+                        e.preventDefault();
+                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

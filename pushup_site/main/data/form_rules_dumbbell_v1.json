@@ -1,0 +1,248 @@
+{
+  "rulesVersion": 4,
+  "locale": "ru",
+  "antiCheat": {
+    "minTrackedFrameRatio": 0.65,
+    "maxRepsPerMinute": 45,
+    "minRepDurationMs": 600,
+    "maxBodyCenterShiftPerFrame": 0.09
+  },
+  "exercises": [
+    {
+      "id": "dumbbell_curl_bicep",
+      "rules": [
+        {
+          "id": "curl_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 28,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Локти уходят вперёд",
+          "hint": "Прижми локти к корпусу — так безопаснее для плеч и бицепс работает лучше",
+          "healthTighten": ["shoulders"]
+        },
+        {
+          "id": "curl_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Рывок в движении",
+          "hint": "Снизь вес и выполняй повтор медленнее — рывки повышают риск травмы"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_hammer_curl",
+      "rules": [
+        {
+          "id": "hammer_elbow_forward",
+          "phase": "down",
+          "metric": "elbow_forward_px",
+          "dangerAbove": 30,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Локти уходят вперёд",
+          "hint": "Держи локти у корпуса в молотковом хвате",
+          "healthTighten": ["shoulders"]
+        },
+        {
+          "id": "hammer_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Рывок",
+          "hint": "Контролируй темп"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_press_shoulder",
+      "rules": [
+        {
+          "id": "press_back_lean",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 155,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Прогиб в пояснице",
+          "hint": "Напряги пресс, не отклоняйся назад — снизь вес гантелей",
+          "healthTighten": ["back"]
+        },
+        {
+          "id": "press_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 24,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Рывок при жиме",
+          "hint": "Выжимай плавно"
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_triceps",
+      "rules": [
+        {
+          "id": "tri_elbow_spread",
+          "phase": "down",
+          "metric": "elbow_spread_ratio",
+          "dangerAbove": 1.12,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Локти разведены",
+          "hint": "Сведи локти ближе к голове — нагрузка на трицепс, меньше на сустав",
+          "healthTighten": ["shoulders"]
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_lateral_raise",
+      "rules": [
+        {
+          "id": "lateral_too_high",
+          "phase": "down",
+          "metric": "shoulder_abduction_deg",
+          "dangerAbove": 93,
+          "warnAbove": 88,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Рука выше плеча",
+          "hint": "Остановись на уровне плеч — выше 90° повышает риск для плечевого сустава",
+          "healthTighten": ["shoulders"]
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_chest_fly",
+      "rules": [
+        {
+          "id": "fly_elbow_lock",
+          "phase": "down",
+          "metric": "elbow_lock_deg",
+          "dangerAbove": 168,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Локти выпрямлены",
+          "hint": "Держи лёгкий сгиб в локтях — не «замок» в суставе",
+          "healthTighten": ["shoulders"]
+        }
+      ]
+    },
+    {
+      "id": "dumbbell_row",
+      "rules": [
+        {
+          "id": "row_round_back",
+          "phase": "any",
+          "metric": "torso_lean_deg",
+          "dangerBelow": 145,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Округление спины",
+          "hint": "Наклони корпус из бёдер, спина прямая — иначе нагрузка на поясницу",
+          "healthTighten": ["back"]
+        }
+      ]
+    },
+    {
+      "id": "pullup_classic",
+      "rules": [
+        {
+          "id": "pullup_jerk",
+          "phase": "any",
+          "metric": "angle_velocity_deg_per_frame",
+          "dangerAbove": 16,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Резкое движение",
+          "hint": "Подтягивайся плавно — рывки и дёрганья не засчитываются",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_kip",
+          "phase": "any",
+          "metric": "body_center_shift_norm",
+          "dangerAbove": 0.08,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Раскачивание корпуса",
+          "hint": "Держи корпус стабильным, без махов и раскачки",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_incomplete_hang",
+          "phase": "top",
+          "metric": "wrist_elevation_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Нет полного виса",
+          "hint": "В нижней точке полностью разогни руки — кисти выше плеч",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_not_hanging",
+          "phase": "top",
+          "metric": "wrist_above_nose_px",
+          "dangerBelow": 10,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Это не вис на перекладине",
+          "hint": "Кисти должны быть выше головы. Махи руками вверх-вниз не считаются",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_shallow",
+          "phase": "down",
+          "metric": "elbow_flexion_deg",
+          "dangerAbove": 108,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Недостаточный подъём",
+          "hint": "Подтяни выше — локти должны согнуться сильнее",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_wrist_drift",
+          "phase": "any",
+          "metric": "wrist_drift_px",
+          "dangerAbove": 34,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Кисти смещаются",
+          "hint": "Держи хват на перекладине — подтягивай корпус, а не води руками",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_no_body_rise",
+          "phase": "down",
+          "metric": "body_rise_px",
+          "dangerBelow": 22,
+          "severity": "CRITICAL",
+          "blockRep": true,
+          "message": "Корпус не поднимается",
+          "hint": "Подтяни плечи и подбородок вверх — кисти остаются на месте",
+          "healthTighten": []
+        },
+        {
+          "id": "pullup_asymmetry",
+          "phase": "down",
+          "metric": "elbow_asymmetry_deg",
+          "warnAbove": 28,
+          "severity": "WARNING",
+          "blockRep": false,
+          "message": "Разная работа рук",
+          "hint": "Тяни симметрично обеими руками",
+          "healthTighten": ["shoulders"]
+        }
+      ]
+    }
+  ]
+}

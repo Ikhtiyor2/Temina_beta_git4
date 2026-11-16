@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Temina - Статистика</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@800;900&amp;family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#e5e1e4",
+                    "surface-tint": "#a04100",
+                    "on-primary-container": "#572000",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#ffdbcc",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#5f5e60",
+                    "on-surface-variant": "#5a4136",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-dim": "#dad9e2",
+                    "inverse-on-surface": "#f1eff9",
+                    "surface-variant": "#e3e1eb",
+                    "on-secondary-container": "#656466",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#ffb693",
+                    "surface-container-high": "#e9e7f1",
+                    "on-tertiary-container": "#003357",
+                    "tertiary": "#0062a1",
+                    "tertiary-container": "#059eff",
+                    "background": "#fbf8ff",
+                    "outline-variant": "#e2bfb0",
+                    "outline": "#8e7164",
+                    "on-tertiary-fixed": "#001d35",
+                    "inverse-surface": "#2f3037",
+                    "primary-fixed-dim": "#ffb693",
+                    "secondary-fixed": "#e5e1e4",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "surface-container-highest": "#e3e1eb",
+                    "on-tertiary-fixed-variant": "#00497b",
+                    "surface-bright": "#fbf8ff",
+                    "tertiary-fixed-dim": "#9ccaff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f4f2fc",
+                    "tertiary-fixed": "#d0e4ff",
+                    "surface-container": "#efedf6",
+                    "primary-container": "#ff6b00",
+                    "error": "#ba1a1a",
+                    "surface": "#fbf8ff",
+                    "on-background": "#1a1b22",
+                    "on-surface": "#1a1b22",
+                    "on-primary-fixed": "#351000",
+                    "primary": "#a04100",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "on-secondary-fixed-variant": "#474649",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "margin-page": "24px",
+                    "gutter-grid": "16px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "section-gap": "48px"
+            },
+            "fontFamily": {
+                    "section-title": ["manrope"],
+                    "body-secondary": ["manrope"],
+                    "headline-lg": ["lexend"],
+                    "display-metric": ["lexend"],
+                    "headline-lg-mobile": ["lexend"],
+                    "caption-pill": ["manrope"],
+                    "body-main": ["manrope"]
+            },
+            "fontSize": {
+                    "section-title": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-secondary": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["34px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "display-metric": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "800"}],
+                    "caption-pill": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-main": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #fbf8ff; font-family: 'Manrope', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .chart-gradient { background: linear-gradient(180deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0) 100%); }
+        .active-ring { stroke-dasharray: 283; stroke-dashoffset: 70; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 border-b border-secondary-container flex justify-between items-center w-full px-margin-page py-4 max-w-7xl mx-auto z-50 sticky">
+<div class="flex items-center gap-4">
+<button class="scale-98 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-black text-on-surface">Stats</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="scale-98 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-secondary">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden">
+<img alt="User Profile" data-alt="A professional studio portrait of a fit individual with a focused expression, representing a premium athletic lifestyle. The lighting is soft and directional, casting subtle shadows to emphasize muscle definition. The background is a clean, neutral grey that fits the minimal corporate aesthetic of the Temina brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTDTchwpyShnrll3ETqz4lCfyakk6eQJ5v2uHYDZzWwD9DR6WnkX4IuCAFmB_5EBd4aGKE7oONk0LOeqbdCJ5AMUM0jVXEhJXUE0j4slf6kmoUUM_xrGyrnBF8O_eZFyCkq6QjW2jPuskEjiE_g_IOYmSWzFsZ5gu2b_mUanb16EO68gU6R4M75EMdLU0ZoLBzAriE5xvSWgvVVD68YgBwdSQkFvB2YpyW_ZfQ5wZNx1ByRfvPpc2RFQXRlB_rKZlVXYUrmnQXuGz1"/>
+</div>
+</div>
+</header>
+<main class="px-margin-page pb-32 pt-8 max-w-7xl mx-auto">
+<!-- Large Metric Header -->
+<section class="mb-stack-lg text-center">
+<p class="font-caption-pill text-caption-pill text-secondary uppercase tracking-widest mb-1">Калории</p>
+<h2 class="font-display-metric text-display-metric text-on-surface">1,240 <span class="text-headline-lg text-secondary align-baseline">kcal</span></h2>
+<div class="flex justify-center items-center gap-2 mt-2 text-primary">
+<span class="material-symbols-outlined text-base">trending_up</span>
+<span class="font-body-secondary text-body-secondary">+12% vs yesterday</span>
+</div>
+</section>
+<!-- Period Switcher -->
+<nav class="flex p-1 bg-surface-container rounded-full mb-stack-lg max-w-md mx-auto">
+<button class="flex-1 py-2 rounded-full font-caption-pill text-caption-pill bg-primary-container text-white transition-all">День</button>
+<button class="flex-1 py-2 rounded-full font-caption-pill text-caption-pill text-secondary hover:text-primary transition-all">Неделя</button>
+<button class="flex-1 py-2 rounded-full font-caption-pill text-caption-pill text-secondary hover:text-primary transition-all">Месяц</button>
+<button class="flex-1 py-2 rounded-full font-caption-pill text-caption-pill text-secondary hover:text-primary transition-all">Все</button>
+</nav>
+<!-- Main Chart Section (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-grid mb-section-gap">
+<div class="md:col-span-2 bg-surface-container-lowest border border-secondary-container rounded-[24px] p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-section-title text-section-title">Burn Trend</h3>
+<span class="material-symbols-outlined text-secondary">info</span>
+</div>
+<!-- Sophisticated Area Chart Visualization -->
+<div class="relative h-64 w-full">
+<svg class="w-full h-full" viewbox="0 0 400 150">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#FF6B00" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#FF6B00" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#E8E8EC" stroke-width="1" x1="0" x2="400" y1="30" y2="30"></line>
+<line stroke="#E8E8EC" stroke-width="1" x1="0" x2="400" y1="75" y2="75"></line>
+<line stroke="#E8E8EC" stroke-width="1" x1="0" x2="400" y1="120" y2="120"></line>
+<!-- Area Path -->
+<path d="M0,150 L0,120 C40,110 60,130 100,80 C140,30 180,90 220,60 C260,30 300,50 340,20 L400,40 L400,150 Z" fill="url(#chartGradient)"></path>
+<!-- Line Path -->
+<path d="M0,120 C40,110 60,130 100,80 C140,30 180,90 220,60 C260,30 300,50 340,20 L400,40" fill="none" stroke="#FF6B00" stroke-linecap="round" stroke-width="3"></path>
+<!-- Active Point -->
+<circle cx="220" cy="60" fill="#FF6B00" r="6"></circle>
+<circle cx="220" cy="60" fill="#FF6B00" fill-opacity="0.2" r="10"></circle>
+</svg>
+<div class="flex justify-between mt-4 px-2 font-caption-pill text-caption-pill text-secondary">
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>00:00</span>
+</div>
+</div>
+</div>
+<!-- Goal Progress Ring -->
+<div class="bg-surface-container-lowest border border-secondary-container rounded-[24px] p-6 flex flex-col items-center justify-center">
+<h3 class="font-section-title text-section-title mb-6 self-start">Daily Goal</h3>
+<div class="relative w-40 h-40">
+<!-- Progress Ring -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-secondary-container" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary-container" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="132" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="font-headline-lg-mobile text-headline-lg-mobile">70%</span>
+<span class="font-caption-pill text-caption-pill text-secondary">of 2k</span>
+</div>
+</div>
+<p class="font-body-secondary text-body-secondary mt-6 text-center text-secondary">
+                    Keep going! You're only <span class="text-primary font-bold">560 kcal</span> away from your daily target.
+                </p>
+</div>
+</div>
+<!-- Activity Breakdown Cards -->
+<h3 class="font-section-title text-section-title mb-stack-md">Breakdown</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-grid">
+<!-- Exercise Card -->
+<div class="bg-surface-container-lowest border border-secondary-container rounded-[24px] p-6 flex items-center gap-4 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<div>
+<p class="font-caption-pill text-caption-pill text-secondary">Exercise</p>
+<p class="font-section-title text-section-title">480 kcal</p>
+</div>
+</div>
+<!-- Steps Card -->
+<div class="bg-surface-container-lowest border border-secondary-container rounded-[24px] p-6 flex items-center gap-4 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+<div class="w-12 h-12 rounded-full bg-[#E8E8EC] flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">footprint</span>
+</div>
+<div>
+<p class="font-caption-pill text-caption-pill text-secondary">Steps</p>
+<p class="font-section-title text-section-title">120 kcal</p>
+</div>
+</div>
+<!-- Basal Card -->
+<div class="bg-surface-container-lowest border border-secondary-container rounded-[24px] p-6 flex items-center gap-4 transition-transform hover:scale-[1.02] active:scale-[0.98]">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<div>
+<p class="font-caption-pill text-caption-pill text-secondary">Basal (BMR)</p>
+<p class="font-section-title text-section-title">640 kcal</p>
+</div>
+</div>
+</div>
+<!-- Secondary Insights (Asymmetric Layout) -->
+<div class="mt-section-gap flex flex-col md:flex-row gap-gutter-grid">
+<div class="flex-1 bg-primary text-white rounded-[24px] p-8 overflow-hidden relative group">
+<div class="relative z-10">
+<h4 class="font-headline-lg-mobile text-headline-lg-mobile mb-2">High Efficiency</h4>
+<p class="font-body-main text-body-main opacity-90 max-w-xs">Your metabolism was 15% more active during the morning HIIT session.</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[120px] opacity-10 group-hover:scale-110 transition-transform">auto_awesome</span>
+</div>
+<div class="flex-1 bg-surface-container rounded-[24px] p-8 flex flex-col justify-between">
+<div>
+<h4 class="font-section-title text-section-title mb-2">Weekly Summary</h4>
+<p class="font-body-secondary text-body-secondary text-secondary">Average daily burn: 1,850 kcal</p>
+</div>
+<div class="flex gap-2 mt-4">
+<div class="flex-1 h-2 bg-primary-container rounded-full"></div>
+<div class="flex-1 h-2 bg-primary-container rounded-full"></div>
+<div class="flex-1 h-2 bg-primary-container rounded-full"></div>
+<div class="flex-1 h-2 bg-secondary-container rounded-full"></div>
+<div class="flex-1 h-2 bg-secondary-container rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full bg-surface border-t border-secondary-container flex justify-around items-center px-4 py-3 pb-safe z-50">
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined">home</span>
+<span class="font-caption-pill text-caption-pill mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-caption-pill text-caption-pill mt-1">Workouts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-caption-pill text-caption-pill mt-1">Quests</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary relative after:content-[''] after:absolute after:-top-2 after:w-12 after:h-1 after:bg-primary after:rounded-full transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+<span class="font-caption-pill text-caption-pill mt-1">Stats</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined">person</span>
+<span class="font-caption-pill text-caption-pill mt-1">Profile</span>
+</button>
+</nav>
+</body></html>

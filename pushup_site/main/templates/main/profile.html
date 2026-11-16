@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_lang == 'en' %}Profile{% else %}Профиль{% endif %} · TeminaFit{% endblock %}
+
+{% block extra_css %}
+<style>
+  .profile-page { max-width: 1000px; margin: 0 auto; }
+  .profile-title { font-size: 1.85rem; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .profile-sub { color: var(--muted); font-size: 1rem; margin-bottom: 28px; }
+  .profile-two { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+  @media (max-width: 768px) { .profile-two { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) {
+    .profile-title { font-size: 1.4rem; }
+    .profile-avatar-ring { width: 96px; height: 96px; }
+    .profile-avatar-inner { font-size: 2rem; }
+    .profile-avatar-wrap { width: 96px; }
+    .profile-skill-item { padding: 14px; gap: 10px; }
+    .profile-skill-ico { width: 40px; height: 40px; font-size: 1.1rem; }
+    .profile-skill-box { padding: 18px 14px; }
+    .profile-skill-num { font-size: 2rem; }
+  }
+  .profile-left { }
+  .profile-avatar-wrap { position: relative; margin: 0 auto 16px; width: 120px; }
+  .profile-avatar-ring { width: 120px; height: 120px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 32px var(--glow); }
+  .profile-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--bg); border: 2px solid var(--bg); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--txt); }
+  .profile-avatar-badge { position: absolute; top: -2px; right: -2px; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .profile-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; color: var(--purple2); }
+  .profile-lvl { font-size: 0.9rem; color: var(--muted); margin-bottom: 16px; }
+  .profile-xp-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  .profile-xp-bar-wrap { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
+  .profile-xp-bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 6px; }
+  .profile-xp-bar fill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-start), var(--accent-end)); }
+  .profile-xp-next { font-size: 0.8rem; color: var(--muted2); }
+  .profile-skill-box { margin-top: 24px; padding: 24px; border-radius: 18px; background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(217,70,239,0.08)); border: 1px solid rgba(168,85,247,0.25); text-align: center; }
+  .profile-skill-num { font-size: 2.5rem; font-weight: 800; color: var(--purple2); margin-bottom: 4px; }
+  .profile-skill-hint { font-size: 0.85rem; color: var(--muted); }
+  .profile-right { }
+  .profile-skills-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; color: var(--txt); }
+  .profile-skill-item { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border); margin-bottom: 12px; transition: border-color .2s, box-shadow .2s; }
+  .profile-skill-item:hover { border-color: rgba(168,85,247,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .profile-skill-ico { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; }
+  .profile-skill-ico.str { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .profile-skill-ico.sta { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .profile-skill-ico.agi { background: rgba(168,85,247,0.15); color: var(--purple2); }
+  .profile-skill-ico.tec { background: rgba(236,72,153,0.15); color: #ec4899; }
+  .profile-skill-body { flex: 1; min-width: 0; }
+  .profile-skill-name { font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+  .profile-skill-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
+  .profile-skill-footer { display: flex; align-items: center; justify-content: space-between; }
+  .profile-skill-lvl { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+  .profile-skill-btn {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border);
+    color: var(--txt); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+    cursor: pointer; transition: background .2s, border-color .2s; font-family: inherit;
+  }
+  .profile-skill-btn:hover:not(:disabled) { background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4); color: var(--purple2); }
+  .profile-skill-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  {% if is_view_only %}
+  <p class="profile-sub" style="margin-bottom: 12px;">
+    <a href="{% url 'leaderboard' %}" style="color: var(--muted); text-decoration: none; font-weight: 600;">← {% if current_lang == 'en' %}Back to leaderboard{% else %}Назад к лидерборду{% endif %}</a>
+  </p>
+  <p class="profile-sub" style="margin-bottom: 24px; font-size: 0.9rem;">{% if current_lang == 'en' %}View only — viewing another player's profile{% else %}Только просмотр — профиль другого игрока{% endif %}</p>
+  {% else %}
+  <h1 class="profile-title">{% if current_lang == 'en' %}Character progress{% else %}Прогресс персонажа{% endif %}</h1>
+  <p class="profile-sub">{% if current_lang == 'en' %}Level up, upgrade skills and unlock achievements{% else %}Повышайте уровень, прокачивайте навыки и открывайте достижения{% endif %}</p>
+  {% endif %}
+
+  <div class="profile-two">
+    <div class="ds-card profile-left">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-ring">
+          <div class="profile-avatar-inner">{% if player.avatar_url %}<img src="{{ player.avatar_url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% elif is_view_only %}{{ profile_user.username|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</div>
+        </div>
+        <span class="profile-avatar-badge">{{ player.level|default:1 }}</span>
+      </div>
+      <div class="profile-name">{% if is_view_only %}{% if profile_user.username %}{{ profile_user.username|title }}{% else %}{% if current_lang == 'en' %}Player{% else %}Игрок{% endif %}{% endif %}{% else %}{% if user.username %}{{ user.username|title }}{% else %}{% if current_lang == 'en' %}Player{% else %}Игрок{% endif %}{% endif %}{% endif %}</div>
+      <div class="profile-lvl">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %} {{ player.level|default:1 }}</div>
+      <div class="profile-xp-label">{% if current_lang == 'en' %}XP{% else %}Опыт{% endif %}</div>
+      <div class="profile-xp-bar-wrap">
+        <span>{{ player.exp|default:0 }}/{{ player.exp_to_level|default:100 }}</span>
+      </div>
+      <div class="profile-xp-bar"><div style="width:{{ level_progress|default:0 }}%; height:100%; border-radius:999px; background: linear-gradient(90deg, var(--accent-start), var(--accent-end));"></div></div>
+      <div class="profile-xp-next">{% if current_lang == 'en' %}XP to next level:{% else %}До следующего уровня:{% endif %} {{ player.exp_to_level|default:100 }} {% if current_lang == 'en' %}XP{% else %}опыта{% endif %}</div>
+      {% if not is_view_only %}
+      <div class="profile-skill-box">
+        <div class="profile-skill-num" id="profileSkillPoints">{{ skill_points|default:0 }}</div>
+        <div class="profile-skill-hint">{% if current_lang == 'en' %}Skill points available{% else %}Доступно очков навыков{% endif %}</div>
+        <div class="profile-skill-hint" style="margin-top:4px;">{% if current_lang == 'en' %}Spend them on upgrades below{% else %}Тратьте их на прокачку ниже{% endif %}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="ds-card profile-right">
+      <h3 class="profile-skills-title">{% if current_lang == 'en' %}Skills{% else %}Навыки{% endif %}</h3>
+      <div class="profile-skill-item">
+        <div class="profile-skill-ico str"><i class="ri-heart-pulse-fill"></i></div>
+        <div class="profile-skill-body">
+          <div class="profile-skill-name">{% if current_lang == 'en' %}Strength{% else %}Сила{% endif %}</div>
+          <div class="profile-skill-desc">{% if current_lang == 'en' %}+5% XP per level for push-ups and pull-ups{% else %}+5% опыта за уровень за отжимания и подтягивания{% endif %}</div>
+          <div class="profile-skill-footer">
+            <span class="profile-skill-lvl">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %} <span id="skill-strength">{{ player.strength|default:1 }}</span></span>
+            {% if not is_view_only %}<button type="button" class="profile-skill-btn" title="{% if current_lang == 'en' %}Upgrade{% else %}Прокачать{% endif %}" data-skill="strength" aria-label="{% if current_lang == 'en' %}Upgrade strength{% else %}Прокачать силу{% endif %}"><i class="ri-add-line"></i></button>{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="profile-skill-item">
+        <div class="profile-skill-ico sta"><i class="ri-run-fill"></i></div>
+        <div class="profile-skill-body">
+          <div class="profile-skill-name">{% if current_lang == 'en' %}Stamina{% else %}Выносливость{% endif %}</div>
+          <div class="profile-skill-desc">{% if current_lang == 'en' %}+3% calories per level in any workout{% else %}+3% калорий за уровень при любой тренировке{% endif %}</div>
+          <div class="profile-skill-footer">
+            <span class="profile-skill-lvl">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %} <span id="skill-stamina">{{ player.stamina|default:1 }}</span></span>
+            {% if not is_view_only %}<button type="button" class="profile-skill-btn" title="{% if current_lang == 'en' %}Upgrade{% else %}Прокачать{% endif %}" data-skill="stamina" aria-label="{% if current_lang == 'en' %}Upgrade stamina{% else %}Прокачать выносливость{% endif %}"><i class="ri-add-line"></i></button>{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="profile-skill-item">
+        <div class="profile-skill-ico agi"><i class="ri-flashlight-fill"></i></div>
+        <div class="profile-skill-body">
+          <div class="profile-skill-name">{% if current_lang == 'en' %}Agility{% else %}Ловкость{% endif %}</div>
+          <div class="profile-skill-desc">{% if current_lang == 'en' %}+3% XP per level in any workout{% else %}+3% опыта за уровень за любую тренировку{% endif %}</div>
+          <div class="profile-skill-footer">
+            <span class="profile-skill-lvl">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %} <span id="skill-agility">{{ player.agility|default:1 }}</span></span>
+            {% if not is_view_only %}<button type="button" class="profile-skill-btn" title="{% if current_lang == 'en' %}Upgrade{% else %}Прокачать{% endif %}" data-skill="agility" aria-label="{% if current_lang == 'en' %}Upgrade agility{% else %}Прокачать ловкость{% endif %}"><i class="ri-add-line"></i></button>{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="profile-skill-item">
+        <div class="profile-skill-ico tec"><i class="ri-focus-3-fill"></i></div>
+        <div class="profile-skill-body">
+          <div class="profile-skill-name">{% if current_lang == 'en' %}Technique{% else %}Техника{% endif %}</div>
+          <div class="profile-skill-desc">{% if current_lang == 'en' %}+5% XP per level in any workout{% else %}+5% опыта за уровень за любую тренировку{% endif %}</div>
+          <div class="profile-skill-footer">
+            <span class="profile-skill-lvl">{% if current_lang == 'en' %}Level{% else %}Уровень{% endif %} <span id="skill-technique">{{ player.technique|default:1 }}</span></span>
+            {% if not is_view_only %}<button type="button" class="profile-skill-btn" title="{% if current_lang == 'en' %}Upgrade{% else %}Прокачать{% endif %}" data-skill="technique" aria-label="{% if current_lang == 'en' %}Upgrade technique{% else %}Прокачать технику{% endif %}"><i class="ri-add-line"></i></button>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if not is_view_only %}
+  <p style="margin-top: 24px; display: grid; gap: 12px;">
+    <a href="{% url 'stats' %}" class="profile-skill-item" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--txt);">
+      <i class="ri-bar-chart-2-line" style="font-size: 1.2rem; color: var(--purple2);"></i>
+      {% if current_lang == 'en' %}Stats — week and month{% else %}Статистика — неделя и месяц{% endif %}
+    </a>
+    <a href="{% url 'fitness_profile' %}" class="profile-skill-item" style="display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--txt);">
+      <i class="ri-robot-2-line" style="font-size: 1.2rem; color: var(--purple2);"></i>
+      {% if current_lang == 'en' %}AI Coach Profile — set goals, health & get a personalized plan{% else %}Профиль для ИИ — цели, здоровье и персональный план{% endif %}
+    </a>
+  </p>
+  {% endif %}
+</div>
+
+<div style="display:none">{% csrf_token %}</div>
+
+<script>
+(function() {
+  var P_LANG = '{{ current_lang|default:"ru" }}';
+  function getCookie(name) {
+    var v = document.cookie.match('(?:^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
+  }
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+  const API_UPGRADE = '/api/player/upgrade-skill/';
+  const pointsEl = document.getElementById('profileSkillPoints');
+
+  function updateButtons() {
+    const points = parseInt(pointsEl?.textContent || '0', 10);
+    document.querySelectorAll('.profile-skill-btn[data-skill]').forEach(function(btn) {
+      btn.disabled = points <= 0;
+    });
+  }
+
+  document.querySelectorAll('.profile-skill-btn[data-skill]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const skill = this.getAttribute('data-skill');
+      if (!skill || this.disabled) return;
+      this.disabled = true;
+      fetch(API_UPGRADE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrf,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ skill: skill })
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            var levelEl = document.getElementById('skill-' + skill);
+            if (levelEl) levelEl.textContent = data.new_value;
+            if (pointsEl) pointsEl.textContent = data.skill_points;
+            updateButtons();
+            if (window.showNotification) window.showNotification(P_LANG === 'en' ? 'Skill upgraded!' : 'Навык прокачан!', 'success');
+          } else {
+            if (window.showNotification) window.showNotification(data.error === 'not_enough_skill_points' ? (P_LANG === 'en' ? 'Not enough skill points' : 'Недостаточно очков навыков') : (P_LANG === 'en' ? 'Error' : 'Ошибка'), 'error');
+            updateButtons();
+          }
+        })
+        .catch(function() {
+          if (window.showNotification) window.showNotification(P_LANG === 'en' ? 'Network error' : 'Ошибка сети', 'error');
+          updateButtons();
+        });
+    });
+  });
+
+  updateButtons();
+})();
+</script>
+{% endblock %}
